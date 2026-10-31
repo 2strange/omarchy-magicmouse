@@ -97,7 +97,8 @@ BarWidget {
   readonly property int percent: daemonHas ? Number(status.percent) : (device ? Math.round(device.percentage * 100) : -1)
   readonly property bool charging: daemonHas ? status.charging === true : (device !== null && device.state === UPowerDeviceState.Charging)
   readonly property bool low: known && percent <= lowAt
-  readonly property string modelName: daemonHas && status.model ? String(status.model) : (device && device.model ? device.model : "Mouse")
+  // the daemon knows the mouse's own name even when the charge comes from UPower
+  readonly property string modelName: status && status.connected && status.model ? String(status.model) : (device && device.model ? device.model : "Mouse")
 
   readonly property string stateText: {
     if (!known) return ""
