@@ -36,8 +36,11 @@ understands well:
 - **Clicks.** Left and right are decided by the mouse's own firmware, as on macOS; the
   kernel's centre "middle click" zone (paste on Linux) is a left click. Control + click as
   a right click is a switch.
-- **Workspaces at the ends.** Stop, open a new one, or wrap around, and empty workspaces
-  count, so you can always reach a workspace to start something on.
+- **Workspaces at the ends.** In touchpad mode Hyprland's swipe decides (with the
+  [Trackpad plugin](https://github.com/2strange/omarchy-trackpad): stop or open a new one,
+  empty workspaces count). Without touchpad mode the daemon switches by itself: stop, open a
+  new one, or wrap around, and empty workspaces count, so you can always reach a workspace
+  to start something on.
 - **Without touchpad mode** the daemon scrolls by itself: start threshold, natural or wheel
   direction, diagonal scrolling, momentum, one-finger page flick and a two-finger
   workspace switch. Useful on a compositor without trackpad gestures.
@@ -100,7 +103,8 @@ journalctl --user -u magic-mouse -f        # what is it doing?
 **Coming from `maikunari/omarchy-magic-mouse`?** Same daemon name, service and
 `~/.config/magic-mouse/config.toml`, so your settings carry over. Install as above;
 `install.sh` disables the old bar widget, then `omarchy plugin remove
-io.github.maikunari.magic-mouse` removes it.
+io.github.maikunari.magic-mouse` removes it. Touchpad mode is on by default; switch it off
+on the Scroll tab to keep the daemon's own scrolling.
 
 ## Settings
 
@@ -146,8 +150,8 @@ comments, `magic-mouse-config get` prints the effective settings.
   built-in trackpad. Scroll speed and natural scrolling are set for the mouse alone.
 - The mouse is smaller than a trackpad: a full-hand swipe as on a Magic Trackpad does not
   fit, hence the swipe boost.
-- Two fingers that really slide while the hand holds the mouse can nudge the workspace a
-  little (it springs back). Widen the edge zones if that happens to you.
+- Two fingers that really slide while the hand holds the mouse can move the workspace, and
+  now and then switch it. Widen the edge zones if that happens to you.
 - "Empty workspaces count" means 1-5 plus every one up to the highest open one, as in the
   bar. With several monitors that is counted per monitor.
 - The first-generation mouse does not answer the daemon's direct battery query; the bar
