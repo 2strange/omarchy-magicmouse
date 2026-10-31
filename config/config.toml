@@ -1,4 +1,4 @@
-# omarchy-magic-mouse — ~/.config/magic-mouse/config.toml
+# MagicMouse — ~/.config/magic-mouse/config.toml
 # Saved changes apply live (no restart). Delete a line to get its default back.
 
 [pointer]
@@ -26,6 +26,12 @@ edge_right_mm = 3.0
 edge_front_mm = 0.0
 edge_release_mm = 2.0  # ...until it slides this far on the surface (plus 3x what the hand moved the mouse)
 edge_back_mm = 18.0  # touches that start this close to the back are the palm: always ignored (0 = off)
+# Touch check: a finger counts only after a real touch, not while it hovers above the surface.
+# Sizes are the mouse's own contact size (0..1020); the touch preview shows them live, with sliders.
+touch_start_size = 300   # a single finger needs this size... (0 = no check)
+touch_rate = 42          # ...in 3 reports in a row at this many reports per second or faster (hover reports less often)
+touch_hold_size = 250    # once counted, it keeps counting down to this size
+touch_pair_size = 250    # two fingers at this size count at once (one often comes in from the side)
 
 [buttons]
 middle = "left"      # click in the centre zone: "left" (macOS has no middle click), "middle" (paste on Linux), "right"
@@ -37,11 +43,21 @@ swipe_pages = true   # quick one-finger sideways flick = back / forward in brows
 swipe_mm = 8.0       # finger travel that counts as a swipe
 invert_swipe = false # swap the two-finger swipe directions
 swipe_end = "wrap"   # at the last/first workspace: "wrap" around, open a "new" one, or "stop"
+include_empty = true # empty workspaces count (1-5 always, like the bar). false = only open ones
 # Hyprland's socket takes Lua here (same call as Omarchy's Super+Tab). Older Hyprland: "dispatch workspace e+1"
 two_finger_swipe_left = 'dispatch hl.dsp.focus({ workspace = "e+1" })'    # like macOS "swipe between full-screen apps"
 two_finger_swipe_right = 'dispatch hl.dsp.focus({ workspace = "e-1" })'
 two_finger_double_tap = ""   # Mission Control on macOS. Any "dispatch ..." (Hyprland) or shell command
 double_tap = ""              # smart zoom on macOS. Same rules
+
+[touchpad]
+# Touchpad mode: the mouse acts as a trackpad with one finger more. One finger scrolls like on a
+# trackpad (apps scroll and glide themselves), two fingers sideways drive Hyprland's live workspace
+# swipe (needs a 3-finger workspace gesture in Hyprland). [scroll] speed, start_mm, free_axis,
+# [momentum] and the two-finger swipe above rest while it is on; the touch check and edges still apply.
+enabled = true
+scroll_speed = 0.85  # scroll speed of the virtual touchpad (Hyprland scroll_factor, this device only)
+swipe_gain = 2.7     # during a two-finger swipe, finger travel counts this many times (the mouse is small)
 
 [bar]
 show_percent = true  # show the number next to the mouse icon in the bar

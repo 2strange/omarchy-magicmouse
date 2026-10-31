@@ -1,158 +1,169 @@
-# omarchy-magic-mouse
+# MagicMouse for Omarchy
 
 Make an Apple Magic Mouse feel like it does on a Mac, on [Omarchy](https://omarchy.org)
-(Hyprland / Wayland). Pointer acceleration that slows down for small targets,
-scrolling that only happens when you mean it, natural direction, and momentum.
+(Hyprland, Wayland). Scrolling that glides like on a trackpad, a workspace that follows
+your two fingers and lets you change your mind halfway, no scrolling while your finger only
+hovers, and a pointer that slows down for small targets the way macOS does.
 
-## Why the stock experience is bad
+![The touch preview: every contact on the mouse, its size and what the daemon decides](preview-touch.png)
 
-The kernel `hid_magicmouse` driver exposes the mouse as a plain pointer plus
-an "emulated scroll wheel" derived from the touch surface. Three things follow:
+It will never be a Mac. But it should come close, and every setting is there to get you
+closer on your own mouse and your own hand.
 
-- **The page scrolls while you aim.** Any finger drift on the glass becomes
-  wheel events. There is no start threshold, so as you slow down to click, the
-  page moves under you.
-- **The cursor jumps past small targets.** Bluetooth delivers some reports in
-  bursts. libinput turns a burst into a huge instantaneous velocity, and every
-  acceleration profile then multiplies that frame.
-- **Scroll direction and momentum are wrong or missing.**
+## What it does
 
-## What this does
+A small daemon grabs the mouse and turns its touch surface into something Linux
+understands well:
 
-A small daemon grabs the real mouse and re-emits a virtual one called
-`magic-mouse-omarchy`:
+- **Touchpad mode (default).** The mouse also acts as a trackpad, with one finger more:
+  one finger on the mouse is two on the virtual trackpad, so apps scroll pixel by pixel and
+  glide on by themselves, exactly as they do for a real trackpad. Two fingers sideways are
+  three on the trackpad: Hyprland's live workspace swipe, which follows your fingers and
+  goes back if you change your mind. The mouse is small, so a swipe counts your finger
+  travel several times (**Swipe boost**, 2.7×).
+- **Touch check.** The surface already reports a finger 1-2 mm above it. A finger only
+  counts once it really touches: big enough, and reporting at the rate of a real touch
+  (a hovering finger reports less often). Once it counts, it keeps counting while it gets
+  lighter as it slides. Two fingers together need less, since one of them usually comes
+  in from the side.
+- **Fingers that only hold the mouse don't count.** Touches that land on the side edges
+  hold the mouse until they really slide; the back of the surface is where your palm
+  rests and is ignored. Each zone is adjustable per side.
+- **Pointer.** Apple's own acceleration curve (from the open-source IOHIDFamily driver),
+  driven by the same "Tracking speed" number as the macOS slider, with smoothing so
+  Bluetooth bursts can't make the cursor jump. A click briefly freezes the pointer so the
+  click itself can't nudge it.
+- **Clicks.** Left and right are decided by the mouse's own firmware, as on macOS; the
+  kernel's centre "middle click" zone (paste on Linux) is a left click. Control + click as
+  a right click is a switch.
+- **Workspaces at the ends.** Stop, open a new one, or wrap around, and empty workspaces
+  count, so you can always reach a workspace to start something on.
+- **Without touchpad mode** the daemon scrolls by itself: start threshold, natural or wheel
+  direction, diagonal scrolling, momentum, one-finger page flick and a two-finger
+  workspace switch. Useful on a compositor without trackpad gestures.
+- **In the bar:** the mouse's charge and name; click for the settings, right-click for
+  Bluetooth.
 
-- **Pointer:** Apple's own acceleration curve, taken from the open-source
-  IOHIDFamily driver, driven by the same "tracking speed" number as the macOS
-  slider. Velocity is smoothed so Bluetooth bursts can't spike it. Click
-  tolerance freezes the cursor for a moment after a press so the click itself
-  can't nudge it.
-- **Scroll:** synthesized from the touch surface, ignoring the kernel wheel.
-  A finger must travel about a millimetre, and be clearly moving, before a
-  scroll starts. Fingers that only hold the mouse don't count: a touch that
-  lands on the side edge is a grip, and among several fingers the one that
-  slides scrolls (two sliding together scroll too). While the mouse itself
-  moves, a scroll only starts if the finger slides several times farther than
-  the mouse travels, so a resting finger drifting as you aim never scrolls,
-  and a scroll stops once you start mousing. No scroll starts right around a
-  click. One axis at a time, natural direction, and the scroll rate ramps with
-  finger speed.
-- **Momentum:** flick and lift, the page glides and eases out.
-- **Clicks:** the kernel driver's centre "middle-click" zone (which pastes on
-  Linux) is a left click, like on a Mac. Configurable. Control-click as a
-  right click is a switch in the settings popup (`buttons.control_click`):
-  the daemon never reads the keyboard, so it adds a Hyprland binding for
-  Control + click on its virtual mouse only and answers it with a right click.
-  While it is on, apps no longer see Control + click from the Magic Mouse.
-- **Gestures:** one-finger sideways flick = back / forward (browser buttons).
-  Two-finger sideways swipe = previous / next workspace. One- and two-finger
-  double taps are hooks you can point at any Hyprland dispatcher or command.
+## The touch preview
 
-- **Battery and settings in the bar:** a small Omarchy shell widget shows the
-  mouse's charge and highlights when low. Click it for a settings popup with
-  tracking speed, natural scrolling, scroll speed, momentum and gesture
-  switches; every control applies live. Right-click opens the Bluetooth panel.
-  The daemon asks the mouse for its charge directly (the mouse only volunteers
-  it to the kernel on its own schedule, so UPower alone shows 0% for a long
-  time after connecting).
-- **Clicks decided by the mouse:** the kernel driver's three fixed touch zones
-  (left / middle / right) are turned off, so the mouse's own firmware decides
-  left vs right, exactly as on macOS.
+Open **Touch preview** in the menu (Touch tab). It shows what the mouse reports, live:
+every contact with its size and report rate, which ones are followed, resting, not
+touching yet, on an edge or the palm, the edge zones, and the reason for every decision
+("not touching yet (size 210)", "touchpad: 2 fingers -> 3 (swipe)", …).
 
-Hyprland only needs a flat profile for the virtual device; the installer adds it.
+Its sliders set the touch check (start size, hold size, two-finger size, report rate)
+while you watch your own fingers, so you can tune the mouse to your hand in a minute.
+Sizes are the mouse's own scale (0 to about 1000). It runs from a terminal too:
 
-## macOS feature checklist
+```sh
+qs -p ~/.config/omarchy/plugins/io.github.2strange.magicmouse/preview
+```
 
-| macOS | Here |
-|---|---|
-| Pointer acceleration | Apple's curve, same numbers |
-| Natural scrolling | yes |
-| Scroll starts only when you mean it | start threshold, resting and gripping fingers ignored, finger-vs-mouse motion |
-| Momentum scrolling | yes (`momentum.decay` 0.984 matches Apple's rate) |
-| Secondary click on the right side | done by the mouse itself |
-| Secondary click off | `buttons.right_click = false` (switch in the popup) |
-| Control-click = secondary click | `buttons.control_click = true` (switch in the popup) |
-| No middle click | `buttons.middle = "left"` |
-| Swipe between pages (one finger) | back / forward buttons |
-| Swipe between full-screen apps (two fingers) | workspace switch (`hl.dsp.focus({ workspace = "e+1" })`) |
-| Mission Control (two-finger double tap) | hook, off by default |
-| Smart zoom (one-finger double tap) | hook, off by default |
-| Battery level | bar widget (`io.github.maikunari.magic-mouse`) |
-| Force click, Handoff | not applicable |
+The stream is a private Unix socket (`$XDG_RUNTIME_DIR/magic-mouse/probe.sock`, owner
+only). Nothing is sent while no preview is connected; `--no-probe` turns it off.
+
+## Requirements
+
+- Omarchy 4 with Hyprland 0.56 or newer (Lua config).
+- `python-evdev` (the installer adds it) and the in-kernel `hid_magicmouse` driver.
+- **For the workspace swipe in touchpad mode,** Hyprland needs a three-finger workspace
+  gesture. Omarchy ships it commented out in `~/.config/hypr/input.lua`; remove the `--`
+  in front of
+
+  ```lua
+  hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
+  ```
+
+  or use the [Trackpad plugin](https://github.com/2strange/omarchy-trackpad), which adds it
+  and also sets what happens at the last workspace and whether empty ones count. Both your
+  trackpad and the mouse use that one gesture.
 
 ## Install
 
-This repo is an Omarchy plugin (the bar widget and settings popup) that ships
-its own helper daemon. Two steps:
-
 ```sh
-# 1. the plugin: clones into ~/.config/omarchy/plugins/ and enables the bar widget
-omarchy plugin add https://github.com/maikunari/omarchy-magic-mouse --enable
+# 1. the plugin: the bar widget and its menu
+omarchy plugin add https://github.com/2strange/omarchy-magicmouse --enable
 
-# 2. the daemon, udev rule, driver option and Hyprland snippet (asks for your password once)
-~/.config/omarchy/plugins/io.github.maikunari.magic-mouse/install.sh
+# 2. the daemon, its user service, a udev rule and a driver option (asks for your password once)
+~/.config/omarchy/plugins/io.github.2strange.magicmouse/install.sh
 ```
 
-Later updates: `omarchy plugin update io.github.maikunari.magic-mouse`, then
-re-run `install.sh` to refresh the daemon.
-
-Prefer a plain checkout? `git clone` anywhere and run `./install.sh`; it copies
-the widget into the plugins directory for you.
-
-Pair the mouse with Bluetooth as usual. The daemon waits for it and grabs it
-whenever it connects.
-
-Check it is running:
+Pair the mouse over Bluetooth as usual; the daemon waits for it and takes it over whenever
+it connects. Updates: `omarchy plugin update io.github.2strange.magicmouse`, then re-run
+`install.sh` to refresh the daemon.
 
 ```sh
-systemctl --user status magic-mouse
-journalctl --user -u magic-mouse -f
-hyprctl devices | grep magic-mouse-omarchy
+systemctl --user status magic-mouse        # is it running?
+journalctl --user -u magic-mouse -f        # what is it doing?
 ```
 
-## Tune it
+**Coming from `maikunari/omarchy-magic-mouse`?** Same daemon name, service and
+`~/.config/magic-mouse/config.toml`, so your settings carry over. Install as above;
+`install.sh` disables the old bar widget, then `omarchy plugin remove
+io.github.maikunari.magic-mouse` removes it.
 
-Click the mouse icon in the bar for the common settings. Everything else is in
-`~/.config/magic-mouse/config.toml`; changes apply live, no restart. From a
-shell, `magic-mouse-config set pointer.tracking_speed=1.0` edits the file
-without disturbing your comments, and `magic-mouse-config get` prints the
-effective config as JSON.
+## Settings
+
+Click the mouse in the bar. Every switch applies at once, sliders when you let go;
+**Undo changes** returns to how things were when the menu opened, **Defaults** resets
+the open tab.
+
+| Tab | Settings |
+|---|---|
+| Pointer | tracking speed, right-side click, Control-click, battery percentage in the bar |
+| Scroll | touchpad mode, natural scrolling, scroll speed; without touchpad mode also start distance, diagonal scrolling, momentum |
+| Gestures | swipe boost; without touchpad mode page flick, two-finger workspace switch, swipe distance, end of row, empty workspaces, direction |
+| Touch | touch preview, edge zones left / right / front, palm zone at the back |
+
+Everything lives in `~/.config/magic-mouse/config.toml` (commented, changes apply live).
+`magic-mouse-config set touchpad.swipe_gain=3` edits it from a shell without touching your
+comments, `magic-mouse-config get` prints the effective settings.
 
 | Feels like… | Change |
 |---|---|
-| pointer too slow / too fast | `pointer.tracking_speed`, same scale as the macOS slider (0 to 3, Apple default 0.6875) |
-| the curve is right but everything is a touch off | `pointer.speed` 0.9 / 1.1 |
-| scroll starts when I only meant to click | raise `scroll.start_mm` (1.2) or `scroll.settle_ms` (250) |
-| have to move the finger too far before it scrolls | lower `scroll.start_mm` (0.5) |
-| scrolling backwards | flip `scroll.natural` |
-| forward/back inverted only on my model | flip `scroll.invert_y` |
-| glide too long / too short | `momentum.decay` 0.95 / 0.985 |
-| no glide | `momentum.enabled = false` |
+| scrolls while the finger only hovers | raise the start size or the report rate in the preview |
+| a light touch does not scroll | lower the start size; a scroll that stops while sliding: lower the hold size |
+| two-finger swipe hard to start | lower the two-finger size, raise Swipe boost |
+| touchpad scrolling too fast / slow | Scroll speed on the Scroll tab (`touchpad.scroll_speed`) |
+| pointer too slow / fast | Tracking speed, same scale as macOS (0 to 3, Apple default 0.6875) |
+| a finger holding the mouse scrolls | widen the edge zone on that side |
+| the palm scrolls | raise the back zone |
 
-## Touch preview
+## Tested on
 
-The daemon publishes a live stream of the touch surface on a private Unix socket
-(`$XDG_RUNTIME_DIR/magic-mouse/probe.sock`, owner-only). Open **Touch preview** in
-the bar menu (or run `qs -p ~/.config/omarchy/plugins/io.github.maikunari.magic-mouse/preview`)
-to see every contact with its size and role (followed, resting, grip) and the
-reason the daemon scrolls or does not ("below start distance", "click pause",
-"sideways with two fingers (gesture)", …). Nothing is sent while no window is
-connected. `--no-probe` turns the socket off.
+- **Magic Mouse 1** (`05ac:030d`, AA batteries) on a MacBook Pro 11,3, Omarchy 4.0.6,
+  Hyprland 0.56.2.
+- Magic Mouse 2 (`004c:0269`) and Magic Mouse USB-C (`004c:0323`) are recognised by ID but
+  not tested yet. Their contact sizes may differ; the preview shows them, and the sliders
+  set the touch check to match. Reports welcome.
+
+## Limits
+
+- No pinch, no smart zoom, no Mission Control: the hooks for one- and two-finger double
+  tap can run any command, they are off by default.
+- In touchpad mode the trackpad settings that Hyprland applies to every touchpad (for
+  example the three-finger gesture, end of row, swipe direction) are shared with your
+  built-in trackpad. Scroll speed and natural scrolling are set for the mouse alone.
+- The mouse is smaller than a trackpad: a full-hand swipe as on a Magic Trackpad does not
+  fit, hence the swipe boost.
+- Two fingers that really slide while the hand holds the mouse can nudge the workspace a
+  little (it springs back). Widen the edge zones if that happens to you.
+- "Empty workspaces count" means 1-5 plus every one up to the highest open one, as in the
+  bar. With several monitors that is counted per monitor.
+- The first-generation mouse does not answer the daemon's direct battery query; the bar
+  then shows UPower's reading, which works.
 
 ## Remove
 
 ```sh
-~/.config/omarchy/plugins/io.github.maikunari.magic-mouse/uninstall.sh   # daemon, unit, udev rule, driver option
-omarchy plugin remove io.github.maikunari.magic-mouse                     # the widget
+~/.config/omarchy/plugins/io.github.2strange.magicmouse/uninstall.sh   # daemon, service, udev rule, driver option
+omarchy plugin remove io.github.2strange.magicmouse                     # the bar widget
 ```
 
-`uninstall.sh` leaves `~/.config/magic-mouse/config.toml` and the small
-`magic-mouse-omarchy` device block in your Hyprland input config; delete those
-by hand if you want a clean slate.
+`~/.config/magic-mouse/config.toml` and the small `magic-mouse-omarchy` device block in
+your Hyprland input config stay; delete them by hand for a clean slate.
 
 ## What the installer touches
-
-Everything is listed so you can decide before running it:
 
 | Path | What |
 |---|---|
@@ -160,69 +171,47 @@ Everything is listed so you can decide before running it:
 | `~/.config/systemd/user/magic-mouse.service` | user service, enabled and started |
 | `~/.config/magic-mouse/config.toml` | your settings (only created if missing) |
 | `~/.config/hypr/input.lua` (or `input.conf`) | a 7-line device block, **appended only after asking**, with a backup |
-| `/etc/udev/rules.d/70-magic-mouse.rules` | via the root helper: a `uaccess` rule for the mouse's input and raw HID nodes and for `/dev/uinput`, matched by device ID |
-| `/etc/modprobe.d/hid_magicmouse.conf` | via the root helper: `emulate_3button=0` |
-| `/etc/modules-load.d/magic-mouse.conf` | via the root helper: loads `uinput` at boot so the rule above can apply |
+| `/etc/udev/rules.d/70-magic-mouse.rules` | a `uaccess` rule for the mouse's input and raw HID nodes and for `/dev/uinput`, matched by device ID |
+| `/etc/modprobe.d/hid_magicmouse.conf` | `emulate_3button=0` |
+| `/etc/modules-load.d/magic-mouse.conf` | loads `uinput` at boot so the rule above can apply |
 
-No file from the checkout runs as root. The only privileged step is a short
-Python helper embedded in `install.sh` and handed to the distro's `python3` on
-the command line, so it is already in memory when `sudo` runs and nothing on
-disk can be swapped in afterwards. It carries the exact bytes of all three `/etc`
-files, walks to each directory one component at a time without following
-symlinks, requires root-owned directories that only root can write to, writes
-to an exclusive temporary file there, verifies it through the same descriptor,
-renames it into place atomically and verifies again; it refuses if anything
-in the way is a symlink or not a regular file. It then reloads udev and
-prints the files' SHA-256 digests, which `install.sh` re-checks as your user.
-Access to the mouse comes from that device-specific `uaccess` rule alone: the
-installer never changes your group membership, and stops if your user still
-cannot open the device nodes afterwards.
+No file from the checkout runs as root. The only privileged step is a short Python helper
+embedded in `install.sh` and handed to the distro's `python3` on the command line, so it
+is in memory before `sudo` runs. It carries the exact bytes of the three `/etc` files,
+walks to each directory without following symlinks, writes to an exclusive temporary file,
+verifies it, renames it into place atomically and prints SHA-256 digests that `install.sh`
+re-checks as your user. No group changes, no sudoers entries, nothing downloaded at
+install time. The daemon runs as your user and talks only to the mouse, `/dev/uinput`
+and Hyprland's socket.
 
-No sudoers changes, no NOPASSWD, nothing downloaded at install time. The
-daemon runs as your user, talks only to the local mouse and the Hyprland
-socket, and writes its status under `$XDG_RUNTIME_DIR/magic-mouse/` (an owner-only directory).
+More detail on the file handling: `config.toml` and the status file are read and written
+descriptor-first (no symlink following, no blocking on a FIFO, owner/type/size checks,
+`O_EXCL` temp file and rename); the bar widget reads the battery status through a
+short-lived child (`status-reader.py`) under `timeout`, never inside the shell.
 
-## Dependencies
+## Development
 
-- `python-evdev` (Arch package; the installer adds it with `omarchy pkg add`)
-- the in-kernel `hid_magicmouse` driver (ships with Arch) and `upower` (ships with Omarchy)
-- Omarchy shell for the bar widget; the daemon works on any Hyprland
+```sh
+python3 -m unittest discover -s tests -v
+```
 
-## Notes
+The tests drive the daemon's engine with synthetic touch frames (touch tracking, touch
+check, touchpad mode, workspace ends).
 
-- Works with Magic Mouse 1 (`05ac:030d`), Magic Mouse 2 (`004c:0269`) and Magic Mouse USB‑C (`004c:0323`),
-  matched by ID, so it does not matter what you named the mouse on macOS.
-- Requires `python-evdev` (installed by `install.sh`) and the in-kernel
-  `hid_magicmouse` driver, which Arch ships.
-- The installer writes `/etc/modprobe.d/hid_magicmouse.conf` with
-  `emulate_3button=0`. The old `scroll_acceleration` / `scroll_speed` options
-  only affect the kernel's emulated wheel, which this daemon ignores.
-- `config.toml` and the battery status file are only ever read and written
-  descriptor-first: no symlink following, no blocking on a planted FIFO,
-  owner/type/size checks before reading, and writes go to a random
-  same-directory `O_EXCL` temp file (mode 0600) that is fsynced and renamed
-  into place.
-- The status directory `$XDG_RUNTIME_DIR/magic-mouse/` is created owner-only
-  (0700). If it already exists the daemon uses it only when it is a real
-  directory owned by you that group and others cannot write to; otherwise it
-  logs `status: not publishing battery status ...` to the journal
-  (`journalctl --user -u magic-mouse`), changes nothing there, and keeps
-  handling the mouse. The bar widget then falls back to UPower's reading.
-- The bar widget never opens `battery.json` inside the shell. On start, every
-  60 seconds, and whenever the status directory changes (a watch on the
-  directory only, which never opens the file) it runs `status-reader.py`
-  (shipped with the plugin) as a child process under `timeout`; the child
-  applies the same directory checks, opens the file with `O_NOFOLLOW |
-  O_NONBLOCK`, requires a regular file owned by you, not
-  group/other-writable and at most 4 KiB (the read itself is capped too), and
-  prints the validated JSON, or nothing. A FIFO, symlink, oversized or
-  unreadable file therefore costs one short-lived child, never the shell.
-- Checks for both: `python3 -m unittest discover -s tests -v`.
-- Bar widget settings (on its entry in `~/.config/omarchy/shell.json`):
-  `"match": "MMM"` to pin it to one device by model name, `"lowAt": 20` for the
-  low-battery highlight threshold.
+## Credits
 
----
+MagicMouse grew out of [omarchy-magic-mouse](https://github.com/maikunari/omarchy-magic-mouse)
+by Mike Sewell, which brought Apple's pointer curve, the click handling, the battery query
+and the careful installer. Thank you. This plugin reworked touch tracking, scrolling and
+gestures around the question "does it feel like the Mac?" and added touchpad mode, the
+touch check, edge and palm zones, the touch preview and the tabbed menu. It is a separate
+plugin with its own ID, so both can be found and installed on their own.
 
-Magic Mouse, Mac and macOS are trademarks of Apple Inc. This project is
-independent and is not affiliated with or endorsed by Apple.
+Built by the Omarchy Bob team for [2strange](https://github.com/2strange).
+
+## License
+
+MIT, see [LICENSE](LICENSE).
+
+Magic Mouse, Mac and macOS are trademarks of Apple Inc. This project is independent and is
+not affiliated with or endorsed by Apple.

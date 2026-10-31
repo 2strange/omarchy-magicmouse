@@ -34,6 +34,7 @@ ShellRoot {
   // ---------- live tuning: reads and writes ~/.config/magic-mouse/config.toml via magic-mouse-config;
   // the daemon reloads the file on change, so a slider takes effect as soon as it is let go
   property var cfg: ({})
+  readonly property bool tp: cfgVal("touchpad", "enabled", false) === true  // touchpad mode
   function cfgVal(section, key, fallback) {
     var sec = cfg[section]
     return sec && sec[key] !== undefined ? sec[key] : fallback
@@ -54,6 +55,10 @@ ShellRoot {
     command: ["magic-mouse-config", "get"]
     running: true
     stdout: StdioCollector { onStreamFinished: { try { shell.cfg = JSON.parse(text) } catch (err) {} } }
+  }
+  Timer {  // pick up changes made in the bar menu (touchpad mode, sizes) while the preview is open
+    interval: 3000; repeat: true; running: true
+    onTriggered: if (!writer.running && !reader.running) reader.running = true
   }
   Process {
     id: writer
@@ -223,10 +228,10 @@ ShellRoot {
 
         Rectangle {
           width: parent.width; height: 64; radius: 8
-          color: shell.scrolling ? "#3a3020" : shell.surface
+          color: shell.scrolling || (shell.tp && shell.why.indexOf("touchpad:") === 0) ? "#3a3020" : shell.surface
           Column {
             anchors.fill: parent; anchors.margins: 10; spacing: 4
-            Text { text: shell.scrolling ? "SCROLLING (" + shell.axis + ")" : shell.coasting ? "GLIDING" : "NOT SCROLLING"; color: shell.scrolling ? shell.roleColor.follow : shell.fg; font.family: shell.mono; font.pixelSize: 14; font.bold: true }
+            Text { text: shell.tp ? "TOUCHPAD MODE" : shell.scrolling ? "SCROLLING (" + shell.axis + ")" : shell.coasting ? "GLIDING" : "NOT SCROLLING"; color: shell.scrolling || (shell.tp && shell.why.indexOf("touchpad:") === 0) ? shell.roleColor.follow : shell.fg; font.family: shell.mono; font.pixelSize: 14; font.bold: true }
             Text { text: shell.why || "–"; color: shell.fg; font.family: shell.mono; font.pixelSize: 12; width: parent.width; elide: Text.ElideRight }
           }
         }
@@ -251,8 +256,10 @@ ShellRoot {
         Tune { label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
         Tune { label: "Two-finger size"; section: "scroll"; key: "touch_pair_size"; from: 0; to: 900; step: 10; fallback: 250 }
         Tune { label: "Touch report rate"; section: "scroll"; key: "touch_rate"; from: 0; to: 90; step: 1; unit: " /s"; fallback: 45; hint: "0 = any" }
-        Tune { label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }
-        Tune { label: "Scroll speed"; section: "scroll"; key: "speed"; from: 0.2; to: 4; step: 0.1; decimals: 1; unit: "×"; fallback: 1.0 }
+        Tune { visible: !shell.tp; label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }
+        Tune { visible: !shell.tp; label: "Scroll speed"; section: "scroll"; key: "speed"; from: 0.2; to: 4; step: 0.1; decimals: 1; unit: "×"; fallback: 1.0 }
+        Tune { visible: shell.tp; label: "Touchpad scroll speed"; section: "touchpad"; key: "scroll_speed"; from: 0.3; to: 2; step: 0.05; decimals: 2; unit: "×"; fallback: 0.85 }
+        Tune { visible: shell.tp; label: "Swipe boost"; section: "touchpad"; key: "swipe_gain"; from: 1; to: 5; step: 0.1; decimals: 1; unit: "×"; fallback: 2.7 }
 
         Text { text: "SIZE PER CONTACT"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
         Column {

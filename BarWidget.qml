@@ -11,7 +11,7 @@ import qs.Ui
 //   "lowAt": 20      highlight at or below this percentage
 BarWidget {
   id: root
-  moduleName: "io.github.maikunari.magic-mouse"
+  moduleName: "io.github.2strange.magicmouse"
 
   readonly property string match: String(setting("match", ""))
   readonly property int lowAt: Number(setting("lowAt", 20))
@@ -141,7 +141,7 @@ BarWidget {
   }
 
   IpcHandler {
-    target: "io.github.maikunari.magic-mouse"
+    target: "io.github.2strange.magicmouse"
     function open(): void { root.open() }
     function close(): void { root.close() }
     function show(): void { root.open() }

@@ -233,7 +233,12 @@ if command -v hyprctl >/dev/null 2>&1 && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}"
   [ -z "$errs" ] || { echo "$errs"; say "WARNING: Hyprland reported config errors above"; }
 fi
 
-plugin_id="io.github.maikunari.magic-mouse"
+plugin_id="io.github.2strange.magicmouse"
+old_id="io.github.maikunari.magic-mouse"  # the plugin this one grew out of: same daemon, unit and config
+if grep -q "$old_id" "$HOME/.config/omarchy/shell.json" 2>/dev/null; then
+  say "replacing the bar widget $old_id with $plugin_id"
+  omarchy plugin disable "$old_id" >/dev/null 2>&1 || say "WARNING: could not disable $old_id; remove it with: omarchy plugin remove $old_id"
+fi
 plugins_dir="$HOME/.config/omarchy/plugins"
 if command -v omarchy-shell >/dev/null 2>&1; then
   if [ "$here" = "$plugins_dir/$plugin_id" ]; then

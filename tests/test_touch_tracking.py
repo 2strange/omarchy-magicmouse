@@ -146,8 +146,8 @@ class TouchConfirm(EngineCase):
         self.assertEqual(self.ui.wheel["y"], 0)
 
     def test_small_contact_does_not_scroll(self):
-        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 350))
-        self.slide(0, 30, 350)
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 200))
+        self.slide(0, 30, 200)
         self.assertEqual(self.ui.wheel["y"], 0)
 
     def test_firm_touch_scrolls_and_keeps_scrolling_when_lighter(self):
@@ -222,6 +222,75 @@ class TouchpadMode(EngineCase):
         self.frame((SLOT, 0), (Y, 40))
         self.frame((SLOT, 0), (TID, -1))
         self.assertEqual(self.pad.calls[-1][0], [])
+
+
+class RecordingUI:
+    """Collects what a VPad writes: per virtual tracking id, its x positions."""
+
+    def __init__(self):
+        self.slot, self.cur, self.xs = 0, {}, {}
+
+    def write(self, typ, code, value):
+        e = daemon.e
+        if typ != e.EV_ABS:
+            return
+        if code == e.ABS_MT_SLOT:
+            self.slot = value
+        elif code == e.ABS_MT_TRACKING_ID:
+            self.cur[self.slot] = value
+        elif code == e.ABS_MT_POSITION_X:
+            self.xs.setdefault(self.cur[self.slot], []).append(value)
+
+    def syn(self):
+        pass
+
+
+@unittest.skipIf(SKIP, SKIP)
+class VirtualTouchpad(unittest.TestCase):
+    def pad(self):
+        p = daemon.VPad.__new__(daemon.VPad)
+        p.xr, p.yr, p.res = (-6000, 6000), (-9000, 9000), 38.0
+        p.ui = RecordingUI()
+        p.slots, p.ids, p.next_id, p.extra, p.extra_pos, p.count = {}, {}, 0, None, None, 0
+        p.gain, p.anchor, p.last = 1.0, {}, {}
+        return p
+
+    def test_no_virtual_finger_jumps_when_the_pair_becomes_one(self):
+        p = self.pad()
+        for i in range(10):  # two fingers swipe, then the first lifts, the second goes on
+            p.update([(1, -300 + 20 * i, 0), (2, 300 + 20 * i, 0)], 2.7)
+        for i in range(10, 20):
+            p.update([(2, 300 + 20 * i, 0)], 2.7)
+        for xs in p.ui.xs.values():
+            steps = [abs(b - a) for a, b in zip(xs, xs[1:])]
+            self.assertLessEqual(max(steps or [0]), 2.7 * 20 + 1)
+
+    def test_new_finger_lands_next_to_the_one_already_down(self):
+        p = self.pad()
+        for i in range(10):
+            p.update([(1, 20 * i, 0), (2, 400 + 20 * i, 0)], 3.0)  # gain moves the virtual fingers away
+        p.update([(2, 600, 0)], 3.0)
+        p.update([(2, 600, 0), (3, 900, 0)], 3.0)
+        v2, v3 = p.last[2], p.last[3]
+        self.assertAlmostEqual(v3[0] - v2[0], 300, delta=1)  # same distance as on the mouse
+
+
+@unittest.skipIf(SKIP, SKIP)
+class TouchpadSteadiness(EngineCase):
+    def setUp(self):
+        super().setUp()
+        self.pad = self.eng.vpad = FakePad()
+
+    def test_pair_does_not_flap_while_one_finger_slows(self):
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 400), (MAJOR, 600),
+                   (SLOT, 1), (TID, 2), (X, 300), (Y, 450), (MAJOR, 600))
+        for i in range(1, 15):
+            self.frame((SLOT, 0), (X, -300 + 40 * i), (SLOT, 1), (X, 300 + 40 * i))
+        for i in range(15, 30):  # the second finger nearly stops, the first goes on
+            self.frame((SLOT, 0), (X, -300 + 40 * i), (SLOT, 1), (X, 300 + 40 * 15 + i))
+        counts = [len(c[0]) for c in self.pad.calls if c[0]]
+        changes = sum(1 for a, b in zip(counts, counts[1:]) if a != b)
+        self.assertLessEqual(changes, 1)
 
 
 @unittest.skipIf(SKIP, SKIP)

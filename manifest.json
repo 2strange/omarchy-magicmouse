@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "io.github.maikunari.magic-mouse",
-  "name": "Magic Mouse for Omarchy",
-  "version": "1.2.2",
-  "author": "Mike Sewell",
+  "id": "io.github.2strange.magicmouse",
+  "name": "MagicMouse",
+  "version": "1.0.0",
+  "author": "2strange",
   "license": "MIT",
-  "description": "Make an Apple Magic Mouse feel like a Mac: Apple's pointer curve, sane scrolling, momentum, gestures, battery in the bar and a settings popup",
+  "description": "Apple Magic Mouse that feels like on a Mac: touchpad-style scrolling and live workspace swipe, Apple's pointer curve, touch check against hover, edge and palm rejection, live touch preview, battery in the bar",
   "kinds": [
     "bar-widget"
   ],
@@ -13,8 +13,8 @@
     "barWidget": "BarWidget.qml"
   },
   "barWidget": {
-    "displayName": "Magic Mouse for Omarchy",
-    "description": "Mouse battery in the bar; click for pointer, scroll, momentum and gesture settings",
+    "displayName": "MagicMouse",
+    "description": "Mouse battery and name in the bar; click for pointer, scroll, gesture and touch settings",
     "category": "Input",
     "allowMultiple": false,
     "defaultSection": "right"

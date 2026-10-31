@@ -9,8 +9,8 @@ import qs.Ui
 // hot-reloads that file, so sliders take effect while you drag.
 Panel {
   id: root
-  moduleName: "io.github.maikunari.magic-mouse"
-  ipcTarget: "io.github.maikunari.magic-mouse"
+  moduleName: "io.github.2strange.magicmouse"
+  ipcTarget: "io.github.2strange.magicmouse"
   manageIpc: false
 
   property var anchorItem: null

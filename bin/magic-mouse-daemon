@@ -147,12 +147,13 @@ DEFAULTS = {
         # A finger scrolls only after a real touch: contact size at least touch_start_size in
         # FIRM_REPORTS reports in a row at touch_rate or faster (a hovering finger reports less often). Then it
         # keeps scrolling down to touch_hold_size, as less of the fingertip touches while it
-        # slides. A second finger needs only touch_hold_size once one finger is confirmed.
+        # slides. A second finger next to a confirmed one, or two fingers landing together,
+        # need only the smaller of touch_hold_size and touch_pair_size.
         # 0 = off. Contact size is the mouse's own scale (0..1020), shown in the touch preview.
-        "touch_start_size": 480.0,
-        "touch_hold_size": 300.0,
+        "touch_start_size": 300.0,
+        "touch_hold_size": 250.0,
         "touch_pair_size": 250.0,  # two fingers at this size or more both count at once (0 = the hold size)
-        "touch_rate": 45.0,  # reports per second a touch must reach (touch ~60-77, hover ~40); 0 = any rate
+        "touch_rate": 42.0,  # reports per second a touch must reach (touch ~60-77, hover ~40); 0 = any rate
         "free_axis": False,  # diagonal scrolling: both axes at once instead of locking to one per scroll
         # A touch that lands this close to the left, right or front edge counts as holding the mouse...
         "edge_left_mm": 3.0,
@@ -185,7 +186,7 @@ DEFAULTS = {
         # (1 -> 2 = touchpad scrolling, apps scroll and glide themselves; 2 -> 3 = Hyprland's live
         # workspace swipe). Scroll settings, momentum and the two-finger swipe above then rest;
         # edges, palm and the touch check still decide which fingers count.
-        "enabled": False,
+        "enabled": True,
         "scroll_speed": 0.85,  # Hyprland scroll_factor for the virtual touchpad
         "swipe_gain": 2.7,  # with two fingers, finger travel counts this many times (the mouse is small)
     },
@@ -335,12 +336,26 @@ def load_config(path: str) -> dict:
                 vals.setdefault("edge_left_mm", old)
                 vals.setdefault("edge_right_mm", old)
             if "palm_zone" in vals:
-                vals.setdefault("edge_back_mm", float(vals.pop("palm_zone")) * SURFACE_LENGTH_MM)
+                pz = vals.pop("palm_zone")
+                if isinstance(pz, (int, float)) and not isinstance(pz, bool):
+                    vals.setdefault("edge_back_mm", float(pz) * SURFACE_LENGTH_MM)
         for k, v in vals.items():
-            if k in cfg[sect]:
-                cfg[sect][k] = v
-            else:
+            if k not in cfg[sect]:
                 log(f"config: unknown key {sect}.{k} ignored")
+                continue
+            want = DEFAULTS[sect][k]
+            if isinstance(want, bool):
+                ok = isinstance(v, bool)
+            elif isinstance(want, (int, float)):
+                ok = isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+                if ok and isinstance(want, float):
+                    v = float(v)
+            else:
+                ok = isinstance(v, type(want))
+            if ok:
+                cfg[sect][k] = v
+            else:  # a wrong type would crash the daemon later; keep the default instead
+                log(f"config: {sect}.{k} = {v!r} is not a {type(want).__name__}, using the default")
     return cfg
 
 
@@ -694,6 +709,7 @@ class HyprEvents:
         self.bound: bool | None = None  # what Hyprland currently has, as far as we know
         self.next_sync = 0.0  # after a failed attempt, don't retry before this
         self.warned = False
+        self.connects = 0  # successful connections so far (others re-apply runtime settings on a change)
 
     def fileno(self) -> int:
         return self.sock.fileno() if self.sock else -1
@@ -712,6 +728,7 @@ class HyprEvents:
         except OSError:
             return
         self.sock, self.buf = s, b""
+        self.connects += 1
         self.resync()  # a new connection may be a new Hyprland
 
     def resync(self) -> None:
@@ -847,6 +864,7 @@ def workspace_step(forward: bool, end: str, fallback: str, include_empty: bool =
 
 # --------------------------------------------------------------------------- touchpad mode
 VPAD_GROW = 5.0  # the virtual surface is this many times the mouse, so a swipe has room (max swipe_gain)
+TP_PAIR_FRAMES = 3  # a second finger joins the virtual touchpad after pairing this many frames in a row
 VPAD_EXTRA_MM = 12.0  # the added finger sits this far beside the first one
 VPAD_TOOLS = [e.BTN_TOOL_FINGER, e.BTN_TOOL_DOUBLETAP, e.BTN_TOOL_TRIPLETAP, e.BTN_TOOL_QUADTAP, e.BTN_TOOL_QUINTTAP]
 
@@ -878,6 +896,7 @@ class VPad:
         self.ids: dict[int, int] = {}  # real tracking id -> virtual id
         self.next_id = 0
         self.extra: int | None = None
+        self.extra_pos: tuple[float, float] | None = None
         self.count = 0
         self.gain = 1.0
         self.anchor: dict[int, tuple[float, float, float, float]] = {}  # real tid -> real x, y, virtual x, y
@@ -888,21 +907,31 @@ class VPad:
         return self.next_id
 
     def update(self, fingers: list[tuple[int, float, float]], gain: float) -> None:
-        """fingers: (real tracking id, x, y) to put down; [] lifts everything."""
+        """fingers: (real tracking id, x, y) to put down; [] lifts everything.
+        No virtual finger ever jumps: a finger keeps its virtual place, a new one lands
+        relative to a finger that was already down, and the added finger moves along with it."""
         gain = min(max(gain, 1.0), VPAD_GROW) if len(fingers) >= 2 else 1.0
         if gain != self.gain:  # re-anchor, so no finger jumps when the gain changes
             self.anchor.clear()
             self.gain = gain
+        prev = dict(self.last)
         real = {f[0] for f in fingers}
         for tid in [t for t in self.last if t not in real]:
             self.last.pop(tid, None)
             self.anchor.pop(tid, None)
+        lead = next(((t, x, y) for t, x, y in fingers if t in prev), None)  # down in the last frame too
         want = []
         for tid, x, y in fingers:
             if tid not in self.ids:
                 self.ids[tid] = self.new_id()
             if tid not in self.anchor:
-                vx, vy = self.last.get(tid, (x, y))
+                if tid in prev:
+                    vx, vy = prev[tid]
+                elif lead is not None:
+                    lvx, lvy = prev[lead[0]]
+                    vx, vy = lvx + (x - lead[1]), lvy + (y - lead[2])
+                else:
+                    vx, vy = x, y  # a fresh landing: where it really is, in the middle of the bigger surface
                 self.anchor[tid] = (x, y, vx, vy)
             ax, ay, avx, avy = self.anchor[tid]
             vx = min(max(avx + (x - ax) * gain, self.xr[0]), self.xr[1])
@@ -910,13 +939,22 @@ class VPad:
             self.last[tid] = (vx, vy)
             want.append((self.ids[tid], vx, vy))
         if want:
-            if self.extra is None:
-                self.extra = self.new_id()
-            _, x0, y0 = want[0]
-            dx = VPAD_EXTRA_MM * self.res
-            want.append((self.extra, x0 + dx if x0 + dx <= self.xr[1] else x0 - dx, y0))
+            if self.extra is not None and self.extra_pos is not None and lead is not None:
+                lvx, lvy = prev[lead[0]]
+                nvx, nvy = self.last[lead[0]]
+                ex, ey = self.extra_pos
+                self.extra_pos = (ex + nvx - lvx, ey + nvy - lvy)  # rides along with the lead finger
+            else:
+                self.extra = self.new_id()  # a new touch: the added finger lands too
+                _, x0, y0 = want[0]
+                dx = VPAD_EXTRA_MM * self.res
+                self.extra_pos = (x0 + dx if x0 + dx <= self.xr[1] else x0 - dx, y0)
+            ex = min(max(self.extra_pos[0], self.xr[0]), self.xr[1])
+            ey = min(max(self.extra_pos[1], self.yr[0]), self.yr[1])
+            want.append((self.extra, ex, ey))
         else:
             self.extra = None
+            self.extra_pos = None
         keep = {v for v, _, _ in want}
         ui = self.ui
         for vid in [v for v in self.slots if v not in keep]:  # lifts
@@ -969,6 +1007,8 @@ class Engine:
         self.record = None  # --record: raw input events, one "ts type code value" line each
         self.probe: "Probe | None" = None  # live touch view for the preview window
         self.vpad: VPad | None = None  # touchpad mode
+        self.tp_key: tuple[int, ...] | None = None  # the fingers down on the virtual touchpad
+        self.tp_pair_n = 0  # frames a second finger has been pairing with the one down
         self.why = ""  # why the last frame did (or did not) scroll; for the probe
         self.why_locked = False
         self.curve = AppleCurve(float(cfg["pointer"]["tracking_speed"]))
@@ -1481,10 +1521,35 @@ class Engine:
         self.follow(ts, key, x, y)
 
     def touchpad_frame(self, ts: float, fingers: list[int]) -> None:
-        """Touchpad mode: hand the followed finger(s) to the virtual touchpad, plus one."""
-        key = self.pick(fingers, ts) if fingers else None
-        self.primary = key
+        """Touchpad mode: hand the followed finger(s) to the virtual touchpad, plus one.
+        The set of fingers on the virtual touchpad stays steady: every change makes libinput
+        end one gesture and start another. A touch goes down only once a finger really slides
+        (not just rides along while the hand moves the mouse); a second finger joins after its
+        pairing held for TP_PAIR_FRAMES; a finger leaves when it lifts or the hand takes over."""
         gain = float(self.cfg["touchpad"]["swipe_gain"])
+        key = self.tp_key
+        if key is not None:
+            still = tuple(t for t in key if t in fingers)
+            key = still or None  # one of two lifted: keep the other
+        cand = self.pick(fingers, ts) if fingers else None
+        if key is not None:
+            if len(key) == 1 and cand is not None and len(cand) == 2 and key[0] in cand \
+                    and self.key_recent_mm(cand) >= MIN_SLIDE_MM:
+                self.tp_pair_n += 1
+                if self.tp_pair_n >= TP_PAIR_FRAMES:
+                    key = cand
+                    self.tp_pair_n = 0
+            else:
+                self.tp_pair_n = 0
+            pointer = self.pointer_mm(ts, MOVE_WINDOW)
+            if pointer >= MIN_SLIDE_MM and pointer > self.key_recent_mm(key):
+                key = None  # the mouse moves farther than the fingers slide: this is mousing now
+                self.why = "mousing: touchpad fingers lifted"
+        elif cand is not None and self.tp_engage(ts, cand):
+            key = cand
+            self.tp_pair_n = 0
+        self.tp_key = key
+        self.primary = key
         if key is None:
             if not fingers:
                 light = [t.size for t in self.touches.values() if not t.grip]
@@ -1495,6 +1560,23 @@ class Engine:
         self.vpad.update([(t, self.touches[t].x, self.touches[t].y) for t in key], gain)
         self.why = f"touchpad: {len(key)} finger{'s' if len(key) > 1 else ''} -> {len(key) + 1}" + \
             (" (swipe)" if len(key) >= 2 else " (scroll)")
+
+    def tp_engage(self, ts: float, key: tuple[int, ...]) -> bool:
+        """May these fingers go down on the virtual touchpad? Same rules as a scroll start:
+        not around a click, really sliding, and while the mouse moves, sliding clearly farther."""
+        if self.pressed or ts - self.last_button_t < CLICK_QUIET:
+            self.why = "button pressed or click pause"
+            return False
+        slide = self.key_recent_mm(key)
+        if slide < (MIN_SLIDE_MM if len(key) >= 2 else MOVING_MM):
+            # two fingers go down only when they clearly slide together: a hand holding the
+            # mouse shifts two fingers slowly, and on the touchpad that would nudge the workspace
+            self.why = "fingers resting" if slide < MOVING_MM else "two fingers creeping"
+            return False
+        if self.pointer_moving(ts) and (slide < MIN_SLIDE_MM or slide < POINTER_RATIO * self.pointer_mm(ts, MOVE_WINDOW)):
+            self.why = "mouse moving: finger slide too small"
+            return False
+        return True
 
     def confirm_touches(self, ts: float, reports: dict[int, int]) -> None:
         """Hysteresis on contact size: a finger counts once it touches firmly (big and
@@ -1877,29 +1959,35 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
     next_battery = 0.0
     write_status({"connected": True, "model": dev.name, "ts": time.time()})
     vpad_cfg = None  # Hyprland settings last applied to the virtual touchpad
+    vpad_retry = 0.0  # after a failed apply (Hyprland not up yet), try again from then
+    hypr_conn = hypr.connects
 
     def sync_vpad() -> None:
-        nonlocal vpad_cfg
+        nonlocal vpad_cfg, vpad_retry
         want = bool(eng.cfg["touchpad"]["enabled"])
         if want and eng.vpad is None:
             try:
                 eng.vpad = VPad((eng.x_min, eng.x_max), (eng.y_min, eng.y_max), eng.res_x)
                 log("touchpad mode on")
-            except OSError as exc:
-                log(f"touchpad mode: cannot create the virtual touchpad: {exc}")
+            except Exception as exc:  # OSError, or python-evdev's UInputError
+                log(f"touchpad mode: cannot create the virtual touchpad, staying off: {exc}")
                 return
             eng.stop_coast("touchpad mode")
             eng.scrolling = False
+            eng.tp_key = None
             vpad_cfg = None
         elif not want and eng.vpad is not None:
             eng.vpad.close()
             eng.vpad = None
+            eng.tp_key = None
             log("touchpad mode off")
         if eng.vpad is not None:
             lua = vpad_lua(eng.cfg)
             if lua != vpad_cfg:
                 reply = hypr_request("eval " + lua)
                 vpad_cfg = lua if reply is not None and reply.strip() == "ok" else None
+                if vpad_cfg is None:
+                    vpad_retry = time.monotonic() + HyprEvents.RETRY_SEC
 
     try:
         sync_vpad()
@@ -1926,6 +2014,11 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
                 elif hidraw is None:
                     log("battery: no hidraw node found for the mouse")
             hypr.connect(now)
+            if hypr.connects != hypr_conn:  # a new Hyprland (or a reconnect): settings are gone
+                hypr_conn = hypr.connects
+                vpad_cfg = None
+            if eng.vpad is not None and vpad_cfg is None and now >= vpad_retry:
+                sync_vpad()
             hypr.sync_binding(bool(eng.cfg["buttons"]["control_click"]), now)
             timeout = TICK if eng.coasting else 0.25
             fds = [dev.fd] + ([hypr] if hypr.sock else []) + (eng.probe.fds() if eng.probe else [])
