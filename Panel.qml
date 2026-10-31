@@ -301,7 +301,7 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             spacing: Style.space(2)
             Text { text: "Magic Mouse"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.title; font.bold: true; width: parent.width; elide: Text.ElideRight }
-            Text { text: (root.batteryText !== "" ? root.batteryText : "Mac-like on Omarchy").toUpperCase(); color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; font.bold: true; font.letterSpacing: 1.2; width: parent.width; elide: Text.ElideRight }
+            Text { text: root.batteryText !== "" ? root.batteryText : "MAC-LIKE ON OMARCHY"; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; font.bold: true; width: parent.width; elide: Text.ElideRight }
           }
         }
 
@@ -448,9 +448,9 @@ Panel {
           SliderRow {
             visible: root.tp
             label: "Swipe boost"
-            valueText: root.fmt1(root.val("touchpad", "swipe_gain", 2.2)) + "×"
+            valueText: root.fmt1(root.val("touchpad", "swipe_gain", 2.7)) + "×"
             minimum: 1.0; maximum: 5.0; step: 0.1
-            value: root.val("touchpad", "swipe_gain", 2.2)
+            value: root.val("touchpad", "swipe_gain", 2.7)
             onChanged: function(v) { root.set("touchpad", "swipe_gain", Math.round(v * 10) / 10) }
           }
           Text {

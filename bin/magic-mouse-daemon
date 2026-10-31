@@ -187,7 +187,7 @@ DEFAULTS = {
         # edges, palm and the touch check still decide which fingers count.
         "enabled": False,
         "scroll_speed": 0.85,  # Hyprland scroll_factor for the virtual touchpad
-        "swipe_gain": 2.2,  # with two fingers, finger travel counts this many times (the mouse is small)
+        "swipe_gain": 2.7,  # with two fingers, finger travel counts this many times (the mouse is small)
     },
     "bar": {
         "show_percent": True,  # bar widget: show the number next to the icon (the panel's switch)

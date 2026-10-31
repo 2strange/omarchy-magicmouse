@@ -115,7 +115,7 @@ BarWidget {
     if ("anchorItem" in target) target.anchorItem = button
     if ("hostWidget" in target) target.hostWidget = root
     if ("batteryText" in target) target.batteryText = root.connected
-      ? root.modelName + (root.known ? " · " + root.percent + "%" + (root.charging ? " · charging" : "") : "")
+      ? (root.known ? root.percent + "% · " + (root.charging ? "charging · " : "") : "") + root.modelName
       : "not connected"
   }
   onBarChanged: injectPanel()
