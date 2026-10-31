@@ -186,6 +186,44 @@ class TouchConfirm(EngineCase):
         self.assertTrue(self.eng.touches[1].ok)
 
 
+class FakePad:
+    def __init__(self):
+        self.calls = []
+
+    def update(self, fingers, gain):
+        self.calls.append(([f[0] for f in fingers], gain))
+
+
+@unittest.skipIf(SKIP, SKIP)
+class TouchpadMode(EngineCase):
+    """Touchpad mode hands the followed fingers to the virtual touchpad and scrolls nothing itself."""
+
+    def setUp(self):
+        super().setUp()
+        self.pad = self.eng.vpad = FakePad()
+
+    def test_one_finger_goes_to_the_touchpad_without_wheel_events(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600))
+        self.assertEqual(self.pad.calls[-1][0], [1])
+        self.assertEqual(self.ui.wheel, {"x": 0, "y": 0})
+
+    def test_two_fingers_moving_together_go_as_a_pair(self):
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 400), (MAJOR, 600),
+                   (SLOT, 1), (TID, 2), (X, 300), (Y, 450), (MAJOR, 600))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (X, -300 + 30 * i), (SLOT, 1), (X, 300 + 28 * i))
+        self.assertEqual(self.pad.calls[-1][0], [1, 2])
+        self.assertFalse(self.actions)  # no workspace action of our own
+
+    def test_lift_lifts_the_touchpad(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        self.frame((SLOT, 0), (Y, 40))
+        self.frame((SLOT, 0), (TID, -1))
+        self.assertEqual(self.pad.calls[-1][0], [])
+
+
 @unittest.skipIf(SKIP, SKIP)
 class WorkspaceSwipeEnd(unittest.TestCase):
     """workspace_step against a fake Hyprland: 1, 2 and 4 open on monitor 0, 3 on monitor 1."""

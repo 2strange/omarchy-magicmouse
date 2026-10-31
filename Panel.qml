@@ -145,11 +145,12 @@ Panel {
   // key to what it was when the menu opened.
   readonly property var tabKeys: ({
     point: ["pointer.tracking_speed", "buttons.right_click", "buttons.control_click", "bar.show_percent"],
-    scroll: ["scroll.natural", "scroll.speed", "scroll.start_mm", "scroll.free_axis", "momentum.enabled", "momentum.decay"],
-    gestures: ["gestures.swipe_pages", "gestures.two_finger_swipe_left", "gestures.two_finger_swipe_right", "gestures.invert_swipe", "gestures.swipe_mm", "gestures.swipe_end", "gestures.include_empty"],
+    scroll: ["touchpad.enabled", "touchpad.scroll_speed", "scroll.natural", "scroll.speed", "scroll.start_mm", "scroll.free_axis", "momentum.enabled", "momentum.decay"],
+    gestures: ["touchpad.swipe_gain", "gestures.swipe_pages", "gestures.two_finger_swipe_left", "gestures.two_finger_swipe_right", "gestures.invert_swipe", "gestures.swipe_mm", "gestures.swipe_end", "gestures.include_empty"],
     touch: ["scroll.edge_left_mm", "scroll.edge_right_mm", "scroll.edge_front_mm", "scroll.edge_back_mm"]
   })
   property var defaults: null
+  readonly property bool tp: val("touchpad", "enabled", false) === true  // touchpad mode
   property var openedCfg: null  // snapshot when the menu opened, for Undo
   function keyVal(src, path) {
     var p = path.split(".")
@@ -368,12 +369,29 @@ Panel {
           // ---------- Scrolling ----------
           PanelSectionHeader { text: "SCROLLING"; foreground: root.fg; fontFamily: root.fontFam }
           SwitchRow {
+            label: "Touchpad mode"
+            description: root.tp
+              ? "The mouse scrolls and swipes like a trackpad: apps scroll and glide themselves, the workspace follows your fingers"
+              : "Let the mouse act as a trackpad (one finger more): smoother scrolling and the live workspace swipe"
+            checked: root.tp
+            onToggled: root.set("touchpad", "enabled", !root.tp)
+          }
+          SwitchRow {
             label: "Natural scrolling"
             description: "Content follows the finger"
             checked: root.val("scroll", "natural", true) === true
             onToggled: root.set("scroll", "natural", !(root.val("scroll", "natural", true) === true))
           }
           SliderRow {
+            visible: root.tp
+            label: "Scroll speed"
+            valueText: root.fmt1(root.val("touchpad", "scroll_speed", 0.85)) + "×"
+            minimum: 0.3; maximum: 2.0; step: 0.05
+            value: root.val("touchpad", "scroll_speed", 0.85)
+            onChanged: function(v) { root.set("touchpad", "scroll_speed", Math.round(v * 100) / 100) }
+          }
+          SliderRow {
+            visible: !root.tp
             label: "Scroll speed"
             valueText: root.fmt1(root.val("scroll", "speed", 1.0)) + "×"
             minimum: 0.4; maximum: 2.5; step: 0.1
@@ -381,6 +399,7 @@ Panel {
             onChanged: function(v) { root.set("scroll", "speed", Math.round(v * 100) / 100) }
           }
           SliderRow {
+            visible: !root.tp
             label: "Finger travel before a scroll starts"
             valueText: root.fmt1(root.val("scroll", "start_mm", 0.8)) + " mm"
             minimum: 0.3; maximum: 2.0; step: 0.1
@@ -388,6 +407,7 @@ Panel {
             onChanged: function(v) { root.set("scroll", "start_mm", Math.round(v * 100) / 100) }
           }
           SwitchRow {
+            visible: !root.tp
             label: "Diagonal scrolling"
             description: "Scroll up/down and sideways at once, like in a code editor. Off: each scroll locks to one direction"
             checked: root.val("scroll", "free_axis", false) === true
@@ -395,14 +415,16 @@ Panel {
           }
 
           // ---------- Momentum ----------
-          PanelSectionHeader { text: "MOMENTUM"; foreground: root.fg; fontFamily: root.fontFam }
+          PanelSectionHeader { visible: !root.tp; text: "MOMENTUM"; foreground: root.fg; fontFamily: root.fontFam }
           SwitchRow {
+            visible: !root.tp
             label: "Momentum scrolling"
             description: "Flick and lift, the page keeps gliding"
             checked: root.val("momentum", "enabled", true) === true
             onToggled: root.set("momentum", "enabled", !(root.val("momentum", "enabled", true) === true))
           }
           SliderRow {
+            visible: !root.tp
             label: "Glide length"
             valueText: root.val("momentum", "decay", 0.97) >= 0.983 ? "long (macOS)" : (root.val("momentum", "decay", 0.97) <= 0.955 ? "short" : "medium")
             minimum: 0.94; maximum: 0.99; step: 0.005
@@ -417,13 +439,35 @@ Panel {
           visible: root.tab === "gestures"
           // ---------- Gestures ----------
           PanelSectionHeader { text: "GESTURES"; foreground: root.fg; fontFamily: root.fontFam }
+          Text {
+            visible: root.tp
+            width: parent.width
+            text: "Touchpad mode: two fingers sideways switch workspaces with Hyprland's live swipe, like three fingers on the trackpad. End of row, empty workspaces and direction follow the Trackpad settings."
+            color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; wrapMode: Text.WordWrap
+          }
+          SliderRow {
+            visible: root.tp
+            label: "Swipe boost"
+            valueText: root.fmt1(root.val("touchpad", "swipe_gain", 2.2)) + "×"
+            minimum: 1.0; maximum: 5.0; step: 0.1
+            value: root.val("touchpad", "swipe_gain", 2.2)
+            onChanged: function(v) { root.set("touchpad", "swipe_gain", Math.round(v * 10) / 10) }
+          }
+          Text {
+            visible: root.tp
+            width: parent.width
+            text: "The mouse is small: finger travel counts this many times during a swipe"
+            color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; wrapMode: Text.WordWrap
+          }
           SwitchRow {
+            visible: !root.tp
             label: "Swipe between pages"
             description: "One-finger sideways flick = back / forward"
             checked: root.val("gestures", "swipe_pages", true) === true
             onToggled: root.set("gestures", "swipe_pages", !(root.val("gestures", "swipe_pages", true) === true))
           }
           SwitchRow {
+            visible: !root.tp
             label: "Two-finger swipe switches workspace"
             checked: String(root.val("gestures", "two_finger_swipe_left", "")) !== ""
             onToggled: {
@@ -433,11 +477,13 @@ Panel {
             }
           }
           Text {
+            visible: !root.tp
             width: parent.width
             text: "Swipe distance applies to the two-finger swipe and the one-finger page flick"
             color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; wrapMode: Text.WordWrap
           }
           SliderRow {
+            visible: !root.tp
             label: "Swipe distance"
             valueText: root.fmt1(root.val("gestures", "swipe_mm", 8.0)) + " mm"
             minimum: 4; maximum: 16; step: 0.5
@@ -448,7 +494,7 @@ Panel {
             width: parent.width
             spacing: Style.space(6)
             // only the default workspace actions know about an end; custom commands run as they are
-            visible: String(root.val("gestures", "two_finger_swipe_left", "")).indexOf('workspace = "e') !== -1
+            visible: !root.tp && String(root.val("gestures", "two_finger_swipe_left", "")).indexOf('workspace = "e') !== -1
             Text { text: "At the last workspace"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body }
             ButtonGroup {
               width: parent.width
@@ -466,13 +512,14 @@ Panel {
             }
           }
           SwitchRow {
-            visible: String(root.val("gestures", "two_finger_swipe_left", "")).indexOf('workspace = "e') !== -1
+            visible: !root.tp && String(root.val("gestures", "two_finger_swipe_left", "")).indexOf('workspace = "e') !== -1
             label: "Include empty workspaces"
             description: "Workspaces 1-5 always count, like in the bar. Off: only open ones"
             checked: root.val("gestures", "include_empty", true) === true
             onToggled: root.set("gestures", "include_empty", !(root.val("gestures", "include_empty", true) === true))
           }
           SwitchRow {
+            visible: !root.tp
             label: "Invert swipe direction"
             description: "Swap which way the two-finger swipe moves through workspaces"
             checked: root.val("gestures", "invert_swipe", false) === true

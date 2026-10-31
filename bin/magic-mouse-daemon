@@ -37,9 +37,11 @@ import time
 import tomllib
 import errno, secrets, stat
 
-from evdev import InputDevice, UInput, ecodes as e
+from evdev import AbsInfo, InputDevice, UInput, ecodes as e
 
 VIRT_NAME = "magic-mouse-omarchy"
+VPAD_NAME = "Magic Mouse virtual touchpad"  # touchpad mode; Hyprland calls it the line below
+VPAD_HYPR = "magic-mouse-virtual-touchpad"
 APPLE_VENDORS = {0x004C, 0x05AC}
 MAGIC_MOUSE_PRODUCTS = {0x030D, 0x0269, 0x0323}  # Magic Mouse 1, Magic Mouse 2, Magic Mouse USB-C
 CONFIG_PATH = os.path.expanduser(
@@ -177,6 +179,15 @@ DEFAULTS = {
         "two_finger_swipe_right": 'dispatch hl.dsp.focus({ workspace = "e-1" })',
         "two_finger_double_tap": "",  # Mission Control on macOS; any "dispatch ..." or shell command
         "double_tap": "",  # smart zoom on macOS; any "dispatch ..." or shell command
+    },
+    "touchpad": {
+        # Touchpad mode: the fingers the daemon follows go to a virtual touchpad, one finger more
+        # (1 -> 2 = touchpad scrolling, apps scroll and glide themselves; 2 -> 3 = Hyprland's live
+        # workspace swipe). Scroll settings, momentum and the two-finger swipe above then rest;
+        # edges, palm and the touch check still decide which fingers count.
+        "enabled": False,
+        "scroll_speed": 0.85,  # Hyprland scroll_factor for the virtual touchpad
+        "swipe_gain": 2.2,  # with two fingers, finger travel counts this many times (the mouse is small)
     },
     "bar": {
         "show_percent": True,  # bar widget: show the number next to the icon (the panel's switch)
@@ -360,7 +371,7 @@ def find_mouse() -> InputDevice | None:
             dev = InputDevice(path)
         except OSError:
             continue
-        if dev.name == VIRT_NAME:
+        if dev.name in (VIRT_NAME, VPAD_NAME):
             dev.close()
             continue
         if is_magic_mouse(dev):
@@ -834,6 +845,121 @@ def workspace_step(forward: bool, end: str, fallback: str, include_empty: bool =
     threading.Thread(target=run, daemon=True).start()
 
 
+# --------------------------------------------------------------------------- touchpad mode
+VPAD_GROW = 5.0  # the virtual surface is this many times the mouse, so a swipe has room (max swipe_gain)
+VPAD_EXTRA_MM = 12.0  # the added finger sits this far beside the first one
+VPAD_TOOLS = [e.BTN_TOOL_FINGER, e.BTN_TOOL_DOUBLETAP, e.BTN_TOOL_TRIPLETAP, e.BTN_TOOL_QUADTAP, e.BTN_TOOL_QUINTTAP]
+
+
+class VPad:
+    """A virtual touchpad fed with the mouse's followed fingers plus one."""
+
+    def __init__(self, xr: tuple[int, int], yr: tuple[int, int], res: float) -> None:
+        def grow(r):
+            c, h = (r[0] + r[1]) / 2, (r[1] - r[0]) / 2
+            return int(c - h * VPAD_GROW), int(c + h * VPAD_GROW)
+        self.xr, self.yr, self.res = grow(xr), grow(yr), res
+        r = int(round(res))
+        cap = {
+            e.EV_KEY: [e.BTN_LEFT, e.BTN_TOUCH] + VPAD_TOOLS,
+            e.EV_ABS: [
+                (e.ABS_X, AbsInfo(0, self.xr[0], self.xr[1], 0, 0, r)),
+                (e.ABS_Y, AbsInfo(0, self.yr[0], self.yr[1], 0, 0, r)),
+                (e.ABS_MT_SLOT, AbsInfo(0, 0, 9, 0, 0, 0)),
+                (e.ABS_MT_TRACKING_ID, AbsInfo(0, 0, 65535, 0, 0, 0)),
+                (e.ABS_MT_POSITION_X, AbsInfo(0, self.xr[0], self.xr[1], 0, 0, r)),
+                (e.ABS_MT_POSITION_Y, AbsInfo(0, self.yr[0], self.yr[1], 0, 0, r)),
+            ],
+        }
+        # Bluetooth bus: libinput treats it as an external touchpad (not off with the lid, no disable-while-typing)
+        self.ui = UInput(cap, name=VPAD_NAME, vendor=0x004C, product=0x0269, bustype=e.BUS_BLUETOOTH,
+                         version=1, input_props=[e.INPUT_PROP_POINTER, e.INPUT_PROP_BUTTONPAD])
+        self.slots: dict[int, int] = {}  # virtual tracking id -> slot
+        self.ids: dict[int, int] = {}  # real tracking id -> virtual id
+        self.next_id = 0
+        self.extra: int | None = None
+        self.count = 0
+        self.gain = 1.0
+        self.anchor: dict[int, tuple[float, float, float, float]] = {}  # real tid -> real x, y, virtual x, y
+        self.last: dict[int, tuple[float, float]] = {}
+
+    def new_id(self) -> int:
+        self.next_id = self.next_id % 65000 + 1
+        return self.next_id
+
+    def update(self, fingers: list[tuple[int, float, float]], gain: float) -> None:
+        """fingers: (real tracking id, x, y) to put down; [] lifts everything."""
+        gain = min(max(gain, 1.0), VPAD_GROW) if len(fingers) >= 2 else 1.0
+        if gain != self.gain:  # re-anchor, so no finger jumps when the gain changes
+            self.anchor.clear()
+            self.gain = gain
+        real = {f[0] for f in fingers}
+        for tid in [t for t in self.last if t not in real]:
+            self.last.pop(tid, None)
+            self.anchor.pop(tid, None)
+        want = []
+        for tid, x, y in fingers:
+            if tid not in self.ids:
+                self.ids[tid] = self.new_id()
+            if tid not in self.anchor:
+                vx, vy = self.last.get(tid, (x, y))
+                self.anchor[tid] = (x, y, vx, vy)
+            ax, ay, avx, avy = self.anchor[tid]
+            vx = min(max(avx + (x - ax) * gain, self.xr[0]), self.xr[1])
+            vy = min(max(avy + (y - ay) * gain, self.yr[0]), self.yr[1])
+            self.last[tid] = (vx, vy)
+            want.append((self.ids[tid], vx, vy))
+        if want:
+            if self.extra is None:
+                self.extra = self.new_id()
+            _, x0, y0 = want[0]
+            dx = VPAD_EXTRA_MM * self.res
+            want.append((self.extra, x0 + dx if x0 + dx <= self.xr[1] else x0 - dx, y0))
+        else:
+            self.extra = None
+        keep = {v for v, _, _ in want}
+        ui = self.ui
+        for vid in [v for v in self.slots if v not in keep]:  # lifts
+            ui.write(e.EV_ABS, e.ABS_MT_SLOT, self.slots.pop(vid))
+            ui.write(e.EV_ABS, e.ABS_MT_TRACKING_ID, -1)
+        for tid in [t for t, v in self.ids.items() if v not in keep]:
+            del self.ids[tid]
+        for vid, x, y in want:
+            if vid not in self.slots:
+                self.slots[vid] = next(i for i in range(10) if i not in self.slots.values())
+            ui.write(e.EV_ABS, e.ABS_MT_SLOT, self.slots[vid])
+            ui.write(e.EV_ABS, e.ABS_MT_TRACKING_ID, vid)
+            ui.write(e.EV_ABS, e.ABS_MT_POSITION_X, int(x))
+            ui.write(e.EV_ABS, e.ABS_MT_POSITION_Y, int(y))
+        n = min(len(want), len(VPAD_TOOLS))
+        if n != self.count:
+            if self.count:
+                ui.write(e.EV_KEY, VPAD_TOOLS[self.count - 1], 0)
+            if n:
+                ui.write(e.EV_KEY, VPAD_TOOLS[n - 1], 1)
+            ui.write(e.EV_KEY, e.BTN_TOUCH, 1 if n else 0)
+            self.count = n
+        if want:
+            ui.write(e.EV_ABS, e.ABS_X, int(want[0][1]))
+            ui.write(e.EV_ABS, e.ABS_Y, int(want[0][2]))
+        ui.syn()
+
+    def close(self) -> None:
+        try:
+            self.update([], 1.0)
+        except OSError:
+            pass
+        self.ui.close()
+
+
+def vpad_lua(cfg: dict) -> str:
+    """Hyprland settings for the virtual touchpad only (the built-in trackpad keeps its own)."""
+    tp = cfg["touchpad"]
+    natural = "true" if cfg["scroll"].get("natural") else "false"
+    return (f'hl.device({{ name = "{VPAD_HYPR}", scroll_factor = {float(tp["scroll_speed"]):.3f}, '
+            f'natural_scroll = {natural}, tap_to_click = false }})')
+
+
 # --------------------------------------------------------------------------- engine
 class Engine:
     def __init__(self, cfg: dict, ui: UInput, verbose: bool) -> None:
@@ -842,6 +968,7 @@ class Engine:
         self.verbose = verbose
         self.record = None  # --record: raw input events, one "ts type code value" line each
         self.probe: "Probe | None" = None  # live touch view for the preview window
+        self.vpad: VPad | None = None  # touchpad mode
         self.why = ""  # why the last frame did (or did not) scroll; for the probe
         self.why_locked = False
         self.curve = AppleCurve(float(cfg["pointer"]["tracking_speed"]))
@@ -1306,6 +1433,9 @@ class Engine:
         self.confirm_touches(ts, reports)
         self.why_locked = False  # a gesture's reason must not be overwritten later in the frame
         fingers = sorted(tid for tid, t in self.touches.items() if not t.grip and t.ok)
+        if self.vpad is not None:
+            self.touchpad_frame(ts, fingers)
+            return
         if not fingers:
             light = [t.size for t in self.touches.values() if not t.grip]
             self.why = (f"not touching yet (size {max(light)})" if light
@@ -1349,6 +1479,22 @@ class Engine:
         x = sum(self.touches[t].x for t in key) / len(key)
         y = sum(self.touches[t].y for t in key) / len(key)
         self.follow(ts, key, x, y)
+
+    def touchpad_frame(self, ts: float, fingers: list[int]) -> None:
+        """Touchpad mode: hand the followed finger(s) to the virtual touchpad, plus one."""
+        key = self.pick(fingers, ts) if fingers else None
+        self.primary = key
+        gain = float(self.cfg["touchpad"]["swipe_gain"])
+        if key is None:
+            if not fingers:
+                light = [t.size for t in self.touches.values() if not t.grip]
+                self.why = (f"not touching yet (size {max(light)})" if light
+                            else "only grip fingers" if self.touches else "no touch")
+            self.vpad.update([], gain)
+            return
+        self.vpad.update([(t, self.touches[t].x, self.touches[t].y) for t in key], gain)
+        self.why = f"touchpad: {len(key)} finger{'s' if len(key) > 1 else ''} -> {len(key) + 1}" + \
+            (" (swipe)" if len(key) >= 2 else " (scroll)")
 
     def confirm_touches(self, ts: float, reports: dict[int, int]) -> None:
         """Hysteresis on contact size: a finger counts once it touches firmly (big and
@@ -1730,7 +1876,33 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
     hidraw = hidraw_for(dev)
     next_battery = 0.0
     write_status({"connected": True, "model": dev.name, "ts": time.time()})
+    vpad_cfg = None  # Hyprland settings last applied to the virtual touchpad
+
+    def sync_vpad() -> None:
+        nonlocal vpad_cfg
+        want = bool(eng.cfg["touchpad"]["enabled"])
+        if want and eng.vpad is None:
+            try:
+                eng.vpad = VPad((eng.x_min, eng.x_max), (eng.y_min, eng.y_max), eng.res_x)
+                log("touchpad mode on")
+            except OSError as exc:
+                log(f"touchpad mode: cannot create the virtual touchpad: {exc}")
+                return
+            eng.stop_coast("touchpad mode")
+            eng.scrolling = False
+            vpad_cfg = None
+        elif not want and eng.vpad is not None:
+            eng.vpad.close()
+            eng.vpad = None
+            log("touchpad mode off")
+        if eng.vpad is not None:
+            lua = vpad_lua(eng.cfg)
+            if lua != vpad_cfg:
+                reply = hypr_request("eval " + lua)
+                vpad_cfg = lua if reply is not None and reply.strip() == "ok" else None
+
     try:
+        sync_vpad()
         if eng.probe:
             geo = {"model": dev.name, "product": f"{dev.info.product:04x}", "res": TOUCH_UNITS_PER_MM}
             for key, code in (("x", e.ABS_MT_POSITION_X), ("y", e.ABS_MT_POSITION_Y), ("major", e.ABS_MT_TOUCH_MAJOR)):
@@ -1774,6 +1946,8 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
                         eng.control_click(time.time())
                     elif line.startswith("configreloaded>>"):
                         hypr.resync()  # a reload drops bindings added at runtime
+                        vpad_cfg = None  # ...and the virtual touchpad's settings
+                        sync_vpad()
             if eng.coasting:
                 eng.tick(time.time())
             if now >= next_cfg_check:
@@ -1783,7 +1957,11 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
                     mtime = m
                     eng.update_config(load_config(cfg_path))
                     log("config reloaded")
+                    sync_vpad()
     finally:
+        if eng.vpad is not None:
+            eng.vpad.close()
+            eng.vpad = None
         eng.release_buttons()
         for fn in (dev.ungrab, dev.close):
             try:
