@@ -149,6 +149,7 @@ DEFAULTS = {
         # 0 = off. Contact size is the mouse's own scale (0..1020), shown in the touch preview.
         "touch_start_size": 480.0,
         "touch_hold_size": 300.0,
+        "touch_pair_size": 250.0,  # two fingers at this size or more both count at once (0 = the hold size)
         "touch_rate": 45.0,  # reports per second a touch must reach (touch ~60-77, hover ~40); 0 = any rate
         "free_axis": False,  # diagonal scrolling: both axes at once instead of locking to one per scroll
         # A touch that lands this close to the left, right or front edge counts as holding the mouse...
@@ -1351,13 +1352,16 @@ class Engine:
 
     def confirm_touches(self, ts: float, reports: dict[int, int]) -> None:
         """Hysteresis on contact size: a finger counts once it touches firmly (big and
-        closely spaced reports) and keeps counting until its size drops below the hold size."""
+        closely spaced reports) and keeps counting until its size drops below the hold size.
+        Two fingers on the small surface rarely press firmly (one often comes in from the side),
+        so two fingers at touch_pair_size or more count at once, both of them."""
         sc = self.cfg["scroll"]
         start = max(float(sc.get("touch_start_size", 0.0)), 0.0)
         hold = min(max(float(sc.get("touch_hold_size", 0.0)), 0.0), start)
+        pair = min(max(float(sc.get("touch_pair_size", 0.0)), 0.0), start) or hold
         rate = float(sc.get("touch_rate", 0.0))
         max_gap = 1.0 / rate if rate > 0 else math.inf
-        anchor = any(t.ok for t in self.touches.values() if not t.grip)
+        gaps = {}
         for tid, size in reports.items():
             t = self.touches.get(tid)
             if t is None:
@@ -1366,12 +1370,20 @@ class Engine:
             t.last_rep, t.size = ts, size
             if gap > 0:
                 t.rate = 1.0 / gap if t.rate == 0 else 0.8 * t.rate + 0.2 / gap
+            gaps[tid] = gap
+        present = [t for t in self.touches.values()
+                   if not t.grip and t.last_rep is not None and ts - t.last_rep <= STALE_SEC / 3]
+        two = sum(1 for t in present if t.size >= pair) >= 2
+        anchor = any(t.ok for t in present)
+        for tid, gap in gaps.items():
+            t = self.touches[tid]
+            size = t.size
             if t.ok:
                 if size < hold:
                     t.ok, t.firm = False, 0
                 continue
-            if start <= 0 or (anchor and not t.grip and size >= hold):
-                t.ok = True  # off, or a second finger next to a confirmed one (it often comes in from the edge)
+            if start <= 0 or (not t.grip and (anchor or two) and size >= min(hold, pair)):
+                t.ok = True  # off, or one of two fingers (next to a confirmed one, or two at once)
             elif size >= start:
                 t.firm = t.firm + 1 if gap <= max_gap else 1
                 t.ok = t.firm >= FIRM_REPORTS

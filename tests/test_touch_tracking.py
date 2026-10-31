@@ -170,6 +170,16 @@ class TouchConfirm(EngineCase):
         self.frame((SLOT, 1), (TID, 2), (X, 300), (Y, 0), (MAJOR, 350))
         self.assertTrue(self.eng.touches[2].ok)
 
+    def test_two_light_fingers_count_together(self):
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 0), (MAJOR, 280),
+                   (SLOT, 1), (TID, 2), (X, 300), (Y, 0), (MAJOR, 280))
+        self.assertTrue(self.eng.touches[1].ok and self.eng.touches[2].ok)
+
+    def test_one_light_finger_alone_does_not_count(self):
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 0), (MAJOR, 280))
+        self.slide(0, 10, 280)
+        self.assertFalse(self.eng.touches[1].ok)
+
     def test_off_counts_every_touch(self):
         self.cfg["scroll"]["touch_start_size"] = 0
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 100))
