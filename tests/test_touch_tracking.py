@@ -132,7 +132,7 @@ class TouchTracking(unittest.TestCase):
 class WorkspaceSwipeEnd(unittest.TestCase):
     """workspace_step against a fake Hyprland: 1, 2 and 4 open on monitor 0, 3 on monitor 1."""
 
-    def step(self, current, forward, end, monitor=0):
+    def step(self, current, forward, end, monitor=0, empty=False):
         sent, ran = [], []
         replies = {"j/workspaces": '[{"id":1,"monitorID":0},{"id":2,"monitorID":0},{"id":3,"monitorID":1},'
                                    '{"id":4,"monitorID":0},{"id":-98,"monitorID":0}]',
@@ -152,7 +152,7 @@ class WorkspaceSwipeEnd(unittest.TestCase):
         with mock.patch.object(daemon, "hypr_request", request), \
                 mock.patch.object(daemon, "run_action", ran.append), \
                 mock.patch.object(daemon, "threading", types.SimpleNamespace(Thread=Now, Lock=daemon.threading.Lock)):
-            daemon.workspace_step(forward, end, "FALLBACK")
+            daemon.workspace_step(forward, end, "FALLBACK", empty)
         return sent, ran
 
     def test_next_open_workspace_on_this_monitor(self):
@@ -160,11 +160,24 @@ class WorkspaceSwipeEnd(unittest.TestCase):
 
     def test_end_behaviour_forward(self):
         self.assertEqual(self.step(4, True, "stop"), ([], []))
-        self.assertEqual(self.step(4, True, "new"), (["emptynm"], []))
+        self.assertEqual(self.step(4, True, "new"), (["5"], []))
+        self.assertEqual(self.step(4, True, "wrap"), (["1"], []))
 
     def test_end_behaviour_backward(self):
         self.assertEqual(self.step(1, False, "stop"), ([], []))
         self.assertEqual(self.step(1, False, "new"), ([], []))
+        self.assertEqual(self.step(1, False, "wrap"), (["4"], []))
+
+    def test_include_empty_reaches_empty_workspaces(self):
+        self.assertEqual(self.step(4, True, "stop", empty=True), (["5"], []))  # 1-5 always count
+        self.assertEqual(self.step(2, True, "stop", empty=True), (["4"], []))  # 3 is on the other monitor
+        self.assertEqual(self.step(5, True, "stop", empty=True), ([], []))
+        self.assertEqual(self.step(5, True, "new", empty=True), (["6"], []))
+        self.assertEqual(self.step(5, True, "wrap", empty=True), (["1"], []))
+        self.assertEqual(self.step(1, False, "wrap", empty=True), (["5"], []))
+
+    def test_new_stays_within_ten(self):
+        self.assertEqual(self.step(10, True, "new", empty=True), ([], []))
 
     def test_named_workspace_runs_the_plain_action(self):
         self.assertEqual(self.step(-5, True, "stop"), ([], ["FALLBACK"]))

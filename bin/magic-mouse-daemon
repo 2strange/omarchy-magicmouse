@@ -156,6 +156,7 @@ DEFAULTS = {
         # At the last (or first) workspace the default two-finger swipe actions...
         # "wrap": jump around to the other end, "new": open a new workspace (forward only), "stop": do nothing
         "swipe_end": "wrap",
+        "include_empty": True,  # empty workspaces count (1-5 always, like the bar); false = only open ones
         # Hyprland's socket takes Lua: "dispatch <lua>" runs hl.dispatch(<lua>). Same call as Omarchy's Super+Tab.
         "two_finger_swipe_left": 'dispatch hl.dsp.focus({ workspace = "e+1" })',  # like "swipe between full-screen apps"
         "two_finger_swipe_right": 'dispatch hl.dsp.focus({ workspace = "e-1" })',
@@ -766,9 +767,12 @@ WORKSPACE_PREV = 'workspace = "e-1"'
 _ws_lock = threading.Lock()  # one step at a time, so a quick second swipe sees the first one's result
 
 
-def workspace_step(forward: bool, end: str, fallback: str) -> None:
-    """Next or previous open workspace on the focused monitor (like Hyprland's e+1 / e-1);
-    at the end open a new one ("new", forward only) or do nothing ("stop").
+def workspace_step(forward: bool, end: str, fallback: str, include_empty: bool = True) -> None:
+    """Next or previous workspace on the focused monitor. With include_empty, workspaces 1-5
+    (always shown in Omarchy's bar) and every one up to the highest open one count, open or
+    not, like Spaces on a Mac; otherwise only open workspaces (like Hyprland's e+1 / e-1).
+    At the end: jump to the other end ("wrap"), open a new one after the last ("new", forward
+    only, up to 10) or do nothing ("stop"). Workspaces on other monitors are skipped.
     On a named workspace (negative id) the plain action runs instead."""
     def run() -> None:
         with _ws_lock:
@@ -777,21 +781,40 @@ def workspace_step(forward: bool, end: str, fallback: str) -> None:
                 spaces = json.loads(hypr_request("j/workspaces") or "[]")
                 cur = int(act.get("id", 0))
                 mon = act.get("monitorID")
-                ids = sorted({int(w["id"]) for w in spaces
-                              if isinstance(w, dict) and int(w.get("id", 0)) > 0 and w.get("monitorID") == mon})
+                here = {cur}
+                elsewhere = set()
+                for w in spaces:
+                    if isinstance(w, dict) and int(w.get("id", 0)) > 0:
+                        (here if w.get("monitorID") == mon else elsewhere).add(int(w["id"]))
             except (ValueError, TypeError, AttributeError, KeyError) as exc:
                 log(f"workspace step: {exc}")
                 return
-            if cur <= 0 or not ids:
+            if cur <= 0:
                 run_action(fallback)
                 return
-            if forward:
-                later = [i for i in ids if i > cur]
-                target = str(later[0]) if later else "emptynm" if end == "new" else None
+            top = max(here)
+            if include_empty:
+                ids = [i for i in range(1, max(5, top) + 1) if i not in elsewhere or i in here]
             else:
-                earlier = [i for i in ids if i < cur]
-                target = str(earlier[-1]) if earlier else None
-            if target is not None:
+                ids = sorted(here)
+            pos = ids.index(cur)
+            target = None
+            if forward:
+                if pos + 1 < len(ids):
+                    target = ids[pos + 1]
+                elif end == "wrap":
+                    target = ids[0]
+                elif end == "new":
+                    target = ids[-1] + 1
+                    while target in elsewhere:
+                        target += 1
+                    if target > 10:
+                        target = None
+            elif pos > 0:
+                target = ids[pos - 1]
+            elif end == "wrap":
+                target = ids[-1]
+            if target is not None and target != cur:
                 hypr_request(f'dispatch hl.dsp.focus({{ workspace = "{target}" }})')
     threading.Thread(target=run, daemon=True).start()
 
@@ -1405,8 +1428,8 @@ class Engine:
             end = str(g.get("swipe_end", "wrap"))
             if end not in ("wrap", "new", "stop"):
                 end = "wrap"
-            if end != "wrap" and (WORKSPACE_NEXT in action or WORKSPACE_PREV in action):
-                workspace_step(WORKSPACE_NEXT in action, end, action)  # the default actions, with the chosen end
+            if WORKSPACE_NEXT in action or WORKSPACE_PREV in action:  # the default actions: our own stepping
+                workspace_step(WORKSPACE_NEXT in action, end, action, bool(g.get("include_empty", True)))
             else:
                 run_action(action)
 

@@ -146,7 +146,7 @@ Panel {
   readonly property var tabKeys: ({
     point: ["pointer.tracking_speed", "buttons.right_click", "buttons.control_click", "bar.show_percent"],
     scroll: ["scroll.natural", "scroll.speed", "scroll.start_mm", "scroll.free_axis", "momentum.enabled", "momentum.decay"],
-    gestures: ["gestures.swipe_pages", "gestures.two_finger_swipe_left", "gestures.two_finger_swipe_right", "gestures.invert_swipe", "gestures.swipe_mm", "gestures.swipe_end"],
+    gestures: ["gestures.swipe_pages", "gestures.two_finger_swipe_left", "gestures.two_finger_swipe_right", "gestures.invert_swipe", "gestures.swipe_mm", "gestures.swipe_end", "gestures.include_empty"],
     touch: ["scroll.edge_left_mm", "scroll.edge_right_mm", "scroll.edge_front_mm", "scroll.edge_back_mm"]
   })
   property var defaults: null
@@ -464,6 +464,13 @@ Panel {
               focusable: false
               onChanged: function(v) { root.set("gestures", "swipe_end", v) }
             }
+          }
+          SwitchRow {
+            visible: String(root.val("gestures", "two_finger_swipe_left", "")).indexOf('workspace = "e') !== -1
+            label: "Include empty workspaces"
+            description: "Workspaces 1-5 always count, like in the bar. Off: only open ones"
+            checked: root.val("gestures", "include_empty", true) === true
+            onToggled: root.set("gestures", "include_empty", !(root.val("gestures", "include_empty", true) === true))
           }
           SwitchRow {
             label: "Invert swipe direction"
