@@ -83,8 +83,7 @@ BRIDGE_MS = 0.06
 # only expired after this long without a mention, and comes back if it is mentioned
 # again without a new tracking id.
 STALE_SEC = 0.3
-FIRM_REPORTS = 3  # a finger must show this many big reports in a row...
-FIRM_GAP_SEC = 0.022  # ...each within this long of the previous one (touch ~13-16 ms apart, hover ~25 ms and more)
+FIRM_REPORTS = 3  # a finger must show this many big reports in a row, at scroll.touch_rate or faster
 JUMP_MM = 5.0  # a slot moving this far in one report without a new tracking id is a new finger
 # Free (diagonal) scrolling: the smaller axis is dropped while it is below this share of
 # the larger one, so a straight scroll does not wobble sideways.
@@ -100,7 +99,7 @@ def EVIOCGMTSLOTS(length: int) -> int:
 class Touch:
     """One finger on the surface, from landing to lift."""
 
-    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size")
+    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size", "rate")
 
     def __init__(self, ts: float, x: int, y: int, grip: bool, palm: bool = False) -> None:
         self.x, self.y, self.grip, self.palm = x, y, grip or palm, palm
@@ -110,6 +109,7 @@ class Touch:
         self.ok = False  # confirmed as a touch: it may scroll
         self.last_rep: float | None = None
         self.size = 0
+        self.rate = 0.0  # this finger's reports per second, smoothed (for the preview)
         self.hist: collections.deque = collections.deque([(ts, x, y)])
 
     def update(self, ts: float, x: int, y: int) -> None:
@@ -143,12 +143,13 @@ DEFAULTS = {
         "accel": 0.6,  # 0 = linear, 1 = strong ramp with finger speed
         "horizontal": True,
         # A finger scrolls only after a real touch: contact size at least touch_start_size in
-        # FIRM_REPORTS closely spaced reports (a hovering finger reports bigger gaps). Then it
+        # FIRM_REPORTS reports in a row at touch_rate or faster (a hovering finger reports less often). Then it
         # keeps scrolling down to touch_hold_size, as less of the fingertip touches while it
         # slides. A second finger needs only touch_hold_size once one finger is confirmed.
         # 0 = off. Contact size is the mouse's own scale (0..1020), shown in the touch preview.
         "touch_start_size": 480.0,
         "touch_hold_size": 300.0,
+        "touch_rate": 45.0,  # reports per second a touch must reach (touch ~60-77, hover ~40); 0 = any rate
         "free_axis": False,  # diagonal scrolling: both axes at once instead of locking to one per scroll
         # A touch that lands this close to the left, right or front edge counts as holding the mouse...
         "edge_left_mm": 3.0,
@@ -1151,7 +1152,7 @@ class Engine:
             role = ("palm" if t and t.palm else "grip" if t and t.grip
                     else "hover" if t and not t.ok
                     else "follow" if v[0] in follow else "rest")
-            contacts.append([v[0], v[1], v[2], v[3], v[4], role])
+            contacts.append([v[0], v[1], v[2], v[3], v[4], role, round(t.rate) if t else 0])
         self.probe.send({
             "t": round(ts, 4),
             "c": contacts,
@@ -1354,6 +1355,8 @@ class Engine:
         sc = self.cfg["scroll"]
         start = max(float(sc.get("touch_start_size", 0.0)), 0.0)
         hold = min(max(float(sc.get("touch_hold_size", 0.0)), 0.0), start)
+        rate = float(sc.get("touch_rate", 0.0))
+        max_gap = 1.0 / rate if rate > 0 else math.inf
         anchor = any(t.ok for t in self.touches.values() if not t.grip)
         for tid, size in reports.items():
             t = self.touches.get(tid)
@@ -1361,6 +1364,8 @@ class Engine:
                 continue
             gap = ts - t.last_rep if t.last_rep is not None else 0.0
             t.last_rep, t.size = ts, size
+            if gap > 0:
+                t.rate = 1.0 / gap if t.rate == 0 else 0.8 * t.rate + 0.2 / gap
             if t.ok:
                 if size < hold:
                     t.ok, t.firm = False, 0
@@ -1368,7 +1373,7 @@ class Engine:
             if start <= 0 or (anchor and not t.grip and size >= hold):
                 t.ok = True  # off, or a second finger next to a confirmed one (it often comes in from the edge)
             elif size >= start:
-                t.firm = t.firm + 1 if gap <= FIRM_GAP_SEC else 1
+                t.firm = t.firm + 1 if gap <= max_gap else 1
                 t.ok = t.firm >= FIRM_REPORTS
             else:
                 t.firm = 0

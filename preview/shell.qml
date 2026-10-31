@@ -131,7 +131,7 @@ ShellRoot {
   FloatingWindow {
     title: "Magic Mouse touch preview"
     implicitWidth: 760
-    implicitHeight: 820
+    implicitHeight: 860
     color: shell.bg
     visible: true
 
@@ -246,9 +246,20 @@ ShellRoot {
           }
         }
 
+        Text { text: "TUNING  (applies when you let go)"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
+        Tune { label: "Touch start size"; section: "scroll"; key: "touch_start_size"; from: 0; to: 900; step: 10; fallback: 480; hint: "0 = off" }
+        Tune { label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
+        Tune { label: "Touch report rate"; section: "scroll"; key: "touch_rate"; from: 0; to: 90; step: 1; unit: " /s"; fallback: 45; hint: "0 = any" }
+        Tune { label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }
+        Tune { label: "Scroll speed"; section: "scroll"; key: "speed"; from: 0.2; to: 4; step: 0.1; decimals: 1; unit: "×"; fallback: 1.0 }
+
         Text { text: "SIZE PER CONTACT"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
-        Repeater {
-          model: shell.contacts
+        Column {
+          width: parent.width
+          height: 3 * 16  // room for three contacts, always; more are not listed
+          clip: true
+          Repeater {
+          model: shell.contacts.slice(0, 3)
           delegate: Item {
             required property var modelData
             width: parent.width; height: 16
@@ -257,7 +268,7 @@ ShellRoot {
               height: 10; radius: 3; anchors.verticalCenter: parent.verticalCenter
               color: shell.roleColor[modelData[5]] || shell.fg
             }
-            Text { anchors.right: parent.right; text: "#" + modelData[0] + "  " + modelData[3] + " × " + modelData[4]; color: shell.fg; font.family: shell.mono; font.pixelSize: 11 }
+            Text { anchors.right: parent.right; text: "#" + modelData[0] + "  " + modelData[3] + " × " + modelData[4] + "  " + (modelData[6] || 0) + "/s"; color: shell.fg; font.family: shell.mono; font.pixelSize: 11 }
             Repeater {  // touch start and hold sizes
               model: [shell.cfgVal("scroll", "touch_start_size", 0), shell.cfgVal("scroll", "touch_hold_size", 0)]
               delegate: Rectangle {
@@ -270,12 +281,7 @@ ShellRoot {
             }
           }
         }
-
-        Text { text: "TUNING  (applies when you let go)"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
-        Tune { label: "Touch start size"; section: "scroll"; key: "touch_start_size"; from: 0; to: 900; step: 10; fallback: 480; hint: "0 = off" }
-        Tune { label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
-        Tune { label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }
-        Tune { label: "Scroll speed"; section: "scroll"; key: "speed"; from: 0.2; to: 4; step: 0.1; decimals: 1; unit: "×"; fallback: 1.0 }
+        }
 
         Text { text: "DECISIONS"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
         Repeater {
