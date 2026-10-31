@@ -42,8 +42,7 @@ class FakeUI:
         pass
 
 
-@unittest.skipIf(SKIP, SKIP)
-class TouchTracking(unittest.TestCase):
+class EngineCase(unittest.TestCase):
     def setUp(self):
         daemon.log = lambda msg: None
         self.actions = []
@@ -66,6 +65,9 @@ class TouchTracking(unittest.TestCase):
         for _ in range(n):
             self.frame()
 
+
+@unittest.skipIf(SKIP, SKIP)
+class TouchTracking(EngineCase):
     def test_ghost_slot_from_sync_expires(self):
         # a slot loaded by sync_mt that the kernel never mentions again
         self.eng.slots = {5: [900, 0, 600, 400, 300]}
@@ -126,6 +128,52 @@ class TouchTracking(unittest.TestCase):
             self.frame((SLOT, 0), (Y, 400 + 30 * i))
         self.assertEqual(self.eng.primary, (1,))
 
+
+
+@unittest.skipIf(SKIP, SKIP)
+class TouchConfirm(EngineCase):
+    """Hysteresis on contact size: hover does not scroll, a firm touch does and keeps going."""
+
+    def slide(self, slot, n, size, gap=0.011, y0=0, step=40):
+        for i in range(n):
+            self.frame((SLOT, slot), (Y, y0 + step * i), (MAJOR, size))
+            self.t += gap - 0.011
+
+    def test_hover_with_big_but_sparse_reports_does_not_scroll(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        self.slide(0, 30, 600, gap=0.03)
+        self.assertFalse(self.eng.touches[1].ok)
+        self.assertEqual(self.ui.wheel["y"], 0)
+
+    def test_small_contact_does_not_scroll(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 350))
+        self.slide(0, 30, 350)
+        self.assertEqual(self.ui.wheel["y"], 0)
+
+    def test_firm_touch_scrolls_and_keeps_scrolling_when_lighter(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        self.slide(0, 3, 600)
+        self.assertTrue(self.eng.touches[1].ok)
+        self.slide(0, 25, 320, y0=120)  # less of the fingertip touches while it slides
+        self.assertTrue(self.eng.scrolling)
+        self.assertNotEqual(self.ui.wheel["y"], 0)
+
+    def test_dropping_below_hold_stops_counting(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        self.slide(0, 3, 600)
+        self.slide(0, 2, 200, y0=120)
+        self.assertFalse(self.eng.touches[1].ok)
+
+    def test_second_finger_needs_only_the_hold_size(self):
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 0), (MAJOR, 600))
+        self.slide(0, 3, 600)
+        self.frame((SLOT, 1), (TID, 2), (X, 300), (Y, 0), (MAJOR, 350))
+        self.assertTrue(self.eng.touches[2].ok)
+
+    def test_off_counts_every_touch(self):
+        self.cfg["scroll"]["touch_start_size"] = 0
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 100))
+        self.assertTrue(self.eng.touches[1].ok)
 
 
 @unittest.skipIf(SKIP, SKIP)

@@ -83,6 +83,8 @@ BRIDGE_MS = 0.06
 # only expired after this long without a mention, and comes back if it is mentioned
 # again without a new tracking id.
 STALE_SEC = 0.3
+FIRM_REPORTS = 3  # a finger must show this many big reports in a row...
+FIRM_GAP_SEC = 0.022  # ...each within this long of the previous one (touch ~13-16 ms apart, hover ~25 ms and more)
 JUMP_MM = 5.0  # a slot moving this far in one report without a new tracking id is a new finger
 # Free (diagonal) scrolling: the smaller axis is dropped while it is below this share of
 # the larger one, so a straight scroll does not wobble sideways.
@@ -98,12 +100,16 @@ def EVIOCGMTSLOTS(length: int) -> int:
 class Touch:
     """One finger on the surface, from landing to lift."""
 
-    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist")
+    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size")
 
     def __init__(self, ts: float, x: int, y: int, grip: bool, palm: bool = False) -> None:
         self.x, self.y, self.grip, self.palm = x, y, grip or palm, palm
         self.x0, self.y0 = x, y
         self.ptr0 = 0.0  # Engine.ptr_total when the finger landed
+        self.firm = 0  # big, closely spaced reports in a row (a real touch, not a hover)
+        self.ok = False  # confirmed as a touch: it may scroll
+        self.last_rep: float | None = None
+        self.size = 0
         self.hist: collections.deque = collections.deque([(ts, x, y)])
 
     def update(self, ts: float, x: int, y: int) -> None:
@@ -136,6 +142,13 @@ DEFAULTS = {
         "settle_counts": 4.0,  # ...by more than this many raw counts (then a scroll needs POINTER_RATIO more slide)
         "accel": 0.6,  # 0 = linear, 1 = strong ramp with finger speed
         "horizontal": True,
+        # A finger scrolls only after a real touch: contact size at least touch_start_size in
+        # FIRM_REPORTS closely spaced reports (a hovering finger reports bigger gaps). Then it
+        # keeps scrolling down to touch_hold_size, as less of the fingertip touches while it
+        # slides. A second finger needs only touch_hold_size once one finger is confirmed.
+        # 0 = off. Contact size is the mouse's own scale (0..1020), shown in the touch preview.
+        "touch_start_size": 480.0,
+        "touch_hold_size": 300.0,
         "free_axis": False,  # diagonal scrolling: both axes at once instead of locking to one per scroll
         # A touch that lands this close to the left, right or front edge counts as holding the mouse...
         "edge_left_mm": 3.0,
@@ -860,6 +873,7 @@ class Engine:
         self.cur_slot = 0
         self.mt_frame = False  # this SYN_REPORT included ABS_MT_* (a HID touch report)
         self.mt_seen: set[int] = set()  # slots mentioned in this touch report
+        self.f_reported: set[int] = set()  # the same, kept for touch() after the frame is closed
         self.slot_seen: dict[int, float] = {}  # slot -> last report that mentioned it
         self.parked: dict[int, list] = {}  # slots expired for silence; restored if they speak again
         self.parked_touch: dict[int, Touch] = {}  # their Touch objects, so a restore is not a new landing
@@ -1081,6 +1095,7 @@ class Engine:
         for s in stale:
             del self.slots[s]
             self.slot_seen.pop(s, None)
+        self.f_reported = set(self.mt_seen)
         self.mt_frame = False
         self.mt_seen.clear()
 
@@ -1134,6 +1149,7 @@ class Engine:
                 continue
             t = self.touches.get(v[0])
             role = ("palm" if t and t.palm else "grip" if t and t.grip
+                    else "hover" if t and not t.ok
                     else "follow" if v[0] in follow else "rest")
             contacts.append([v[0], v[1], v[2], v[3], v[4], role])
         self.probe.send({
@@ -1241,6 +1257,7 @@ class Engine:
 
     def touch(self, ts: float) -> None:
         live = {v[0]: (v[1], v[2]) for v in self.slots.values() if v[0] >= 0}
+        reports = {v[0]: v[3] for s, v in self.slots.items() if v[0] >= 0 and s in self.f_reported}
         parked_ids = {v[0] for v in self.parked.values()}
         for tid in [t for t in self.touches if t not in live]:
             gone = self.touches.pop(tid)
@@ -1275,8 +1292,6 @@ class Engine:
                     grip = palm = False  # a tracking-id flicker of a scrolling finger, not a new grip
                 self.touches[tid] = Touch(ts, x, y, grip, palm)
                 self.touches[tid].ptr0 = self.ptr_total
-                if not (grip or palm):
-                    self.stop_coast("touch")
             else:
                 t.update(ts, x, y)
                 if t.grip and not t.palm and self.edge_finger_slides(ts, t):
@@ -1286,10 +1301,13 @@ class Engine:
                     if self.verbose:
                         log(f"edge finger {tid} released")
 
+        self.confirm_touches(ts, reports)
         self.why_locked = False  # a gesture's reason must not be overwritten later in the frame
-        fingers = sorted(tid for tid, t in self.touches.items() if not t.grip)
+        fingers = sorted(tid for tid, t in self.touches.items() if not t.grip and t.ok)
         if not fingers:
-            self.why = "only grip fingers" if self.touches else "no touch"
+            light = [t.size for t in self.touches.values() if not t.grip]
+            self.why = (f"not touching yet (size {max(light)})" if light
+                        else "only grip fingers" if self.touches else "no touch")
             # A 1–2 report dropout (TOUCH_STATE_NONE, or the kernel leaving a
             # slot up because it never syncs unused contacts) looks like a lift.
             # Wait BRIDGE_MS before ending the scroll so a flicker can hand off.
@@ -1329,6 +1347,34 @@ class Engine:
         x = sum(self.touches[t].x for t in key) / len(key)
         y = sum(self.touches[t].y for t in key) / len(key)
         self.follow(ts, key, x, y)
+
+    def confirm_touches(self, ts: float, reports: dict[int, int]) -> None:
+        """Hysteresis on contact size: a finger counts once it touches firmly (big and
+        closely spaced reports) and keeps counting until its size drops below the hold size."""
+        sc = self.cfg["scroll"]
+        start = max(float(sc.get("touch_start_size", 0.0)), 0.0)
+        hold = min(max(float(sc.get("touch_hold_size", 0.0)), 0.0), start)
+        anchor = any(t.ok for t in self.touches.values() if not t.grip)
+        for tid, size in reports.items():
+            t = self.touches.get(tid)
+            if t is None:
+                continue
+            gap = ts - t.last_rep if t.last_rep is not None else 0.0
+            t.last_rep, t.size = ts, size
+            if t.ok:
+                if size < hold:
+                    t.ok, t.firm = False, 0
+                continue
+            if start <= 0 or (anchor and not t.grip and size >= hold):
+                t.ok = True  # off, or a second finger next to a confirmed one (it often comes in from the edge)
+            elif size >= start:
+                t.firm = t.firm + 1 if gap <= FIRM_GAP_SEC else 1
+                t.ok = t.firm >= FIRM_REPORTS
+            else:
+                t.firm = 0
+            if t.ok and not t.grip:
+                anchor = True
+                self.stop_coast("touch")
 
     def edge_finger_slides(self, ts: float, t: Touch) -> bool:
         """A finger that landed in the edge zone slides on the surface (not just with the hand)."""

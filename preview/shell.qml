@@ -31,6 +31,39 @@ ShellRoot {
   property real peakMajor: 0
   property var zones: [3, 3, 0, 18]  // left, right, front, back (palm) in mm
 
+  // ---------- live tuning: reads and writes ~/.config/magic-mouse/config.toml via magic-mouse-config;
+  // the daemon reloads the file on change, so a slider takes effect as soon as it is let go
+  property var cfg: ({})
+  function cfgVal(section, key, fallback) {
+    var sec = cfg[section]
+    return sec && sec[key] !== undefined ? sec[key] : fallback
+  }
+  property var writeQueue: []
+  function setCfg(path, value) {
+    writeQueue = writeQueue.concat([path + "=" + value])
+    if (!writer.running) flushWrites()
+  }
+  function flushWrites() {
+    if (writeQueue.length === 0) return
+    writer.command = ["magic-mouse-config", "set"].concat(writeQueue)
+    writeQueue = []
+    writer.running = true
+  }
+  Process {
+    id: reader
+    command: ["magic-mouse-config", "get"]
+    running: true
+    stdout: StdioCollector { onStreamFinished: { try { shell.cfg = JSON.parse(text) } catch (err) {} } }
+  }
+  Process {
+    id: writer
+    onExited: function(code) {
+      if (code !== 0) console.warn("magic-mouse-config failed", code)
+      if (shell.writeQueue.length > 0) shell.flushWrites()
+      else reader.running = true
+    }
+  }
+
   function handle(line) {
     var o
     try { o = JSON.parse(line) } catch (err) { return }
@@ -92,13 +125,13 @@ ShellRoot {
   readonly property color fg: "#e8e6e3"
   readonly property color dim: "#8a8780"
   readonly property color surface: "#2c2c32"
-  readonly property var roleColor: ({ grip: "#6b6b75", rest: "#5b8def", follow: "#e0a33a", palm: "#d0605a" })
+  readonly property var roleColor: ({ grip: "#6b6b75", rest: "#5b8def", follow: "#e0a33a", palm: "#d0605a", hover: "#9b7fd4" })
   readonly property string mono: "JetBrainsMono Nerd Font"
 
   FloatingWindow {
     title: "Magic Mouse touch preview"
-    implicitWidth: 720
-    implicitHeight: 600
+    implicitWidth: 760
+    implicitHeight: 820
     color: shell.bg
     visible: true
 
@@ -203,7 +236,7 @@ ShellRoot {
         Row {
           spacing: 14
           Repeater {
-            model: [["follow", "followed"], ["rest", "resting"], ["grip", "edge"], ["palm", "palm"]]
+            model: [["follow", "followed"], ["rest", "resting"], ["hover", "not touching"], ["grip", "edge"], ["palm", "palm"]]
             delegate: Row {
               required property var modelData
               spacing: 6
@@ -225,8 +258,24 @@ ShellRoot {
               color: shell.roleColor[modelData[5]] || shell.fg
             }
             Text { anchors.right: parent.right; text: "#" + modelData[0] + "  " + modelData[3] + " × " + modelData[4]; color: shell.fg; font.family: shell.mono; font.pixelSize: 11 }
+            Repeater {  // touch start and hold sizes
+              model: [shell.cfgVal("scroll", "touch_start_size", 0), shell.cfgVal("scroll", "touch_hold_size", 0)]
+              delegate: Rectangle {
+                required property var modelData
+                visible: modelData > 0
+                x: parent.width * Math.min(1, modelData / Math.max(1, shell.rangeMajor[1])) - 1
+                width: 2; height: 14; anchors.verticalCenter: parent.verticalCenter
+                color: shell.fg; opacity: 0.6
+              }
+            }
           }
         }
+
+        Text { text: "TUNING  (applies when you let go)"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
+        Tune { label: "Touch start size"; section: "scroll"; key: "touch_start_size"; from: 0; to: 900; step: 10; fallback: 480; hint: "0 = off" }
+        Tune { label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
+        Tune { label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }
+        Tune { label: "Scroll speed"; section: "scroll"; key: "speed"; from: 0.2; to: 4; step: 0.1; decimals: 1; unit: "×"; fallback: 1.0 }
 
         Text { text: "DECISIONS"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
         Repeater {
@@ -239,6 +288,57 @@ ShellRoot {
           }
         }
       }
+    }
+  }
+
+  component Tune: Item {
+    id: tune
+    property string label
+    property string section
+    property string key
+    property real from
+    property real to
+    property real step: 1
+    property int decimals: 0
+    property string unit: ""
+    property string hint: ""
+    property real fallback: 0
+    readonly property real saved: Number(shell.cfgVal(section, key, fallback))
+    property real shown: saved
+    property bool dragging: false
+    onSavedChanged: if (!dragging) shown = saved
+    width: parent.width; height: 34
+    function snap(v) { return Math.max(from, Math.min(to, Math.round(v / step) * step)) }
+    Text {
+      text: tune.label + (tune.hint ? "  (" + tune.hint + ")" : "")
+      color: shell.fg; font.family: shell.mono; font.pixelSize: 12
+    }
+    Text {
+      anchors.right: parent.right
+      text: tune.shown.toFixed(tune.decimals) + tune.unit
+      color: tune.dragging ? shell.roleColor.follow : shell.fg; font.family: shell.mono; font.pixelSize: 12; font.bold: true
+    }
+    Rectangle {
+      id: track
+      anchors.bottom: parent.bottom; anchors.bottomMargin: 4
+      width: parent.width; height: 4; radius: 2; color: "#44444c"
+      Rectangle { width: parent.width * (tune.shown - tune.from) / (tune.to - tune.from); height: parent.height; radius: 2; color: shell.roleColor.rest }
+      Rectangle {
+        x: parent.width * (tune.shown - tune.from) / (tune.to - tune.from) - width / 2
+        anchors.verticalCenter: parent.verticalCenter
+        width: 14; height: 14; radius: 7; color: shell.fg
+      }
+    }
+    MouseArea {
+      anchors.fill: parent
+      function at(mx) { return tune.snap(tune.from + (tune.to - tune.from) * Math.max(0, Math.min(1, mx / width))) }
+      onPressed: function(m) { tune.dragging = true; tune.shown = at(m.x) }
+      onPositionChanged: function(m) { if (pressed) tune.shown = at(m.x) }
+      onReleased: {
+        tune.dragging = false
+        if (Math.abs(tune.shown - tune.saved) > 1e-9) shell.setCfg(tune.section + "." + tune.key, tune.shown.toFixed(tune.decimals))
+      }
+      onWheel: function(w) { w.accepted = false }  // the wheel scrolls nothing here
     }
   }
 
