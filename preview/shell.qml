@@ -34,7 +34,7 @@ ShellRoot {
   // ---------- live tuning: reads and writes ~/.config/magic-mouse/config.toml via magic-mouse-config;
   // the daemon reloads the file on change, so a slider takes effect as soon as it is let go
   property var cfg: ({})
-  readonly property bool tp: cfgVal("touchpad", "enabled", false) === true  // touchpad mode
+  readonly property bool tp: !!(cfg.touchpad && cfg.touchpad.enabled === true)  // touchpad mode
   function cfgVal(section, key, fallback) {
     var sec = cfg[section]
     return sec && sec[key] !== undefined ? sec[key] : fallback

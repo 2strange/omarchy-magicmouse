@@ -300,7 +300,7 @@ Panel {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             spacing: Style.space(2)
-            Text { text: "Magic Mouse"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.title; font.bold: true; width: parent.width; elide: Text.ElideRight }
+            Text { text: "MagicMouse"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.title; font.bold: true; width: parent.width; elide: Text.ElideRight }
             Text { text: root.batteryText !== "" ? root.batteryText : "MAC-LIKE ON OMARCHY"; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; font.bold: true; width: parent.width; elide: Text.ElideRight }
           }
         }
