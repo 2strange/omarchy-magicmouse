@@ -632,9 +632,6 @@ class WorkspaceSwipeEnd(unittest.TestCase):
         self.assertEqual(self.step(-5, True, "stop"), ([], ["FALLBACK"]))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
 class FakeBluez:
     def __init__(self):
@@ -691,3 +688,14 @@ class BluezClearIsCheap(unittest.TestCase):
         b.bus, b.objects = object(), {}
         b.GLib = types.SimpleNamespace(idle_add=lambda *a: self.fail("scheduled a clear for nothing"))
         b.clear("aa:bb:cc:dd:ee:ff")
+
+    def test_forced_clear_is_queued(self):
+        b = daemon.BluezBattery.__new__(daemon.BluezBattery)
+        b.bus, b.objects, queued = object(), {}, []
+        b.GLib = types.SimpleNamespace(idle_add=lambda *a: queued.append(a[1:]))
+        b.clear("aa:bb:cc:dd:ee:ff", force=True)  # a _set may still be waiting in the GLib queue
+        self.assertEqual(queued, [("aa:bb:cc:dd:ee:ff",)])
+
+
+if __name__ == "__main__":
+    unittest.main()

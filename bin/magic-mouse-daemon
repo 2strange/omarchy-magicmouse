@@ -677,8 +677,9 @@ class BluezBattery:
         if self.bus and address:
             self.GLib.idle_add(self._set, address, int(percent))
 
-    def clear(self, address: str) -> None:
-        if self.bus and address and self._path(address) in self.objects:  # poll() calls this often
+    def clear(self, address: str, force: bool = False) -> None:
+        """poll() calls this often: only when registered. force (mouse gone) also catches a _set still queued."""
+        if self.bus and address and (force or self._path(address) in self.objects):
             self.GLib.idle_add(self._clear, address)
 
     def _path(self, address: str) -> str:
@@ -2506,7 +2507,7 @@ class Session:
             eng.probe.send({"type": "disconnected"})
             eng.probe = None
         if self.bluez:
-            self.bluez.clear(dev.uniq)
+            self.bluez.clear(dev.uniq, force=True)
         log(f"released grab ({dev.name})")
 
 
