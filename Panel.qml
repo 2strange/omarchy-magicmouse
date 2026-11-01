@@ -146,7 +146,7 @@ Panel {
   readonly property var tabKeys: ({
     point: ["pointer.tracking_speed", "buttons.right_click", "buttons.control_click", "bar.show_percent"],
     scroll: ["touchpad.enabled", "touchpad.scroll_speed", "scroll.natural", "scroll.speed", "scroll.start_mm", "scroll.free_axis", "momentum.enabled", "momentum.decay"],
-    gestures: ["touchpad.swipe_gain", "gestures.swipe_pages", "gestures.two_finger_swipe_left", "gestures.two_finger_swipe_right", "gestures.invert_swipe", "gestures.swipe_mm", "gestures.swipe_end", "gestures.include_empty"],
+    gestures: ["touchpad.swipe", "touchpad.swipe_reverse", "touchpad.swipe_gain", "gestures.swipe_pages", "gestures.two_finger_swipe_left", "gestures.two_finger_swipe_right", "gestures.invert_swipe", "gestures.swipe_mm", "gestures.swipe_end", "gestures.include_empty"],
     touch: ["scroll.edge_front_mm", "scroll.edge_left_mm", "scroll.edge_right_mm", "scroll.edge_back_mm", "scroll.edge_release_mm"]
   })
   property var defaults: null
@@ -442,8 +442,22 @@ Panel {
           Text {
             visible: root.tp
             width: parent.width
-            text: "Touchpad mode: two fingers sideways switch workspaces with Hyprland's live swipe, like three fingers on the trackpad. End of row, empty workspaces and direction follow the Trackpad settings."
+            text: "Touchpad mode: two fingers sideways switch workspaces with Hyprland's live swipe, like three fingers on the trackpad. End of row, empty workspaces and the trackpad's direction come from the Trackpad settings."
             color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; wrapMode: Text.WordWrap
+          }
+          SwitchRow {
+            visible: root.tp
+            label: "Two-finger workspace swipe"
+            description: "Off: two fingers sideways just scroll"
+            checked: root.val("touchpad", "swipe", true) === true
+            onToggled: root.set("touchpad", "swipe", !(root.val("touchpad", "swipe", true) === true))
+          }
+          SwitchRow {
+            visible: root.tp
+            label: "Reverse swipe direction"
+            description: "The mouse swipes the other way round than the trackpad"
+            checked: root.val("touchpad", "swipe_reverse", false) === true
+            onToggled: root.set("touchpad", "swipe_reverse", !(root.val("touchpad", "swipe_reverse", false) === true))
           }
           SliderRow {
             visible: root.tp

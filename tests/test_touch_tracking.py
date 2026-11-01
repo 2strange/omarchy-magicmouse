@@ -200,8 +200,9 @@ class FakePad:
         self.calls = []
         self.pos = []
 
-    def update(self, fingers, gain):
+    def update(self, fingers, gain, mirror=False):
         self.calls.append(([f[0] for f in fingers], gain))
+        self.mirror = mirror
         self.pos.append([(f[1], f[2]) for f in fingers])
 
 
@@ -263,7 +264,7 @@ class VirtualTouchpad(unittest.TestCase):
         p.xr, p.yr, p.res = (-6000, 6000), (-9000, 9000), 38.0
         p.ui = RecordingUI()
         p.slots, p.ids, p.next_id, p.extra, p.extra_pos, p.count = {}, {}, 0, None, None, 0
-        p.gain, p.anchor, p.last = 1.0, {}, {}
+        p.gain, p.gx, p.anchor, p.last = 1.0, 1.0, {}, {}
         return p
 
     def test_no_virtual_finger_jumps_when_the_pair_becomes_one(self):
@@ -275,6 +276,13 @@ class VirtualTouchpad(unittest.TestCase):
         for xs in p.ui.xs.values():
             steps = [abs(b - a) for a, b in zip(xs, xs[1:])]
             self.assertLessEqual(max(steps or [0]), 2.7 * 20 + 1)
+
+    def test_mirrored_swipe_moves_the_other_way(self):
+        p = self.pad()
+        for i in range(10):
+            p.update([(1, 20 * i, 0), (2, 400 + 20 * i, 0)], 2.0, mirror=True)
+        xs = p.ui.xs[p.ids[1]]
+        self.assertLess(xs[-1], xs[0])  # fingers went right, the swipe goes left
 
     def test_new_finger_lands_next_to_the_one_already_down(self):
         p = self.pad()
@@ -401,6 +409,15 @@ class TouchpadSteadiness(EngineCase):
             self.frame((SLOT, 0), (X, 1030 - 3 * i - (100 if i % 8 < 4 else 0)), (Y, -1290 - (30 if i % 6 < 3 else 0)))
         self.assertTrue(self.eng.touches[1].grip)
         self.assertTrue(all(not c[0] for c in self.pad.calls))
+
+    def test_swipe_off_two_fingers_sideways_scroll_as_one(self):
+        self.cfg["touchpad"]["swipe"] = False
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 400), (MAJOR, 600),
+                   (SLOT, 1), (TID, 2), (X, 300), (Y, 450), (MAJOR, 600))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (X, -300 + 40 * i), (SLOT, 1), (X, 300 + 40 * i))
+        down = [c[0] for c in self.pad.calls if c[0]]
+        self.assertTrue(down and all(len(f) == 1 for f in down))
 
     def test_finger_staying_light_lifts(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))

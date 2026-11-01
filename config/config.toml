@@ -59,6 +59,8 @@ double_tap = ""              # smart zoom on macOS. Same rules
 enabled = true
 scroll_speed = 0.85  # scroll speed of the virtual touchpad (Hyprland scroll_factor, this device only)
 swipe_gain = 2.7     # during a two-finger swipe, finger travel counts this many times (the mouse is small)
+swipe = true         # two fingers sideways = the workspace swipe; false: they only scroll
+swipe_reverse = false  # the mouse swipes the other way round than the trackpad (whose direction Hyprland sets for all)
 
 [bar]
 show_percent = true  # show the number next to the mouse icon in the bar

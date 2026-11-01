@@ -193,6 +193,8 @@ DEFAULTS = {
         "enabled": True,
         "scroll_speed": 0.85,  # Hyprland scroll_factor for the virtual touchpad
         "swipe_gain": 2.7,  # with two fingers, finger travel counts this many times (the mouse is small)
+        "swipe": True,  # two fingers sideways = the workspace swipe; off: they only scroll
+        "swipe_reverse": False,  # the mouse swipes the other way round than the trackpad (Hyprland's direction)
     },
     "bar": {
         "show_percent": True,  # bar widget: show the number next to the icon (the panel's switch)
@@ -909,6 +911,7 @@ class VPad:
         self.extra_pos: tuple[float, float] | None = None
         self.count = 0
         self.gain = 1.0
+        self.gx = 1.0  # the gain sideways, negative while a swipe is mirrored
         self.anchor: dict[int, tuple[float, float, float, float]] = {}  # real tid -> real x, y, virtual x, y
         self.last: dict[int, tuple[float, float]] = {}
 
@@ -916,14 +919,17 @@ class VPad:
         self.next_id = self.next_id % 65000 + 1
         return self.next_id
 
-    def update(self, fingers: list[tuple[int, float, float]], gain: float) -> None:
+    def update(self, fingers: list[tuple[int, float, float]], gain: float, mirror: bool = False) -> None:
         """fingers: (real tracking id, x, y) to put down; [] lifts everything.
         No virtual finger ever jumps: a finger keeps its virtual place, a new one lands
-        relative to a finger that was already down, and the added finger moves along with it."""
+        relative to a finger that was already down, and the added finger moves along with it.
+        mirror: a swipe (two or more fingers) moves the other way sideways."""
         gain = min(max(gain, 1.0), VPAD_GROW) if len(fingers) >= 2 else TP_SCROLL_GAIN
-        if gain != self.gain:  # re-anchor, so no finger jumps when the gain changes
+        gx = -gain if mirror and len(fingers) >= 2 else gain
+        if (gain, gx) != (self.gain, self.gx):  # re-anchor, so no finger jumps on a change
             self.anchor.clear()
             self.gain = gain
+        self.gx = gx
         prev = dict(self.last)
         real = {f[0] for f in fingers}
         for tid in [t for t in self.last if t not in real]:
@@ -944,7 +950,7 @@ class VPad:
                     vx, vy = x, y  # a fresh landing: where it really is, in the middle of the bigger surface
                 self.anchor[tid] = (x, y, vx, vy)
             ax, ay, avx, avy = self.anchor[tid]
-            vx = min(max(avx + (x - ax) * gain, self.xr[0]), self.xr[1])
+            vx = min(max(avx + (x - ax) * gx, self.xr[0]), self.xr[1])
             vy = min(max(avy + (y - ay) * gain, self.yr[0]), self.yr[1])
             self.last[tid] = (vx, vy)
             want.append((self.ids[tid], vx, vy))
@@ -1552,6 +1558,7 @@ class Engine:
         A single finger lands where its slide began and catches up over a few frames, so a
         short flick is not cut to its tail."""
         gain = float(self.cfg["touchpad"]["swipe_gain"])
+        swipe_on = self.cfg["touchpad"].get("swipe", True) is True
         key = self.tp_key
         if key is not None:
             keep = []
@@ -1579,7 +1586,7 @@ class Engine:
                 t1 = self.touches[key[0]]
                 dx, dy = t1.x - self.tp_from[0], t1.y - self.tp_from[1]
                 sideways = abs(dx) >= TP_SWIPE_RATIO * abs(dy)
-                cand = self.swipe_partner(key[0]) if sideways or ts - self.tp_t0 < TP_PAIR_YOUNG else None
+                cand = self.swipe_partner(key[0]) if swipe_on and (sideways or ts - self.tp_t0 < TP_PAIR_YOUNG) else None
             if len(key) == 1 and cand is not None:
                 self.tp_pair_n += 1  # a second finger goes sideways along: a swipe after all
                 if self.tp_pair_n >= TP_PAIR_FRAMES:
@@ -1593,10 +1600,10 @@ class Engine:
         elif self.tp_swiped:
             self.why = "swipe done: lift all fingers"
         elif cand is not None:
-            if len(cand) == 2 and not self.swipe_pair(cand):
-                # up and down, the fingers scroll together: one is enough (more would be a swipe)
+            if len(cand) == 2 and not (swipe_on and self.swipe_pair(cand)):
+                # up and down (or swipe off), the fingers scroll together: one is enough (more would be a swipe)
                 cand = (max(cand, key=lambda t: math.hypot(*self.touches[t].recent())),)
-            if len(cand) == 1:
+            if len(cand) == 1 and swipe_on:
                 cand = self.swipe_partner(cand[0]) or cand  # sideways with a finger from the edge
             if self.tp_engage(ts, cand):
                 key = cand
@@ -1628,7 +1635,7 @@ class Engine:
                 self.tp_owed[t] = [ox, oy]
                 if math.hypot(ox, oy) < 1.0:
                     del self.tp_owed[t]
-        self.vpad.update(pos, gain)
+        self.vpad.update(pos, gain, self.cfg["touchpad"].get("swipe_reverse") is True)
         self.why = f"touchpad: {len(key)} finger{'s' if len(key) > 1 else ''} -> {len(key) + 1}" + \
             (" (swipe)" if len(key) >= 2 else " (scroll)") + (" held" if self.tp_light else "")
 

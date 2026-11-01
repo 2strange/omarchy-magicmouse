@@ -124,7 +124,7 @@ the open tab.
 |---|---|
 | Pointer | tracking speed, right-side click, Control-click, battery percentage in the bar |
 | Scroll | touchpad mode, natural scrolling, scroll speed; without touchpad mode also start distance, diagonal scrolling, momentum |
-| Gestures | swipe boost; without touchpad mode page flick, two-finger workspace switch, swipe distance, end of row, empty workspaces, direction |
+| Gestures | workspace swipe on/off, swipe direction reversed against the trackpad, swipe boost; without touchpad mode page flick, two-finger workspace switch, swipe distance, end of row, empty workspaces, direction |
 | Touch | touch preview, edge zones front / left / right, palm zone at the back, how far an edge finger slides before it scrolls |
 
 Everything lives in `~/.config/magic-mouse/config.toml` (commented, changes apply live).
@@ -153,9 +153,10 @@ comments, `magic-mouse-config get` prints the effective settings.
 
 - No pinch, no smart zoom, no Mission Control: the hooks for one- and two-finger double
   tap can run any command, they are off by default.
-- In touchpad mode the trackpad settings that Hyprland applies to every touchpad (for
-  example the three-finger gesture, end of row, swipe direction) are shared with your
-  built-in trackpad. Scroll speed and natural scrolling are set for the mouse alone.
+- In touchpad mode the trackpad settings that Hyprland applies to every touchpad (the
+  three-finger gesture, end of row, empty workspaces) are shared with your built-in
+  trackpad. Scroll speed, natural scrolling, the swipe on/off and its direction (same as
+  the trackpad or reversed) are set for the mouse alone.
 - The mouse is smaller than a trackpad: a full-hand swipe as on a Magic Trackpad does not
   fit, hence the swipe boost.
 - Two fingers that really slide while the hand holds the mouse can move the workspace, and
