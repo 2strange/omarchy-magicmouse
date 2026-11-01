@@ -147,7 +147,7 @@ Panel {
     point: ["pointer.tracking_speed", "buttons.right_click", "buttons.control_click", "bar.show_percent"],
     scroll: ["touchpad.enabled", "touchpad.scroll_speed", "scroll.natural", "scroll.speed", "scroll.start_mm", "scroll.free_axis", "momentum.enabled", "momentum.decay"],
     gestures: ["touchpad.swipe_gain", "gestures.swipe_pages", "gestures.two_finger_swipe_left", "gestures.two_finger_swipe_right", "gestures.invert_swipe", "gestures.swipe_mm", "gestures.swipe_end", "gestures.include_empty"],
-    touch: ["scroll.edge_left_mm", "scroll.edge_right_mm", "scroll.edge_front_mm", "scroll.edge_back_mm"]
+    touch: ["scroll.edge_front_mm", "scroll.edge_left_mm", "scroll.edge_right_mm", "scroll.edge_back_mm", "scroll.edge_release_mm"]
   })
   property var defaults: null
   readonly property bool tp: val("touchpad", "enabled", false) === true  // touchpad mode
@@ -563,29 +563,29 @@ Panel {
           }
           Text {
             width: parent.width
-            text: "A touch that starts in an edge zone counts as holding the mouse until it really slides. The back zone is the palm and is always ignored."
+            text: "A touch that starts in an edge zone holds the mouse: it scrolls only after sliding straight on for a while, so a finger resting there is ignored. In a sideways two-finger swipe it always counts. The back zone is the palm and is always ignored."
             color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; wrapMode: Text.WordWrap
+          }
+          SliderRow {
+            label: "Front edge"
+            valueText: root.mmText(root.val("scroll", "edge_front_mm", 0.0))
+            minimum: 0; maximum: 20; step: 0.5
+            value: root.val("scroll", "edge_front_mm", 0.0)
+            onChanged: function(v) { root.set("scroll", "edge_front_mm", v) }
           }
           SliderRow {
             label: "Left edge"
             valueText: root.mmText(root.val("scroll", "edge_left_mm", 3.0))
-            minimum: 0; maximum: 15; step: 0.5
+            minimum: 0; maximum: 25; step: 0.5
             value: root.val("scroll", "edge_left_mm", 3.0)
             onChanged: function(v) { root.set("scroll", "edge_left_mm", v) }
           }
           SliderRow {
             label: "Right edge"
             valueText: root.mmText(root.val("scroll", "edge_right_mm", 3.0))
-            minimum: 0; maximum: 15; step: 0.5
+            minimum: 0; maximum: 25; step: 0.5
             value: root.val("scroll", "edge_right_mm", 3.0)
             onChanged: function(v) { root.set("scroll", "edge_right_mm", v) }
-          }
-          SliderRow {
-            label: "Front edge"
-            valueText: root.mmText(root.val("scroll", "edge_front_mm", 0.0))
-            minimum: 0; maximum: 15; step: 0.5
-            value: root.val("scroll", "edge_front_mm", 0.0)
-            onChanged: function(v) { root.set("scroll", "edge_front_mm", v) }
           }
           SliderRow {
             label: "Back (palm, ignored)"
@@ -593,6 +593,13 @@ Panel {
             minimum: 0; maximum: 40; step: 1
             value: root.val("scroll", "edge_back_mm", 18.0)
             onChanged: function(v) { root.set("scroll", "edge_back_mm", v) }
+          }
+          SliderRow {
+            label: "Edge finger scrolls after"
+            valueText: root.mmText(root.val("scroll", "edge_release_mm", 3.0))
+            minimum: 1; maximum: 8; step: 0.5
+            value: root.val("scroll", "edge_release_mm", 3.0)
+            onChanged: function(v) { root.set("scroll", "edge_release_mm", v) }
           }
 
           Text {

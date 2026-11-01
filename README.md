@@ -21,14 +21,22 @@ understands well:
   three on the trackpad: Hyprland's live workspace swipe, which follows your fingers and
   goes back if you change your mind. The mouse is small, so a swipe counts your finger
   travel several times (**Swipe boost**, 2.7×).
+  As on a Mac, a scroll stays one scroll: a finger that rests or lands beside it is ignored,
+  up and down any number of fingers scroll as one, and only two fingers going sideways
+  together are the swipe. Small, gentle scrolls of a line or two count, and a short flick
+  counts from its very start.
 - **Touch check.** The surface already reports a finger 1-2 mm above it. A finger only
   counts once it really touches: big enough, and reporting at the rate of a real touch
   (a hovering finger reports less often). Once it counts, it keeps counting while it gets
   lighter as it slides. Two fingers together need less, since one of them usually comes
-  in from the side.
-- **Fingers that only hold the mouse don't count.** Touches that land on the side edges
-  hold the mouse until they really slide; the back of the surface is where your palm
-  rests and is ignored. Each zone is adjustable per side.
+  in from the side. A report with no width is a finger hovering over the edge and never
+  counts.
+- **Fingers that only hold the mouse don't count.** Touches that land in an edge zone
+  hold the mouse: they scroll only after sliding straight on for a few millimetres, so a
+  finger resting or wobbling there is ignored, while in a sideways two-finger swipe they
+  always count. The back of the surface is where your palm rests and is ignored. Each
+  zone is adjustable per side, so you can leave as wide or as narrow a scroll area in
+  the middle as you like.
 - **Pointer.** Apple's own acceleration curve (from the open-source IOHIDFamily driver),
   driven by the same "Tracking speed" number as the macOS slider, with smoothing so
   Bluetooth bursts can't make the cursor jump. A click briefly freezes the pointer so the
@@ -117,7 +125,7 @@ the open tab.
 | Pointer | tracking speed, right-side click, Control-click, battery percentage in the bar |
 | Scroll | touchpad mode, natural scrolling, scroll speed; without touchpad mode also start distance, diagonal scrolling, momentum |
 | Gestures | swipe boost; without touchpad mode page flick, two-finger workspace switch, swipe distance, end of row, empty workspaces, direction |
-| Touch | touch preview, edge zones left / right / front, palm zone at the back |
+| Touch | touch preview, edge zones front / left / right, palm zone at the back, how far an edge finger slides before it scrolls |
 
 Everything lives in `~/.config/magic-mouse/config.toml` (commented, changes apply live).
 `magic-mouse-config set touchpad.swipe_gain=3` edits it from a shell without touching your
@@ -130,7 +138,7 @@ comments, `magic-mouse-config get` prints the effective settings.
 | two-finger swipe hard to start | lower the two-finger size, raise Swipe boost |
 | touchpad scrolling too fast / slow | Scroll speed on the Scroll tab (`touchpad.scroll_speed`) |
 | pointer too slow / fast | Tracking speed, same scale as macOS (0 to 3, Apple default 0.6875) |
-| a finger holding the mouse scrolls | widen the edge zone on that side |
+| a finger holding the mouse scrolls | widen the edge zone on that side, or raise "Edge finger scrolls after" |
 | the palm scrolls | raise the back zone |
 
 ## Tested on

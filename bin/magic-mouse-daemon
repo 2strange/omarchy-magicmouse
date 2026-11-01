@@ -162,7 +162,7 @@ DEFAULTS = {
         "edge_left_mm": 3.0,
         "edge_right_mm": 3.0,
         "edge_front_mm": 0.0,
-        "edge_release_mm": 2.0,  # ...until it slides this far (more than the mouse moves): then it may scroll
+        "edge_release_mm": 3.0,  # ...until it slides this far, straight on (more than the mouse moves): then it may scroll
         "edge_back_mm": 18.0,  # touches that start this close to the back are the palm: always ignored (0 = off)
     },
     "buttons": {
