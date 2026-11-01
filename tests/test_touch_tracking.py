@@ -373,6 +373,15 @@ class TouchpadSteadiness(EngineCase):
             self.frame((SLOT, 0), (X, -700 + 45 * i), (SLOT, 1), (X, 200 + 45 * i))
         self.assertEqual(self.pad.calls[-1][0], [1, 2])
 
+    def test_edge_finger_left_after_a_swipe_holds_again(self):
+        self.test_swipe_with_a_finger_from_the_edge_is_a_swipe()
+        self.frame((SLOT, 1), (TID, -1))  # the middle finger lifts, the edge finger stays on the mouse
+        self.frame((SLOT, 2), (TID, 3), (X, 300), (Y, -500), (MAJOR, 600))
+        for i in range(1, 25):  # a new finger scrolls down
+            self.frame((SLOT, 2), (Y, -500 + 40 * i))
+        self.assertTrue(self.eng.touches[1].grip)
+        self.assertEqual(self.pad.calls[-1][0], [3])
+
     def test_one_finger_sideways_then_a_second_joins_is_a_swipe(self):
         self.frame((SLOT, 0), (TID, 1), (X, 200), (Y, -1100), (MAJOR, 600))
         for i in range(1, 30):

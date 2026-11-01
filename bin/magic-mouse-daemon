@@ -102,7 +102,7 @@ def EVIOCGMTSLOTS(length: int) -> int:
 class Touch:
     """One finger on the surface, from landing to lift."""
 
-    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size", "rate", "path")
+    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size", "rate", "path", "edge0")
 
     def __init__(self, ts: float, x: int, y: int, grip: bool, palm: bool = False) -> None:
         self.x, self.y, self.grip, self.palm = x, y, grip or palm, palm
@@ -114,6 +114,7 @@ class Touch:
         self.size = 0
         self.rate = 0.0  # this finger's reports per second, smoothed (for the preview)
         self.path = 0.0  # distance travelled along the way, in touch units (a wobble adds up, a slide too)
+        self.edge0 = grip and not palm  # landed in an edge zone (grip may be cleared later)
         self.hist: collections.deque = collections.deque([(ts, x, y)])
 
     def update(self, ts: float, x: int, y: int) -> None:
@@ -1479,6 +1480,8 @@ class Engine:
                 self.touches[tid].ptr0 = self.ptr_total
             else:
                 t.update(ts, x, y)
+                if t.grip and not t.palm and math.hypot(*t.recent()) / self.res_x < MOVING_MM / 2:
+                    t.x0, t.y0, t.path = x, y, 0.0  # at rest: a later slide is judged from here
                 if t.grip and not t.palm and self.edge_finger_slides(ts, t):
                     t.grip = False  # it came in from the edge but really slides: let it scroll
                     t.hist.clear()
@@ -1562,6 +1565,11 @@ class Engine:
             if len(key) >= 2 and len(keep) < len(key):
                 keep = []  # one finger of a swipe lifted: the swipe is over, the other must not scroll
                 self.tp_swiped = True
+                for t in key:
+                    o = self.touches.get(t)
+                    if o is not None and o.edge0:
+                        o.grip = True  # back to holding the mouse, as before the swipe
+                        o.x0, o.y0, o.path, o.ptr0 = o.x, o.y, 0.0, self.ptr_total  # a new slide counts from here
             key = tuple(keep) or None
         if not fingers:
             self.tp_swiped = False
@@ -1579,6 +1587,7 @@ class Engine:
                     self.tp_pair_n = 0
                     for t in key:
                         self.touches[t].grip = False
+                    self.tp_owed.clear()  # no catch-up left that would move one finger of the pair
             else:
                 self.tp_pair_n = 0
         elif self.tp_swiped:
@@ -2063,12 +2072,18 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
             eng.scrolling = False
             eng.tp_key = None
             eng.tp_light.clear()
+            eng.tp_owed.clear()
+            eng.tp_swiped = False
+            eng.tp_pair_n = 0
             vpad_cfg = None
         elif not want and eng.vpad is not None:
             eng.vpad.close()
             eng.vpad = None
             eng.tp_key = None
             eng.tp_light.clear()
+            eng.tp_owed.clear()
+            eng.tp_swiped = False
+            eng.tp_pair_n = 0
             log("touchpad mode off")
         if eng.vpad is not None:
             lua = vpad_lua(eng.cfg)
