@@ -139,6 +139,8 @@ ShellRoot {
     implicitHeight: 900
     color: shell.bg
     visible: true
+    // closing the window ends the preview; otherwise the process lingers and keeps a probe slot
+    onVisibleChanged: if (!visible) Qt.quit()
 
     Row {
       anchors.fill: parent
