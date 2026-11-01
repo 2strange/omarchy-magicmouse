@@ -1,7 +1,7 @@
 """Checks for status-reader.py, the bounded reader the bar widget runs instead
 of opening $XDG_RUNTIME_DIR/magic-mouse/battery.json from inside the shell.
 
-Run from the repo root:  python3 -m unittest discover -s tests -v
+Run from the repo root:  /usr/bin/python3 -m unittest discover -s tests -v
 """
 import importlib.util
 import json

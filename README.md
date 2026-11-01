@@ -205,7 +205,7 @@ short-lived child (`status-reader.py`) under `timeout`, never inside the shell.
 ## Development
 
 ```sh
-python3 -m unittest discover -s tests -v
+/usr/bin/python3 -m unittest discover -s tests -v
 ```
 
 The tests drive the daemon's engine with synthetic touch frames (touch tracking, touch

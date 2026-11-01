@@ -2,7 +2,7 @@
 silent slots, ghost slots, restores, slot reuse and two-finger pairing.
 Needs python-evdev, like the daemon itself.
 
-Run from the repo root:  python3 -m unittest discover -s tests -v
+Run from the repo root:  /usr/bin/python3 -m unittest discover -s tests -v
 """
 import importlib.machinery
 import importlib.util
