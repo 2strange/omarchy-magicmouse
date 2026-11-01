@@ -1481,7 +1481,7 @@ class Engine:
             else:
                 t.update(ts, x, y)
                 if t.grip and not t.palm and math.hypot(*t.recent()) / self.res_x < MOVING_MM / 2:
-                    t.x0, t.y0, t.path = x, y, 0.0  # at rest: a later slide is judged from here
+                    t.x0, t.y0, t.path, t.ptr0 = x, y, 0.0, self.ptr_total  # at rest: a later slide is judged from here
                 if t.grip and not t.palm and self.edge_finger_slides(ts, t):
                     t.grip = False  # it came in from the edge but really slides: let it scroll
                     t.hist.clear()
