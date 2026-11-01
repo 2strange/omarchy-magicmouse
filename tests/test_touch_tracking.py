@@ -419,6 +419,15 @@ class TouchpadSteadiness(EngineCase):
         down = [c[0] for c in self.pad.calls if c[0]]
         self.assertTrue(down and all(len(f) == 1 for f in down))
 
+    def test_reversed_swipe_is_sent_mirrored(self):
+        self.cfg["touchpad"]["swipe_reverse"] = True
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 400), (MAJOR, 600),
+                   (SLOT, 1), (TID, 2), (X, 300), (Y, 450), (MAJOR, 600))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (X, -300 + 40 * i), (SLOT, 1), (X, 300 + 40 * i))
+        self.assertEqual(self.pad.calls[-1][0], [1, 2])
+        self.assertTrue(self.pad.mirror)
+
     def test_finger_staying_light_lifts(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
         for i in range(1, 10):
