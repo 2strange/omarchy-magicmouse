@@ -33,6 +33,11 @@ touch_start_size = 300   # a single finger needs this size... (0 = no check)
 touch_rate = 42          # ...in 3 reports in a row at this many reports per second or faster (hover reports less often)
 touch_hold_size = 250    # once counted, it keeps counting down to this size
 touch_pair_size = 250    # two fingers at this size count at once (one often comes in from the side)
+touch_front_size = 540   # near the front a hover is as big as a light touch: a single finger needs this there (0 = off)...
+touch_front_mm = 15      # ...within this far of the front, easing back to touch_start_size over as far again
+touch_straight = 0.5     # touchpad mode: a finger goes down (or joins) only while sliding this straight
+                         # (start-to-end distance / path; a hover wobbling on the spot ~0.1, slides 0.77+). 0 = off
+touch_reverse_mm = 0.5   # touchpad mode: play before a finger down moves the other way, so a wobble scrolls nothing. 0 = off
 
 [buttons]
 middle = "left"      # click in the centre zone: "left" (macOS has no middle click), "middle" (paste on Linux), "right"

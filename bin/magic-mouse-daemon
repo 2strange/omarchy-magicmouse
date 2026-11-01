@@ -129,6 +129,13 @@ class Touch:
         _, x, y = self.hist[0]
         return self.x - x, self.y - y
 
+    def straightness(self) -> float:
+        """Distance from start to end over path length, over (about) the last MOVE_WINDOW:
+        1 for a straight slide, near 0 for a wobble on the spot. 1 while it has not moved."""
+        pts = list(self.hist)
+        path = sum(math.hypot(b[1] - a[1], b[2] - a[2]) for a, b in zip(pts, pts[1:]))
+        return math.hypot(*self.recent()) / path if path > 0 else 1.0
+
 DEFAULTS = {
     "pointer": {
         "tracking_speed": 0.6875,  # macOS "Tracking speed" slider, 0.0 .. 3.0 (Apple default 0.6875)
@@ -158,6 +165,20 @@ DEFAULTS = {
         "touch_hold_size": 250.0,
         "touch_pair_size": 250.0,  # two fingers at this size or more both count at once (0 = the hold size)
         "touch_rate": 42.0,  # reports per second a touch must reach (touch ~60-77, hover ~40); 0 = any rate
+        # Near the front the finger lies flatter: a hover there is as big as a light touch further
+        # back (measured: hover ~470, touch ~710 within 15 mm). Within touch_front_mm a single finger
+        # needs touch_front_size to start, easing back to touch_start_size over as far again.
+        "touch_front_size": 540.0,  # 0 = off (same start size everywhere)
+        "touch_front_mm": 15.0,
+        # A hovering finger wobbles on the spot, a real slide goes one way (measured: hover ~0.1,
+        # slides 0.77 and more). A finger goes down on the virtual touchpad, or joins one already
+        # down, only while its travel over the last MOVE_WINDOW is at least this straight
+        # (distance from start to end / path length). 0 = off.
+        "touch_straight": 0.5,
+        # Play on the virtual touchpad: a finger already down moves it only once it pushes past this,
+        # so a wobble on the spot is no scroll back and forth. A slide runs on without a jerk, a turn
+        # costs this much travel. 0 = off.
+        "touch_reverse_mm": 0.5,
         "free_axis": False,  # diagonal scrolling: both axes at once instead of locking to one per scroll
         # A touch that lands this close to the left, right or front edge counts as holding the mouse...
         "edge_left_mm": 3.0,
@@ -1030,6 +1051,7 @@ class Engine:
         self.tp_light: dict[int, float] = {}  # finger down on the virtual touchpad -> since when it is too light
         self.tp_swiped = False  # a swipe ended with a finger still on: nothing more until all fingers lift
         self.tp_owed: dict[int, list[float]] = {}  # finger -> travel from before it went down, still to replay
+        self.tp_out: dict[int, list[float]] = {}  # finger -> where it is on the virtual touchpad, with play (touch_reverse_mm)
         self.why = ""  # why the last frame did (or did not) scroll; for the probe
         self.why_locked = False
         self.curve = AppleCurve(float(cfg["pointer"]["tracking_speed"]))
@@ -1619,6 +1641,7 @@ class Engine:
         self.primary = key
         self.tp_light = {t: v for t, v in self.tp_light.items() if key and t in key}
         self.tp_owed = {t: v for t, v in self.tp_owed.items() if key and t in key}
+        self.tp_out = {t: v for t, v in self.tp_out.items() if key and t in key}
         if key is None:
             if not fingers:
                 light = [t.size for t in self.touches.values() if not t.grip]
@@ -1629,7 +1652,7 @@ class Engine:
         pos = []
         for t in key:
             ox, oy = self.tp_owed.get(t, (0.0, 0.0))
-            pos.append((t, self.touches[t].x + ox, self.touches[t].y + oy))
+            pos.append((t, *self.with_play(t, self.touches[t].x + ox, self.touches[t].y + oy)))
             if t in self.tp_owed:  # catch up over a few frames, not in one jump
                 ox, oy = ox * TP_CATCH_UP, oy * TP_CATCH_UP
                 self.tp_owed[t] = [ox, oy]
@@ -1639,6 +1662,23 @@ class Engine:
         self.why = f"touchpad: {len(key)} finger{'s' if len(key) > 1 else ''} -> {len(key) + 1}" + \
             (" (swipe)" if len(key) >= 2 else " (scroll)") + (" held" if self.tp_light else "")
 
+    def with_play(self, t: int, x: float, y: float) -> tuple[float, float]:
+        """Where finger t is on the virtual touchpad: it follows the real one with touch_reverse_mm
+        of play on each axis (backlash), so a wobble within it moves nothing. It goes down at the
+        trailing end of the play in the direction it slides, so the slide itself carries on at once."""
+        play = max(float(self.cfg["scroll"].get("touch_reverse_mm", 0.0)), 0.0) * self.res_x
+        out = self.tp_out.get(t)
+        if out is None:
+            rx, ry = self.touches[t].recent()
+            out = self.tp_out[t] = [x - math.copysign(play, rx) if rx else x,
+                                    y - math.copysign(play, ry) if ry else y]
+        for i, v in enumerate((x, y)):
+            if v > out[i] + play:
+                out[i] = v - play
+            elif v < out[i] - play:
+                out[i] = v + play
+        return out[0], out[1]
+
     def swipe_partner(self, t1: int) -> tuple[int, ...] | None:
         """t1 and another confirmed finger sliding sideways the same way, as a sorted pair. The
         other may have landed on an edge: holding the mouse there is ignored, a swipe is not."""
@@ -1647,7 +1687,7 @@ class Engine:
             return None
         best = None
         for t, o in self.touches.items():
-            if t == t1 or o.palm or not o.ok:
+            if t == t1 or o.palm or not o.ok or self.wobbling(o):
                 continue
             bx, by = o.recent()
             m = abs(bx) / self.res_x
@@ -1677,7 +1717,15 @@ class Engine:
         if self.pointer_moving(ts) and (slide < MIN_SLIDE_MM or slide < POINTER_RATIO * self.pointer_mm(ts, MOVE_WINDOW)):
             self.why = "mouse moving: finger slide too small"
             return False
+        if any(self.wobbling(self.touches[t]) for t in key):
+            self.why = "finger wobbling on the spot (hover?)"
+            return False
         return True
+
+    def wobbling(self, t: Touch) -> bool:
+        """Moving, but back and forth rather than one way: a finger hovering just above."""
+        straight = float(self.cfg["scroll"].get("touch_straight", 0.0))
+        return straight > 0 and t.straightness() < straight
 
     def confirm_touches(self, ts: float, reports: dict[int, int]) -> None:
         """Hysteresis on contact size: a finger counts once it touches firmly (big and
@@ -1713,7 +1761,7 @@ class Engine:
                 continue
             if start <= 0 or (not t.grip and (anchor or two) and size >= min(hold, pair)):
                 t.ok = True  # off, or one of two fingers (next to a confirmed one, or two at once)
-            elif size >= start:
+            elif size >= self.start_size(t, start):
                 t.firm = t.firm + 1 if gap <= max_gap else 1
                 t.ok = t.firm >= FIRM_REPORTS
             else:
@@ -1721,6 +1769,18 @@ class Engine:
             if t.ok and not t.grip:
                 anchor = True
                 self.stop_coast("touch")
+
+    def start_size(self, t: Touch, start: float) -> float:
+        """The size a single finger needs to start where it is: touch_front_size within
+        touch_front_mm of the front, easing back to the start size over as far again."""
+        sc = self.cfg["scroll"]
+        front = float(sc.get("touch_front_size", 0.0))
+        depth = float(sc.get("touch_front_mm", 0.0))
+        if front <= start or depth <= 0:
+            return start
+        mm_in = (t.y - self.y_min) / self.res_y
+        share = min(max((2 * depth - mm_in) / depth, 0.0), 1.0)  # 1 up to depth, 0 from twice the depth
+        return start + (front - start) * share
 
     def edge_finger_slides(self, ts: float, t: Touch) -> bool:
         """A finger that landed in the edge zone slides on the surface (not just with the hand)."""
@@ -2080,6 +2140,7 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
             eng.tp_key = None
             eng.tp_light.clear()
             eng.tp_owed.clear()
+            eng.tp_out.clear()
             eng.tp_swiped = False
             eng.tp_pair_n = 0
             vpad_cfg = None
@@ -2089,6 +2150,7 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
             eng.tp_key = None
             eng.tp_light.clear()
             eng.tp_owed.clear()
+            eng.tp_out.clear()
             eng.tp_swiped = False
             eng.tp_pair_n = 0
             log("touchpad mode off")

@@ -189,6 +189,25 @@ class TouchConfirm(EngineCase):
         self.slide(0, 10, 680)
         self.assertFalse(self.eng.touches[1].ok)
 
+    def test_front_zone_needs_the_front_size(self):
+        front = -1589 + 5 * 38  # 5 mm from the front edge, past the default grip zone
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, front), (MAJOR, 480))
+        self.slide(0, 5, 480, y0=front, step=4)
+        self.assertFalse(self.eng.touches[1].ok)  # a hover there is this big
+        self.frame((SLOT, 1), (TID, 2), (X, 500), (Y, front), (MAJOR, 650))
+        self.slide(1, 5, 650, y0=front, step=4)
+        self.assertTrue(self.eng.touches[2].ok)
+
+    def test_front_size_eases_back_to_the_start_size(self):
+        eng, start = self.eng, 300.0
+        at = lambda mm: eng.start_size(types.SimpleNamespace(y=eng.y_min + mm * eng.res_y), start)
+        self.assertEqual(at(10), 540)
+        self.assertAlmostEqual(at(22.5), 420)
+        self.assertEqual(at(30), start)
+        self.assertEqual(at(60), start)
+        self.cfg["scroll"]["touch_front_size"] = 0
+        self.assertEqual(at(10), start)
+
     def test_off_counts_every_touch(self):
         self.cfg["scroll"]["touch_start_size"] = 0
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 100))
@@ -371,7 +390,41 @@ class TouchpadSteadiness(EngineCase):
         first = next(i for i, c in enumerate(self.pad.calls) if c[0])
         y_down = self.pad.pos[first][0][1]
         self.assertLess(y_down, 40 * (first + 1) - 40)  # behind the finger: the slide so far is replayed
-        self.assertAlmostEqual(self.pad.pos[-1][0][1], self.eng.touches[1].y, delta=2)  # caught up
+        play = self.cfg["scroll"]["touch_reverse_mm"] * daemon.TOUCH_UNITS_PER_MM
+        self.assertAlmostEqual(self.pad.pos[-1][0][1], self.eng.touches[1].y - play, delta=2)  # caught up, minus the play
+
+    def test_hovering_finger_wobbling_on_the_spot_stays_up(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 1200), (MAJOR, 600))
+        for i in range(1, 40):  # big enough to count, but only back and forth by 1 mm
+            self.frame((SLOT, 0), (Y, 1200 + (38 if i % 2 else -38)), (MAJOR, 600))
+        self.assertTrue(self.eng.touches[1].ok)
+        self.assertFalse(any(c[0] for c in self.pad.calls))
+        self.assertIn("wobbling", self.eng.why)
+
+    def test_wobbling_second_finger_does_not_join_a_swipe(self):
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 1200), (MAJOR, 600))
+        for i in range(1, 30):  # one finger slides sideways, a second hovers beside it, wobbling
+            ev = [(SLOT, 0), (X, -300 + 40 * i), (MAJOR, 600)]
+            if i == 3:
+                ev += [(SLOT, 1), (TID, 2), (X, 300), (Y, 1100), (MAJOR, 600)]
+            elif i > 3:
+                ev += [(SLOT, 1), (X, 300 + (40 if i % 2 else -40)), (MAJOR, 600)]
+            self.frame(*ev)
+        self.assertTrue(all(c[0] == [1] for c in self.pad.calls if c[0]))
+
+    def test_wobble_of_a_finger_down_moves_nothing(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        for i in range(1, 16):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600))
+        for i in range(10):  # stops and wobbles by less than the play
+            self.frame((SLOT, 0), (Y, 600 + (12 if i % 2 else -12)), (MAJOR, 600))
+        ys = [p[0][1] for p in self.pad.pos[-10:]]
+        self.assertEqual(len(set(ys[1:])), 1)  # at most the first nudge on, then nothing
+        self.assertTrue(all(b >= a for a, b in zip(ys, ys[1:])))  # never back: no scroll to and fro
+        still = ys[-1]
+        for i in range(1, 6):  # slides on: follows again
+            self.frame((SLOT, 0), (Y, 600 + 40 * i), (MAJOR, 600))
+        self.assertGreater(self.pad.pos[-1][0][1], still)
 
     def test_swipe_with_a_finger_from_the_edge_is_a_swipe(self):
         self.cfg["scroll"]["edge_left_mm"] = 13.0

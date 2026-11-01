@@ -30,7 +30,10 @@ understands well:
   (a hovering finger reports less often). Once it counts, it keeps counting while it gets
   lighter as it slides. Two fingers together need less, since one of them usually comes
   in from the side. A report with no width is a finger hovering over the edge and never
-  counts.
+  counts. Near the front, where the finger lies flatter and a hover looks as big as a light
+  touch, a single finger needs a bigger start size. In touchpad mode a finger that wobbles
+  on the spot instead of sliding one way stays up, and a finger already down has a little
+  play: a wobble within it scrolls nothing back and forth, a slide runs on without a jerk.
 - **Fingers that only hold the mouse don't count.** Touches that land in an edge zone
   hold the mouse: they scroll only after sliding straight on for a few millimetres, so a
   finger resting or wobbling there is ignored, while in a sideways two-finger swipe they
@@ -62,7 +65,8 @@ every contact with its size and report rate, which ones are followed, resting, n
 touching yet, on an edge or the palm, the edge zones, and the reason for every decision
 ("not touching yet (size 210)", "touchpad: 2 fingers -> 3 (swipe)", …).
 
-Its sliders set the touch check (start size, hold size, two-finger size, report rate)
+Its sliders set the touch check (start size, hold size, two-finger size, report rate,
+front zone, straight slide, play on turn)
 while you watch your own fingers, so you can tune the mouse to your hand in a minute.
 Sizes are the mouse's own scale (0 to about 1000). It runs from a terminal too:
 
@@ -134,6 +138,7 @@ comments, `magic-mouse-config get` prints the effective settings.
 | Feels like… | Change |
 |---|---|
 | scrolls while the finger only hovers | raise the start size or the report rate in the preview |
+| flickers, tiny scrolls to and fro while a finger hovers close | raise Straight slide or Play on turn; near the front: Front start size |
 | a light touch does not scroll | lower the start size; a scroll that stops while sliding: lower the hold size |
 | two-finger swipe hard to start | lower the two-finger size, raise Swipe boost |
 | touchpad scrolling too fast / slow | Scroll speed on the Scroll tab (`touchpad.scroll_speed`) |

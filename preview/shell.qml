@@ -87,7 +87,7 @@ ShellRoot {
     var cs = o.c || []
     for (var i = 0; i < cs.length; i++) peakMajor = Math.max(peakMajor, cs[i][3])
     if (o.why && o.why !== why) {
-      var next = log.slice(-11)
+      var next = log.slice(-7)
       next.push({ t: new Date().toLocaleTimeString(Qt.locale(), "HH:mm:ss.zzz"), why: o.why })
       log = next
     }
@@ -172,6 +172,11 @@ ShellRoot {
           Rectangle { x: 0; width: shell.zones[0] * parent.mmPx; height: parent.height; color: "#ffffff"; opacity: 0.06 }
           Rectangle { x: parent.width - width; width: shell.zones[1] * parent.mmPx; height: parent.height; color: "#ffffff"; opacity: 0.06 }
           Rectangle { y: 0; width: parent.width; height: shell.zones[2] * parent.mmPx; color: "#ffffff"; opacity: 0.06 }
+          Rectangle {  // front zone with the higher start size; the easing band below it is not drawn
+            y: 0; width: parent.width; height: Number(shell.cfgVal("scroll", "touch_front_mm", 0)) * parent.mmPx
+            visible: Number(shell.cfgVal("scroll", "touch_front_size", 0)) > 0
+            color: shell.roleColor.hover; opacity: 0.08
+          }
           Rectangle { y: parent.height - height; width: parent.width; height: shell.zones[3] * parent.mmPx; color: shell.roleColor.palm; opacity: 0.10 }
           Text { anchors.top: parent.top; anchors.topMargin: 8; anchors.horizontalCenter: parent.horizontalCenter; text: "front"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11 }
           Text { visible: shell.zones[3] > 0; anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.horizontalCenter: parent.horizontalCenter; text: "palm"; color: shell.roleColor.palm; font.family: shell.mono; font.pixelSize: 11 }
@@ -258,6 +263,10 @@ ShellRoot {
         Tune { label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
         Tune { label: "Two-finger size"; section: "scroll"; key: "touch_pair_size"; from: 0; to: 900; step: 10; fallback: 250 }
         Tune { label: "Touch report rate"; section: "scroll"; key: "touch_rate"; from: 0; to: 90; step: 1; unit: " /s"; fallback: 45; hint: "0 = any" }
+        Tune { label: "Front start size"; section: "scroll"; key: "touch_front_size"; from: 0; to: 900; step: 10; fallback: 540; hint: "0 = off" }
+        Tune { label: "Front zone"; section: "scroll"; key: "touch_front_mm"; from: 0; to: 40; step: 1; unit: " mm"; fallback: 15; hint: "eases out over as far again" }
+        Tune { visible: shell.tp; label: "Straight slide"; section: "scroll"; key: "touch_straight"; from: 0; to: 1; step: 0.05; decimals: 2; fallback: 0.5; hint: "hover wobble ~0.1, 0 = off" }
+        Tune { visible: shell.tp; label: "Play on turn"; section: "scroll"; key: "touch_reverse_mm"; from: 0; to: 2; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.5; hint: "0 = off" }
         Tune { visible: !shell.tp; label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }
         Tune { visible: !shell.tp; label: "Scroll speed"; section: "scroll"; key: "speed"; from: 0.2; to: 4; step: 0.1; decimals: 1; unit: "×"; fallback: 1.0 }
         Tune { visible: shell.tp; label: "Touchpad scroll speed"; section: "touchpad"; key: "scroll_speed"; from: 0.05; to: 2; step: 0.025; decimals: 3; unit: "×"; fallback: 0.35 }
