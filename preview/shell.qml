@@ -260,7 +260,7 @@ ShellRoot {
         Tune { label: "Touch report rate"; section: "scroll"; key: "touch_rate"; from: 0; to: 90; step: 1; unit: " /s"; fallback: 45; hint: "0 = any" }
         Tune { visible: !shell.tp; label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }
         Tune { visible: !shell.tp; label: "Scroll speed"; section: "scroll"; key: "speed"; from: 0.2; to: 4; step: 0.1; decimals: 1; unit: "×"; fallback: 1.0 }
-        Tune { visible: shell.tp; label: "Touchpad scroll speed"; section: "touchpad"; key: "scroll_speed"; from: 0.3; to: 2; step: 0.05; decimals: 2; unit: "×"; fallback: 0.85 }
+        Tune { visible: shell.tp; label: "Touchpad scroll speed"; section: "touchpad"; key: "scroll_speed"; from: 0.05; to: 2; step: 0.025; decimals: 3; unit: "×"; fallback: 0.35 }
         Tune { visible: shell.tp; label: "Swipe boost"; section: "touchpad"; key: "swipe_gain"; from: 1; to: 5; step: 0.1; decimals: 1; unit: "×"; fallback: 2.7 }
 
         Text { text: "SIZE PER CONTACT"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }

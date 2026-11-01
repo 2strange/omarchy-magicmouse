@@ -23,7 +23,7 @@ horizontal = true
 free_axis = false    # diagonal scrolling: both axes at once (handy in code editors). false = each scroll locks to one axis
 edge_left_mm = 3.0   # a touch landing this close to an edge holds the mouse (0 = no zone)...
 edge_right_mm = 3.0
-edge_front_mm = 0.0
+edge_front_mm = 2.0
 edge_release_mm = 3.0  # ...until it slides this far, straight on (plus 3x what the hand moved the mouse);
                        # in a sideways two-finger swipe an edge finger always counts
 edge_back_mm = 18.0  # touches that start this close to the back are the palm: always ignored (0 = off)
@@ -57,7 +57,7 @@ double_tap = ""              # smart zoom on macOS. Same rules
 # swipe (needs a 3-finger workspace gesture in Hyprland). [scroll] speed, start_mm, free_axis,
 # [momentum] and the two-finger swipe above rest while it is on; the touch check and edges still apply.
 enabled = true
-scroll_speed = 0.85  # scroll speed of the virtual touchpad (Hyprland scroll_factor, this device only)
+scroll_speed = 0.35  # scroll speed of the virtual touchpad (Hyprland scroll_factor, this device only)
 swipe_gain = 2.7     # during a two-finger swipe, finger travel counts this many times (the mouse is small)
 swipe = true         # two fingers sideways = the workspace swipe; false: they only scroll
 swipe_reverse = false  # the mouse swipes the other way round than the trackpad (whose direction Hyprland sets for all)

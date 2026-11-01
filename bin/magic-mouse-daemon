@@ -162,7 +162,7 @@ DEFAULTS = {
         # A touch that lands this close to the left, right or front edge counts as holding the mouse...
         "edge_left_mm": 3.0,
         "edge_right_mm": 3.0,
-        "edge_front_mm": 0.0,
+        "edge_front_mm": 2.0,
         "edge_release_mm": 3.0,  # ...until it slides this far, straight on (more than the mouse moves): then it may scroll
         "edge_back_mm": 18.0,  # touches that start this close to the back are the palm: always ignored (0 = off)
     },
@@ -191,7 +191,7 @@ DEFAULTS = {
         # workspace swipe). Scroll settings, momentum and the two-finger swipe above then rest;
         # edges, palm and the touch check still decide which fingers count.
         "enabled": True,
-        "scroll_speed": 0.85,  # Hyprland scroll_factor for the virtual touchpad
+        "scroll_speed": 0.35,  # Hyprland scroll_factor for the virtual touchpad (the surface is long: scrolls far)
         "swipe_gain": 2.7,  # with two fingers, finger travel counts this many times (the mouse is small)
         "swipe": True,  # two fingers sideways = the workspace swipe; off: they only scroll
         "swipe_reverse": False,  # the mouse swipes the other way round than the trackpad (Hyprland's direction)

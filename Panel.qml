@@ -385,10 +385,10 @@ Panel {
           SliderRow {
             visible: root.tp
             label: "Scroll speed"
-            valueText: root.fmt1(root.val("touchpad", "scroll_speed", 0.85)) + "×"
-            minimum: 0.3; maximum: 2.0; step: 0.05
-            value: root.val("touchpad", "scroll_speed", 0.85)
-            onChanged: function(v) { root.set("touchpad", "scroll_speed", Math.round(v * 100) / 100) }
+            valueText: (Math.round(root.val("touchpad", "scroll_speed", 0.35) * 1000) / 1000).toString() + "×"
+            minimum: 0.05; maximum: 2.0; step: 0.025
+            value: root.val("touchpad", "scroll_speed", 0.35)
+            onChanged: function(v) { root.set("touchpad", "scroll_speed", Math.round(v * 1000) / 1000) }
           }
           SliderRow {
             visible: !root.tp
@@ -582,9 +582,9 @@ Panel {
           }
           SliderRow {
             label: "Front edge"
-            valueText: root.mmText(root.val("scroll", "edge_front_mm", 0.0))
+            valueText: root.mmText(root.val("scroll", "edge_front_mm", 2.0))
             minimum: 0; maximum: 20; step: 0.5
-            value: root.val("scroll", "edge_front_mm", 0.0)
+            value: root.val("scroll", "edge_front_mm", 2.0)
             onChanged: function(v) { root.set("scroll", "edge_front_mm", v) }
           }
           SliderRow {
