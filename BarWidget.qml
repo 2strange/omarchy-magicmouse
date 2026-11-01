@@ -8,13 +8,15 @@ import qs.Ui
 // mouse (or, failing that, the first HID battery). Hidden when there is none.
 // Settings on the bar entry in shell.json:
 //   "match": "MMM"   only consider devices whose model contains this text
-//   "lowAt": 20      highlight at or below this percentage
+//   "lowAt": 20      highlight (amber) at or below this percentage
+//   "criticalAt": 10 red at or below this percentage
 BarWidget {
   id: root
   moduleName: "io.github.2strange.magicmouse"
 
   readonly property string match: String(setting("match", ""))
   readonly property int lowAt: Number(setting("lowAt", 20))
+  readonly property int criticalAt: Number(setting("criticalAt", 10))
   readonly property var devices: UPower.devices ? UPower.devices.values : []
 
   readonly property var device: {
@@ -97,6 +99,7 @@ BarWidget {
   readonly property int percent: daemonHas ? Number(status.percent) : (device ? Math.round(device.percentage * 100) : -1)
   readonly property bool charging: daemonHas ? status.charging === true : (device !== null && device.state === UPowerDeviceState.Charging)
   readonly property bool low: known && percent <= lowAt
+  readonly property bool critical: known && percent <= criticalAt
   // the daemon knows the mouse's own name even when the charge comes from UPower
   readonly property string modelName: status && status.connected && status.model ? String(status.model) : (device && device.model ? device.model : "Mouse")
 
@@ -115,15 +118,15 @@ BarWidget {
     if ("settings" in target) target.settings = root.settings
     if ("anchorItem" in target) target.anchorItem = button
     if ("hostWidget" in target) target.hostWidget = root
-    if ("batteryText" in target) target.batteryText = root.connected
-      ? (root.known ? root.percent + "% · " + (root.charging ? "charging · " : "") : "") + root.modelName
-      : "not connected"
+    if ("batteryText" in target) target.batteryText = root.batteryLine
   }
+  // one line for the panel header; any change in it (another mouse, its charge) goes to the panel
+  readonly property string batteryLine: root.connected
+    ? (root.known ? root.percent + "% · " + (root.charging ? "charging · " : "") : "") + root.modelName
+    : "not connected"
   onBarChanged: injectPanel()
   onSettingsChanged: injectPanel()
-  onKnownChanged: injectPanel()
-  onPercentChanged: injectPanel()
-  onConnectedChanged: injectPanel()
+  onBatteryLineChanged: injectPanel()
 
   readonly property bool showPercent: panelLoader.item && panelLoader.item.val ? panelLoader.item.val("bar", "show_percent", true) === true : true
   readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
@@ -160,6 +163,8 @@ BarWidget {
     bar: root.bar
     text: root.connected ? (root.charging ? "󰍽󱐋" : "󰍽") + (root.showPercent ? " " + (root.known ? root.percent + "%" : "–") : "") : ""
     active: root.low
+    // amber while low, the theme's urgent red once critical (the theme has no amber of its own)
+    activeColor: root.critical ? (root.bar ? root.bar.urgent : "#a55555") : Qt.tint(button.foreground, "#b0e0a030")
     tooltipText: root.connected ? root.modelName + (root.known ? " battery " + root.percent + "% (" + root.stateText + ")" : " battery: waiting for the mouse to report") : ""
     onPressed: function(b) {
       if (!root.bar) return
