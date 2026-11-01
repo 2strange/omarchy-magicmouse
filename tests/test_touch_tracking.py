@@ -312,6 +312,29 @@ class TouchpadMode(EngineCase):
         self.light_pair(300, -200, 280, 400, -60, 0, 8, state=0x20)
         self.assertEqual(self.pad.calls[-1][0], [])
 
+    def test_firmware_state_of_a_still_finger_stays_with_it(self):
+        # finger 2 lies perfectly still: the input core drops its unchanged values and the slot
+        # switch, so its state byte arrives right after finger 1's events. It must not reach finger 1.
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 200), (RAW, 0x20),
+                   (SLOT, 1), (TID, 2), (X, 600), (Y, 600), (MAJOR, 600), (RAW, 0x40))
+        for i in range(1, 12):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 200), (RAW, 0x20), (RAW, 0x40))
+        self.assertEqual(self.eng.slot_fw[0], 2)  # finger 1 still hovers
+        self.assertNotIn(1, self.pad.calls[-1][0])
+
+    def test_firmware_pair_keeps_the_finger_already_down_in_place(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 300), (Y, -200), (MAJOR, 200), (RAW, 0x40))
+        for i in range(1, 4):
+            self.frame((SLOT, 0), (X, 300 - 60 * i), (MAJOR, 200), (RAW, 0x40))
+        self.eng.tp_t0 = self.t  # a young scroll that turns into a swipe
+        self.frame((SLOT, 0), (X, 60), (MAJOR, 200), (RAW, 0x40),
+                   (SLOT, 1), (TID, 2), (X, 280), (Y, 400), (MAJOR, 200), (RAW, 0x40))
+        for i in range(1, 4):
+            self.frame((SLOT, 0), (X, 60 - 60 * i), (MAJOR, 200), (RAW, 0x40),
+                       (SLOT, 1), (X, 280 - 60 * i), (MAJOR, 200), (RAW, 0x40))
+        if len(self.pad.calls[-1][0]) == 2 and 1 in self.eng.tp_key:
+            self.assertNotIn(1, self.eng.tp_owed)
+
     def test_lift_lifts_the_touchpad(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
         self.frame((SLOT, 0), (Y, 40))

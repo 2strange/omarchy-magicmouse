@@ -543,14 +543,17 @@ STATUS_FILE = os.path.join(STATUS_DIR, "battery.json")
 def hidraw_for(dev: InputDevice) -> str | None:
     want_uniq = f"HID_UNIQ={dev.uniq}".lower() if dev.uniq else None
     want_id = f"HID_ID=0005:{dev.info.vendor:08X}:{dev.info.product:08X}"
+    by_id = None
     for p in sorted(glob.glob("/sys/class/hidraw/hidraw*")):
         try:
             ue = open(f"{p}/device/uevent").read()
         except OSError:
             continue
-        if (want_uniq and want_uniq in ue.lower()) or want_id in ue:
-            return "/dev/" + os.path.basename(p)
-    return None
+        if want_uniq and want_uniq in ue.lower():
+            return "/dev/" + os.path.basename(p)  # this very mouse (two of a model share the ID)
+        if by_id is None and want_id in ue:
+            by_id = "/dev/" + os.path.basename(p)
+    return by_id  # no node names this address: the first of the model, as before
 
 
 def parse_battery_report(buf: bytes) -> tuple[int, bool] | None:
@@ -637,6 +640,9 @@ class BluezBattery:
             self.manager_info = Gio.DBusNodeInfo.new_for_xml(self.MANAGER_XML).interfaces[0]
             self.provider_info = Gio.DBusNodeInfo.new_for_xml(self.PROVIDER_XML).interfaces[0]
             self.bus.register_object(self.ROOT, self.manager_info, self.on_manager_call, None, None)
+            # bluetoothd restarted (or an adapter came back): our registration is gone with it
+            Gio.bus_watch_name_on_connection(self.bus, "org.bluez", Gio.BusNameWatcherFlags.NONE,
+                                             None, lambda *_: self.forget())
         except Exception as exc:  # GLib.Error
             log(f"battery: no system bus for Bluetooth settings: {exc}")
             self.bus = None
@@ -679,6 +685,7 @@ class BluezBattery:
 
     def _set(self, address: str, percent: int) -> bool:
         GLib, path = self.GLib, self._path(address)
+        reg = None
         try:
             if path in self.objects:
                 reg, dev, old = self.objects[path]
@@ -704,8 +711,20 @@ class BluezBattery:
             log(f"battery: {percent}% handed to Bluetooth settings")
         except Exception as exc:  # GLib.Error: BlueZ gone, no BatteryProviderManager1, ...
             log(f"battery: Bluetooth settings: {exc}")
+            if reg is not None:  # or every later try fails with "already exported"
+                try:
+                    self.bus.unregister_object(reg)
+                except Exception:
+                    pass
             self.objects.pop(path, None)
         return False
+
+    def forget(self) -> None:
+        """BlueZ went away: drop every battery; the next set() registers anew."""
+        for reg, _, _ in self.objects.values():
+            self.bus.unregister_object(reg)
+        self.objects.clear()
+        self.adapters.clear()
 
     def _clear(self, address: str) -> bool:
         path = self._path(address)
@@ -1237,6 +1256,7 @@ class Engine:
         self.parked: dict[int, list] = {}  # slots expired for silence; restored if they speak again
         self.slot_fw: dict[int, int] = {}  # slot -> the firmware's contact state (see FW_TOUCHING)
         self.fw_seen = False  # the driver passes the firmware state on (report_undeciphered)
+        self.fw_slot_ok = False  # an ABS_MT_* event came since the last state byte: it belongs to cur_slot
         self.fw_cache: tuple[float, str] = (-1.0, "")  # (ts, fw_status()) for the probe
         self.parked_touch: dict[int, Touch] = {}  # their Touch objects, so a restore is not a new landing
         self.pending_lift: float | None = None  # apparent lift; end scroll if nothing returns within BRIDGE_MS
@@ -1383,6 +1403,7 @@ class Engine:
                 self.dropped = True  # the kernel's buffer overflowed; state is unknown
                 log("SYN_DROPPED")
             elif ev.code == e.SYN_REPORT:
+                self.fw_slot_ok = False
                 if self.dropped:
                     self.resync(ev.timestamp())
                 else:
@@ -1403,12 +1424,18 @@ class Engine:
             return
         if ev.type == e.EV_MSC:
             if ev.code == e.MSC_RAW:  # follows the slot's ABS_MT_* events
-                self.slot_fw[self.cur_slot] = ev.value >> 4
+                # The input core drops unchanged values, and with them the slot switch: the state
+                # byte of a finger lying perfectly still would land on the slot sent last. Take a
+                # byte only right after its own slot's events; a still finger keeps its last state.
+                if self.fw_slot_ok:
+                    self.slot_fw[self.cur_slot] = ev.value >> 4
+                self.fw_slot_ok = False
                 if not self.fw_seen:
                     self.fw_seen = True
                     log("touch: the mouse's own touch state is available (report_undeciphered)")
             return
         if ev.type == e.EV_ABS:
+            self.fw_slot_ok = True
             # A HID touch report lists every live contact. Remember which slots
             # were addressed so process_frame can treat the rest as lifts; the
             # kernel will not (no INPUT_MT_DROP_UNUSED on this device).
@@ -1796,14 +1823,16 @@ class Engine:
                 and self.tp_engage(ts, pair):
             # The mouse says both touch and they slide sideways side by side: the swipe, at once (a light
             # swipe lasts only ~100 ms), edge fingers too, and from where they landed (catch-up).
+            down = set(key or ())  # a finger already on the virtual touchpad stays where it is
             key = pair
             self.tp_pair_n = 0
             self.tp_t0 = ts
-            self.tp_owed, self.tp_out = {}, {}
             for t in key:
                 self.touches[t].grip = False
-                rx, ry = self.touches[t].recent()
-                self.tp_owed[t] = [-float(rx), -float(ry)]
+                if t not in down:
+                    rx, ry = self.touches[t].recent()
+                    self.tp_owed[t] = [-float(rx), -float(ry)]
+                    self.tp_out.pop(t, None)
         elif key is not None:
             if len(key) == 1:
                 t1 = self.touches[key[0]]
@@ -2357,7 +2386,7 @@ class Session:
         self.hidraw = hidraw_for(dev)
         self.next_battery = 0.0
         self.next_kernel_battery = 0.0  # the kernel's charge, for Bluetooth settings (BluezBattery)
-        self.queried: int | None = None  # the charge the mouse told us itself this session
+        self.queried: tuple[int, bool] | None = None  # (percent, charging) the mouse told us itself
         self.battery: tuple[int, bool] | None = None  # (percent, charging) as last known, for the bar
         self.vpad_cfg: str | None = None  # Hyprland settings last applied to the virtual touchpad
         self.vpad_retry = 0.0  # after a failed apply (Hyprland not up yet), try again from then
@@ -2418,28 +2447,29 @@ class Session:
         """Battery and a pending touchpad settings retry. True if the charge changed (status to write)."""
         eng, dev, changed = self.eng, self.dev, False
         bat = eng.cfg["battery"]
-        bluez = self.bluez if bat.get("bluez", True) else None
         if bat["enabled"] and now >= self.next_battery:
             self.next_battery = now + max(float(bat["poll_minutes"]), 1.0) * 60.0
+            self.next_kernel_battery = now  # settle the charge below right away
             got = query_battery(self.hidraw) if self.hidraw else None
             if got:
-                self.queried = got[0]
-                changed, self.battery = got != self.battery, got
-                if bluez:
-                    bluez.set(dev.uniq, got[0])
+                self.queried = got
                 log(f"battery {got[0]}%" + (" charging" if got[1] else ""))
             elif self.hidraw is None:
                 log("battery: no hidraw node found for the mouse")
         if bat["enabled"] and now >= self.next_kernel_battery:
             self.next_kernel_battery = now + 60.0
+            # One source, so the bar does not flip between two readings: the kernel's, which follows
+            # the mouse, and our query's until the kernel knows (some mice never answer the query).
             kernel = kernel_battery(dev)
-            if kernel is not None and (self.battery is None or self.battery[0] != kernel):
-                # some mice never answer our query (EIO): the kernel's charge is all there is
-                self.battery = (kernel, self.battery[1] if self.battery else False)
-                changed = True
-            pct = kernel or self.queried  # the kernel follows the mouse; our query fills in until it knows
-            if bluez and pct is not None:
-                bluez.set(dev.uniq, pct)
+            pct = kernel if kernel is not None else (self.queried[0] if self.queried else None)
+            now_bat = (pct, self.queried[1] if self.queried else False) if pct is not None else None
+            if now_bat != self.battery:
+                self.battery, changed = now_bat, True
+            if self.bluez:
+                if bat.get("bluez", True) and pct is not None:
+                    self.bluez.set(dev.uniq, pct)
+                elif not bat.get("bluez", True):
+                    self.bluez.clear(dev.uniq)  # switched off live
         if eng.vpad is not None and self.vpad_cfg is None and now >= self.vpad_retry:
             self.sync_vpad()
         return changed
@@ -2622,7 +2652,7 @@ def main() -> int:
         probe = Probe()
         probe.open()
     hypr = HyprEvents()
-    bluez = BluezBattery() if cfg["battery"]["enabled"] and cfg["battery"].get("bluez", True) else None
+    bluez = BluezBattery()  # always: battery.bluez can be switched on and off live
     # systemctl stop sends SIGTERM; exit through the finally blocks so buttons
     # are released and the Control-click binding is taken back out of Hyprland.
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
