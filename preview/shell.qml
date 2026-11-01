@@ -29,6 +29,15 @@ ShellRoot {
   property real fps: 0
   property int frameCount: 0
   property real peakMajor: 0
+  property string fw: ""  // the mouse's own touch state: active, ready, reconnect, off, disabled
+  readonly property var fwText: ({
+    active: "mouse touch state: ON (the mouse decides what touches)",
+    ready: "mouse touch state: ready, touch the mouse",
+    reconnect: "mouse touch state: switched on, turn the mouse off and on again",
+    off: "mouse touch state: off (report_undeciphered), size rules",
+    disabled: "mouse touch state: off (touch_firmware in config.toml), size rules"
+  })
+  readonly property var fwNames: ["gone", "start", "hovering", "landing", "touching", "lifting", "lingering", "leaving"]
   property var zones: [3, 3, 0, 18]  // left, right, front, back (palm) in mm
 
   // ---------- live tuning: reads and writes ~/.config/magic-mouse/config.toml via magic-mouse-config;
@@ -107,6 +116,7 @@ ShellRoot {
       shell.moving = !!o.moving
       shell.axis = o.axis || "y"
       if (o.zones) shell.zones = o.zones
+      shell.fw = o.fw || ""
     }
   }
 
@@ -249,6 +259,17 @@ ShellRoot {
 
         Text { textFormat: Text.PlainText; text: "mouse moving: " + (shell.moving ? "yes" : "no"); color: shell.moving ? shell.roleColor.follow : shell.dim; font.family: shell.mono; font.pixelSize: 12 }
 
+        Row {  // the lamp: does the mouse's own touch state reach the daemon?
+          visible: shell.fw !== ""
+          spacing: 8
+          Rectangle {
+            width: 12; height: 12; radius: 6
+            anchors.verticalCenter: parent.verticalCenter
+            color: shell.fw === "active" ? "#5fb36b" : shell.fw === "ready" ? "#3f7a49" : shell.fw === "reconnect" ? shell.roleColor.follow : "#55555c"
+          }
+          Text { textFormat: Text.PlainText; text: shell.fwText[shell.fw] || shell.fw; color: shell.fw === "active" ? "#5fb36b" : shell.fw === "reconnect" ? shell.roleColor.follow : shell.dim; font.family: shell.mono; font.pixelSize: 12 }
+        }
+
         Row {
           spacing: 14
           Repeater {
@@ -291,7 +312,7 @@ ShellRoot {
               height: 10; radius: 3; anchors.verticalCenter: parent.verticalCenter
               color: shell.roleColor[modelData[5]] || shell.fg
             }
-            Text { textFormat: Text.PlainText; anchors.right: parent.right; text: "#" + modelData[0] + "  " + modelData[3] + " × " + modelData[4] + "  " + (modelData[6] || 0) + "/s"; color: shell.fg; font.family: shell.mono; font.pixelSize: 11 }
+            Text { textFormat: Text.PlainText; anchors.right: parent.right; text: "#" + modelData[0] + "  " + modelData[3] + " × " + modelData[4] + "  " + (modelData[6] || 0) + "/s" + (modelData[7] >= 0 ? "  " + (shell.fwNames[modelData[7]] || modelData[7]) : ""); color: shell.fg; font.family: shell.mono; font.pixelSize: 11 }
             Repeater {  // touch start and hold sizes
               model: [shell.cfgVal("scroll", "touch_start_size", 0), shell.cfgVal("scroll", "touch_hold_size", 0)]
               delegate: Rectangle {

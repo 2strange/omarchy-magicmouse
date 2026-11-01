@@ -91,6 +91,7 @@ FIRM_REPORTS = 3  # a finger must show this many big reports in a row, at scroll
 # 3 making touch, 4 touching, 5 breaking touch, 6 lingering, 7 out of range. The driver reports
 # every state but 0 as a contact; only these touch.
 FW_TOUCHING = (3, 4)
+UNDECIPHERED = "/sys/module/hid_magicmouse/parameters/report_undeciphered"
 EDGE_STRAIGHT = 0.6  # an edge finger is released only when its travel is at least this share of its path
 JUMP_MM = 5.0  # a slot moving this far in one report without a new tracking id is a new finger
 # Free (diagonal) scrolling: the smaller axis is dropped while it is below this share of
@@ -1099,6 +1100,7 @@ class Engine:
         self.parked: dict[int, list] = {}  # slots expired for silence; restored if they speak again
         self.slot_fw: dict[int, int] = {}  # slot -> the firmware's contact state (see FW_TOUCHING)
         self.fw_seen = False  # the driver passes the firmware state on (report_undeciphered)
+        self.fw_cache: tuple[float, str] = (-1.0, "")  # (ts, fw_status()) for the probe
         self.parked_touch: dict[int, Touch] = {}  # their Touch objects, so a restore is not a new landing
         self.pending_lift: float | None = None  # apparent lift; end scroll if nothing returns within BRIDGE_MS
         self.touches: dict[int, Touch] = {}  # tracking_id -> Touch
@@ -1139,6 +1141,8 @@ class Engine:
     # ---- device attach
     def attach(self, dev: InputDevice) -> None:
         self.dev = dev
+        self.fw_seen = False
+        self.fw_cache = (-1.0, "")
         self.reset_touch()
         self.v = 0.0
         self.last_motion_t = -1.0
@@ -1374,18 +1378,41 @@ class Engine:
         cut = ts - float(sc["settle_ms"]) / 1000.0
         return sum(d for t, d in self.recent if t >= cut) > float(sc["settle_counts"])
 
+    def fw_status(self, ts: float) -> str:
+        """For the preview: does the mouse's own touch state reach the daemon? The driver
+        reads report_undeciphered only when the mouse connects, so switching it on needs a reconnect."""
+        if ts - self.fw_cache[0] < 1.0:
+            return self.fw_cache[1]
+        if not self.cfg["scroll"].get("touch_firmware", True):
+            status = "disabled"
+        elif self.fw_seen:
+            status = "active"
+        else:
+            try:
+                ready = self.dev is not None and e.MSC_RAW in self.dev.capabilities().get(e.EV_MSC, [])
+            except OSError:
+                ready = False
+            try:
+                with open(UNDECIPHERED) as f:
+                    switched = f.read().strip() in ("Y", "1")
+            except OSError:
+                switched = False
+            status = "ready" if ready else "reconnect" if switched else "off"
+        self.fw_cache = (ts, status)
+        return status
+
     def publish(self, ts: float) -> None:
-        """One probe frame: every contact with its size and role, plus the decision."""
+        """One probe frame: every contact with its size, role and firmware state, plus the decision."""
         follow = set(self.primary or ())
         contacts = []
-        for v in self.slots.values():
+        for s, v in self.slots.items():
             if v[0] < 0:
                 continue
             t = self.touches.get(v[0])
             role = ("palm" if t and t.palm else "grip" if t and t.grip
                     else "hover" if t and not t.ok
                     else "follow" if v[0] in follow else "rest")
-            contacts.append([v[0], v[1], v[2], v[3], v[4], role, round(t.rate) if t else 0])
+            contacts.append([v[0], v[1], v[2], v[3], v[4], role, round(t.rate) if t else 0, self.slot_fw.get(s, -1)])
         self.probe.send({
             "t": round(ts, 4),
             "c": contacts,
@@ -1394,6 +1421,7 @@ class Engine:
             "coast": self.coasting,
             "moving": self.moving_now(ts),
             "why": self.why,
+            "fw": self.fw_status(ts),
             "zones": [float(self.cfg["scroll"][k]) for k in ("edge_left_mm", "edge_right_mm", "edge_front_mm", "edge_back_mm")],
         })
 
