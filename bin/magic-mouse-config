@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """magic-mouse-config: read or change ~/.config/magic-mouse/config.toml, keeping comments.
 
 File access goes through the daemon's read_own_file / write_own_file (no symlink

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """Ask a Magic Mouse for its battery level right now (needs /dev/hidrawN, which the udev rule grants to the logged-in user).
 
 The mouse normally pushes battery input report 0x90 on its own schedule, so the

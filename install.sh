@@ -19,7 +19,7 @@ ask() {  # ask "question" -> 0 for yes
   if [ -t 0 ]; then read -r -p "$1 [Y/n] " a; [[ -z $a || $a =~ ^[Yy] ]]; else return 0; fi
 }
 
-if ! python3 -c 'import evdev' 2>/dev/null; then
+if ! /usr/bin/python3 -c 'import evdev' 2>/dev/null; then
   say "installing python-evdev"
   if command -v omarchy >/dev/null 2>&1; then omarchy pkg add python-evdev; else sudo pacman -S --needed --noconfirm python-evdev; fi
 fi
