@@ -111,8 +111,8 @@ only). Nothing is sent while no preview is connected; `--no-probe` turns it off.
 
 - Omarchy 4 with Hyprland 0.56 or newer (Lua config).
 - `python-evdev` (the installer adds it) and the in-kernel `hid_magicmouse` driver.
-- `python-gobject` for the battery in Bluetooth settings (on Omarchy already there; without
-  it that one feature is off).
+- `python-gobject` for the battery in Bluetooth settings (on Omarchy already there, the
+  installer adds it otherwise; without it that one feature is off).
 - **For the workspace swipe in touchpad mode,** Hyprland needs a three-finger workspace
   gesture. Omarchy ships it commented out in `~/.config/hypr/input.lua`; remove the `--`
   in front of

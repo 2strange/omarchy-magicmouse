@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.2strange.magicmouse",
   "name": "MagicMouse",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "2strange",
   "license": "MIT",
   "description": "Apple Magic Mouse that feels like on a Mac: touchpad-style scrolling and live workspace swipe, Apple's pointer curve, touch check against hover, edge and palm rejection, live touch preview, battery in the bar",

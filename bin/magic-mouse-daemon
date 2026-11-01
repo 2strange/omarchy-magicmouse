@@ -632,7 +632,8 @@ class BluezBattery:
             gi.require_version("Gio", "2.0")
             from gi.repository import Gio, GLib
         except (ImportError, ValueError) as exc:
-            log(f"battery: no python-gobject, not telling Bluetooth settings the charge ({exc})")
+            log(f"battery: python-gobject is missing, so Bluetooth settings do not show the charge"
+                f" (the bar still does; fix: sudo pacman -S python-gobject) ({exc})")
             return
         self.Gio, self.GLib = Gio, GLib
         try:
@@ -677,7 +678,7 @@ class BluezBattery:
             self.GLib.idle_add(self._set, address, int(percent))
 
     def clear(self, address: str) -> None:
-        if self.bus and address:
+        if self.bus and address and self._path(address) in self.objects:  # poll() calls this often
             self.GLib.idle_add(self._clear, address)
 
     def _path(self, address: str) -> str:
@@ -2465,11 +2466,10 @@ class Session:
             now_bat = (pct, self.queried[1] if self.queried else False) if pct is not None else None
             if now_bat != self.battery:
                 self.battery, changed = now_bat, True
-            if self.bluez:
-                if bat.get("bluez", True) and pct is not None:
-                    self.bluez.set(dev.uniq, pct)
-                elif not bat.get("bluez", True):
-                    self.bluez.clear(dev.uniq)  # switched off live
+            if self.bluez and bat.get("bluez", True) and pct is not None:
+                self.bluez.set(dev.uniq, pct)
+        if self.bluez and not (bat["enabled"] and bat.get("bluez", True)):
+            self.bluez.clear(dev.uniq)  # switched off live: no stale charge in Bluetooth settings
         if eng.vpad is not None and self.vpad_cfg is None and now >= self.vpad_retry:
             self.sync_vpad()
         return changed

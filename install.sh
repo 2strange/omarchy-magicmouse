@@ -24,6 +24,12 @@ if ! /usr/bin/python3 -c 'import evdev' 2>/dev/null; then
   if command -v omarchy >/dev/null 2>&1; then omarchy pkg add python-evdev; else sudo pacman -S --needed --noconfirm python-evdev; fi
 fi
 
+if ! /usr/bin/python3 -c 'import gi' 2>/dev/null; then
+  say "installing python-gobject (battery in Bluetooth settings)"
+  if command -v omarchy >/dev/null 2>&1; then omarchy pkg add python-gobject; else sudo pacman -S --needed --noconfirm python-gobject; fi \
+    || say "python-gobject not installed: Bluetooth settings will not show the charge (the bar still does)"
+fi
+
 say "daemon -> ~/.local/bin/magic-mouse-daemon"
 install -Dm755 "$here/bin/magic-mouse-daemon" "$HOME/.local/bin/magic-mouse-daemon"
 install -Dm755 "$here/bin/magic-mouse-config" "$HOME/.local/bin/magic-mouse-config"

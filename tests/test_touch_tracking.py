@@ -634,3 +634,60 @@ class WorkspaceSwipeEnd(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FakeBluez:
+    def __init__(self):
+        self.calls = []
+
+    def set(self, address, percent):
+        self.calls.append(("set", address, percent))
+
+    def clear(self, address):
+        self.calls.append(("clear", address))
+
+
+@unittest.skipIf(SKIP, SKIP)
+class BatteryInBluetooth(unittest.TestCase):
+    """Session.poll hands the charge to Bluetooth settings and takes it back when switched off live."""
+
+    def setUp(self):
+        daemon.log = lambda msg: None
+        self.cfg = {k: dict(v) for k, v in daemon.DEFAULTS.items()}
+        self.bluez = FakeBluez()
+        s = daemon.Session.__new__(daemon.Session)
+        s.dev = types.SimpleNamespace(uniq="aa:bb:cc:dd:ee:ff")
+        s.bluez, s.hidraw, s.queried, s.battery = self.bluez, None, None, None
+        s.next_battery = s.next_kernel_battery = 0.0
+        s.eng = types.SimpleNamespace(cfg=self.cfg, vpad=None)
+        s.vpad_cfg, s.vpad_retry = None, 0.0
+        self.s = s
+
+    def poll(self, now):
+        with mock.patch.object(daemon, "kernel_battery", return_value=60):
+            self.s.poll(now)
+
+    def test_charge_handed_over(self):
+        self.poll(100.0)
+        self.assertEqual(self.bluez.calls, [("set", "aa:bb:cc:dd:ee:ff", 60)])
+
+    def test_battery_switched_off_clears(self):
+        self.poll(100.0)
+        self.cfg["battery"]["enabled"] = False
+        self.poll(200.0)
+        self.assertEqual(self.bluez.calls[-1], ("clear", "aa:bb:cc:dd:ee:ff"))
+
+    def test_bluez_switched_off_clears(self):
+        self.poll(100.0)
+        self.cfg["battery"]["bluez"] = False
+        self.poll(200.0)
+        self.assertEqual(self.bluez.calls[-1], ("clear", "aa:bb:cc:dd:ee:ff"))
+
+
+@unittest.skipIf(SKIP, SKIP)
+class BluezClearIsCheap(unittest.TestCase):
+    def test_clear_skips_unknown_mouse(self):
+        b = daemon.BluezBattery.__new__(daemon.BluezBattery)
+        b.bus, b.objects = object(), {}
+        b.GLib = types.SimpleNamespace(idle_add=lambda *a: self.fail("scheduled a clear for nothing"))
+        b.clear("aa:bb:cc:dd:ee:ff")
