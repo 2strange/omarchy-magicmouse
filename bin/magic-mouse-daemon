@@ -1010,7 +1010,7 @@ def vpad_lua(cfg: dict) -> str:
     """Hyprland settings for the virtual touchpad only (the built-in trackpad keeps its own)."""
     tp = cfg["touchpad"]
     natural = "true" if cfg["scroll"].get("natural") else "false"
-    return (f'hl.device({{ name = "{VPAD_HYPR}", scroll_factor = {float(tp["scroll_speed"]) / TP_SCROLL_GAIN:.3f}, '
+    return (f'hl.device({{ name = "{VPAD_HYPR}", scroll_factor = {float(tp["scroll_speed"]) / TP_SCROLL_GAIN:.4f}, '
             f'natural_scroll = {natural}, tap_to_click = false }})')
 
 
