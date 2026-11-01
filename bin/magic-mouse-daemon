@@ -865,6 +865,9 @@ def workspace_step(forward: bool, end: str, fallback: str, include_empty: bool =
 # --------------------------------------------------------------------------- touchpad mode
 VPAD_GROW = 5.0  # the virtual surface is this many times the mouse, so a swipe has room (max swipe_gain)
 TP_PAIR_FRAMES = 3  # a second finger joins the virtual touchpad after pairing this many frames in a row
+TP_PAIR_YOUNG = 0.15  # ...but only this soon after the first went down: a running scroll ignores other fingers
+TP_SWIPE_RATIO = 1.5  # two fingers go down as a pair (the workspace swipe) only when sliding this much more sideways
+TP_HOLD_SEC = 0.1  # a finger down on the virtual touchpad stays down this long while it reports too light
 VPAD_EXTRA_MM = 12.0  # the added finger sits this far beside the first one
 VPAD_TOOLS = [e.BTN_TOOL_FINGER, e.BTN_TOOL_DOUBLETAP, e.BTN_TOOL_TRIPLETAP, e.BTN_TOOL_QUADTAP, e.BTN_TOOL_QUINTTAP]
 
@@ -1009,6 +1012,8 @@ class Engine:
         self.vpad: VPad | None = None  # touchpad mode
         self.tp_key: tuple[int, ...] | None = None  # the fingers down on the virtual touchpad
         self.tp_pair_n = 0  # frames a second finger has been pairing with the one down
+        self.tp_t0 = 0.0  # when the fingers on the virtual touchpad went down
+        self.tp_light: dict[int, float] = {}  # finger down on the virtual touchpad -> since when it is too light
         self.why = ""  # why the last frame did (or did not) scroll; for the probe
         self.why_locked = False
         self.curve = AppleCurve(float(cfg["pointer"]["tracking_speed"]))
@@ -1523,19 +1528,29 @@ class Engine:
     def touchpad_frame(self, ts: float, fingers: list[int]) -> None:
         """Touchpad mode: hand the followed finger(s) to the virtual touchpad, plus one.
         The set of fingers on the virtual touchpad stays steady: every change makes libinput
-        end one gesture and start another. A touch goes down only once a finger really slides
-        (not just rides along while the hand moves the mouse); a second finger joins after its
-        pairing held for TP_PAIR_FRAMES; a finger leaves when it lifts or the hand takes over."""
+        end one gesture and start another, and the browser waits for a busy page at every new
+        start. So, as on a Mac: a touch goes down only once a finger really slides (not just
+        rides along while the hand moves the mouse); a finger that reports too light for a
+        moment while it slides stays down (TP_HOLD_SEC); a running scroll ignores any other
+        finger; two fingers become the workspace swipe only when they slide sideways together
+        from the start; a finger leaves when it lifts or the hand takes over."""
         gain = float(self.cfg["touchpad"]["swipe_gain"])
         key = self.tp_key
         if key is not None:
-            still = tuple(t for t in key if t in fingers)
-            key = still or None  # one of two lifted: keep the other
+            keep = []
+            for t in key:
+                if t in fingers:
+                    self.tp_light.pop(t, None)
+                    keep.append(t)
+                elif t in self.touches and not self.touches[t].grip \
+                        and ts - self.tp_light.setdefault(t, ts) < TP_HOLD_SEC:
+                    keep.append(t)  # lighter for a moment while it slides: still the same touch
+            key = tuple(keep) or None  # one of two lifted: keep the other
         cand = self.pick(fingers, ts) if fingers else None
         if key is not None:
             if len(key) == 1 and cand is not None and len(cand) == 2 and key[0] in cand \
-                    and self.key_recent_mm(cand) >= MIN_SLIDE_MM:
-                self.tp_pair_n += 1
+                    and ts - self.tp_t0 < TP_PAIR_YOUNG and self.swipe_pair(cand):
+                self.tp_pair_n += 1  # the second finger landed a moment later: a swipe after all
                 if self.tp_pair_n >= TP_PAIR_FRAMES:
                     key = cand
                     self.tp_pair_n = 0
@@ -1545,11 +1560,17 @@ class Engine:
             if pointer >= MIN_SLIDE_MM and pointer > self.key_recent_mm(key):
                 key = None  # the mouse moves farther than the fingers slide: this is mousing now
                 self.why = "mousing: touchpad fingers lifted"
-        elif cand is not None and self.tp_engage(ts, cand):
-            key = cand
-            self.tp_pair_n = 0
+        elif cand is not None:
+            if len(cand) == 2 and not self.swipe_pair(cand):
+                # up and down, the fingers scroll together: one is enough (more would be a swipe)
+                cand = (max(cand, key=lambda t: math.hypot(*self.touches[t].recent())),)
+            if self.tp_engage(ts, cand):
+                key = cand
+                self.tp_pair_n = 0
+                self.tp_t0 = ts
         self.tp_key = key
         self.primary = key
+        self.tp_light = {t: v for t, v in self.tp_light.items() if key and t in key}
         if key is None:
             if not fingers:
                 light = [t.size for t in self.touches.values() if not t.grip]
@@ -1559,7 +1580,13 @@ class Engine:
             return
         self.vpad.update([(t, self.touches[t].x, self.touches[t].y) for t in key], gain)
         self.why = f"touchpad: {len(key)} finger{'s' if len(key) > 1 else ''} -> {len(key) + 1}" + \
-            (" (swipe)" if len(key) >= 2 else " (scroll)")
+            (" (swipe)" if len(key) >= 2 else " (scroll)") + (" held" if self.tp_light else "")
+
+    def swipe_pair(self, pair: tuple[int, ...]) -> bool:
+        """Two fingers sliding sideways together: the workspace swipe, not a scroll."""
+        vx = sum(self.touches[t].recent()[0] for t in pair) / self.res_x
+        vy = sum(self.touches[t].recent()[1] for t in pair) / self.res_y
+        return abs(vx) > 0 and abs(vx) >= TP_SWIPE_RATIO * abs(vy)
 
     def tp_engage(self, ts: float, key: tuple[int, ...]) -> bool:
         """May these fingers go down on the virtual touchpad? Same rules as a scroll start:
@@ -1975,11 +2002,13 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
             eng.stop_coast("touchpad mode")
             eng.scrolling = False
             eng.tp_key = None
+            eng.tp_light.clear()
             vpad_cfg = None
         elif not want and eng.vpad is not None:
             eng.vpad.close()
             eng.vpad = None
             eng.tp_key = None
+            eng.tp_light.clear()
             log("touchpad mode off")
         if eng.vpad is not None:
             lua = vpad_lua(eng.cfg)

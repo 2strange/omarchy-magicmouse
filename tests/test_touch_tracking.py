@@ -292,6 +292,46 @@ class TouchpadSteadiness(EngineCase):
         changes = sum(1 for a, b in zip(counts, counts[1:]) if a != b)
         self.assertLessEqual(changes, 1)
 
+    def test_second_finger_during_a_scroll_is_ignored(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        for i in range(1, 15):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600))
+        for i in range(15, 40):  # a second finger lands beside it and slides along
+            ev = [(SLOT, 0), (Y, 40 * i), (MAJOR, 600)]
+            if i == 15:
+                ev += [(SLOT, 1), (TID, 2), (X, 500), (Y, 600), (MAJOR, 600)]
+            else:
+                ev += [(SLOT, 1), (Y, 600 + 30 * (i - 15))]
+            self.frame(*ev)
+        self.assertTrue(all(c[0] == [1] for c in self.pad.calls if c[0]))
+
+    def test_two_fingers_up_and_down_scroll_as_one(self):
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 0), (MAJOR, 600),
+                   (SLOT, 1), (TID, 2), (X, 300), (Y, 50), (MAJOR, 600))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (Y, 40 * i), (SLOT, 1), (Y, 50 + 38 * i))
+        down = [c[0] for c in self.pad.calls if c[0]]
+        self.assertTrue(down and all(len(f) == 1 for f in down))
+
+    def test_finger_reporting_light_for_a_moment_stays_down(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        for i in range(1, 10):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600))
+        for i in range(10, 14):  # four reports below the hold size while it slides on
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 150))
+        for i in range(14, 20):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600))
+        first = next(i for i, c in enumerate(self.pad.calls) if c[0])
+        self.assertTrue(all(c[0] == [1] for c in self.pad.calls[first:]))
+
+    def test_finger_staying_light_lifts(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        for i in range(1, 10):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600))
+        for i in range(10, 25):  # hovering on: no longer a touch
+            self.frame((SLOT, 0), (Y, 400), (MAJOR, 150))
+        self.assertEqual(self.pad.calls[-1][0], [])
+
 
 @unittest.skipIf(SKIP, SKIP)
 class WorkspaceSwipeEnd(unittest.TestCase):
