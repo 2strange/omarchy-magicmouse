@@ -200,6 +200,7 @@ class TouchConfirm(EngineCase):
 
     def test_front_size_eases_back_to_the_start_size(self):
         eng, start = self.eng, 300.0
+        self.cfg["scroll"].update(touch_front_size=540, touch_front_mm=15)
         at = lambda mm: eng.start_size(types.SimpleNamespace(y=eng.y_min + mm * eng.res_y), start)
         self.assertEqual(at(10), 540)
         self.assertAlmostEqual(at(22.5), 420)

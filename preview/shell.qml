@@ -174,7 +174,7 @@ ShellRoot {
           Rectangle { y: 0; width: parent.width; height: shell.zones[2] * parent.mmPx; color: "#ffffff"; opacity: 0.06 }
           Rectangle {  // front zone with the higher start size; the easing band below it is not drawn
             y: 0; width: parent.width; height: Number(shell.cfgVal("scroll", "touch_front_mm", 0)) * parent.mmPx
-            visible: Number(shell.cfgVal("scroll", "touch_front_size", 0)) > 0
+            visible: Number(shell.cfgVal("scroll", "touch_front_size", 0)) > Number(shell.cfgVal("scroll", "touch_start_size", 0))  // else the daemon ignores it
             color: shell.roleColor.hover; opacity: 0.08
           }
           Rectangle { y: parent.height - height; width: parent.width; height: shell.zones[3] * parent.mmPx; color: shell.roleColor.palm; opacity: 0.10 }
@@ -263,8 +263,8 @@ ShellRoot {
         Tune { label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
         Tune { label: "Two-finger size"; section: "scroll"; key: "touch_pair_size"; from: 0; to: 900; step: 10; fallback: 250 }
         Tune { label: "Touch report rate"; section: "scroll"; key: "touch_rate"; from: 0; to: 90; step: 1; unit: " /s"; fallback: 45; hint: "0 = any" }
-        Tune { label: "Front start size"; section: "scroll"; key: "touch_front_size"; from: 0; to: 900; step: 10; fallback: 540; hint: "0 = off" }
-        Tune { label: "Front zone"; section: "scroll"; key: "touch_front_mm"; from: 0; to: 40; step: 1; unit: " mm"; fallback: 15; hint: "eases out over as far again" }
+        Tune { label: "Front start size"; section: "scroll"; key: "touch_front_size"; from: 0; to: 900; step: 10; fallback: 510; hint: "0 = off" }
+        Tune { label: "Front zone"; section: "scroll"; key: "touch_front_mm"; from: 0; to: 40; step: 1; unit: " mm"; fallback: 13; hint: "eases out over as far again" }
         Tune { visible: shell.tp; label: "Straight slide"; section: "scroll"; key: "touch_straight"; from: 0; to: 1; step: 0.05; decimals: 2; fallback: 0.5; hint: "hover wobble ~0.1, 0 = off" }
         Tune { visible: shell.tp; label: "Play on turn"; section: "scroll"; key: "touch_reverse_mm"; from: 0; to: 2; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.5; hint: "0 = off" }
         Tune { visible: !shell.tp; label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }

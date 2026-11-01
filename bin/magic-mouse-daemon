@@ -168,8 +168,8 @@ DEFAULTS = {
         # Near the front the finger lies flatter: a hover there is as big as a light touch further
         # back (measured: hover ~470, touch ~710 within 15 mm). Within touch_front_mm a single finger
         # needs touch_front_size to start, easing back to touch_start_size over as far again.
-        "touch_front_size": 540.0,  # 0 = off (same start size everywhere)
-        "touch_front_mm": 15.0,
+        "touch_front_size": 510.0,  # 0 = off (same start size everywhere)
+        "touch_front_mm": 13.0,
         # A hovering finger wobbles on the spot, a real slide goes one way (measured: hover ~0.1,
         # slides 0.77 and more). A finger goes down on the virtual touchpad, or joins one already
         # down, only while its travel over the last MOVE_WINDOW is at least this straight
