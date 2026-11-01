@@ -37,6 +37,7 @@ ShellRoot {
     off: "mouse touch state: off (report_undeciphered), size rules",
     disabled: "mouse touch state: off (touch_firmware in config.toml), size rules"
   })
+  readonly property bool fwOn: fw === "active" || fw === "ready"  // the mouse decides: the size rules rest
   readonly property var fwNames: ["gone", "start", "hovering", "landing", "touching", "lifting", "lingering", "leaving"]
   property var zones: [3, 3, 0, 18]  // left, right, front, back (palm) in mm
 
@@ -284,12 +285,12 @@ ShellRoot {
         }
 
         Text { textFormat: Text.PlainText; text: "TUNING  (applies when you let go)"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
-        Tune { label: "Touch start size"; section: "scroll"; key: "touch_start_size"; from: 0; to: 900; step: 10; fallback: 480; hint: "0 = off" }
-        Tune { label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
-        Tune { label: "Two-finger size"; section: "scroll"; key: "touch_pair_size"; from: 0; to: 900; step: 10; fallback: 250 }
-        Tune { label: "Touch report rate"; section: "scroll"; key: "touch_rate"; from: 0; to: 90; step: 1; unit: " /s"; fallback: 45; hint: "0 = any" }
-        Tune { label: "Front start size"; section: "scroll"; key: "touch_front_size"; from: 0; to: 900; step: 10; fallback: 510; hint: "0 = off" }
-        Tune { label: "Front zone"; section: "scroll"; key: "touch_front_mm"; from: 0; to: 40; step: 1; unit: " mm"; fallback: 13; hint: "eases out over as far again" }
+        Tune { visible: !shell.fwOn; label: "Touch start size"; section: "scroll"; key: "touch_start_size"; from: 0; to: 900; step: 10; fallback: 480; hint: "0 = off" }
+        Tune { visible: !shell.fwOn; label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
+        Tune { visible: !shell.fwOn; label: "Two-finger size"; section: "scroll"; key: "touch_pair_size"; from: 0; to: 900; step: 10; fallback: 250 }
+        Tune { visible: !shell.fwOn; label: "Touch report rate"; section: "scroll"; key: "touch_rate"; from: 0; to: 90; step: 1; unit: " /s"; fallback: 45; hint: "0 = any" }
+        Tune { visible: !shell.fwOn; label: "Front start size"; section: "scroll"; key: "touch_front_size"; from: 0; to: 900; step: 10; fallback: 510; hint: "0 = off" }
+        Tune { visible: !shell.fwOn; label: "Front zone"; section: "scroll"; key: "touch_front_mm"; from: 0; to: 40; step: 1; unit: " mm"; fallback: 13; hint: "eases out over as far again" }
         Tune { visible: shell.tp; label: "Straight slide"; section: "scroll"; key: "touch_straight"; from: 0; to: 1; step: 0.05; decimals: 2; fallback: 0.5; hint: "hover wobble ~0.1, 0 = off" }
         Tune { visible: shell.tp; label: "Play on turn"; section: "scroll"; key: "touch_reverse_mm"; from: 0; to: 2; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.5; hint: "0 = off" }
         Tune { visible: !shell.tp; label: "Scroll start"; section: "scroll"; key: "start_mm"; from: 0.2; to: 3; step: 0.1; decimals: 1; unit: " mm"; fallback: 0.8 }

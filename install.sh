@@ -66,8 +66,10 @@ SUBSYSTEM=="hidraw", KERNELS=="0005:05AC:030D.*", TAG+="uaccess"
 """
 MODPROBE = b"""# omarchy-magic-mouse: let the mouse's own firmware decide left vs right click
 # (like macOS) instead of the driver's three fixed touch zones, which also
-# invent a middle button that macOS never had.
-options hid_magicmouse emulate_3button=0
+# invent a middle button that macOS never had. report_undeciphered passes on the
+# mouse's own contact state (hovering, touching, lifting), the way macOS tells a
+# touch from a finger just above the surface.
+options hid_magicmouse emulate_3button=0 report_undeciphered=1
 """
 MODULES = b"""# omarchy-magic-mouse: load uinput at boot so the udev rule can grant access to
 # /dev/uinput. Until the module is loaded that node is a root-only placeholder,
@@ -166,12 +168,12 @@ if os.geteuid() != 0:
     die("must run as root (install.sh runs it via sudo)")
 os.umask(0o022)
 digests = [install(*t) for t in TARGETS]
-try:
-    pfd = os.open("/sys/module/hid_magicmouse/parameters/emulate_3button", os.O_WRONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
-except FileNotFoundError:
-    pass  # driver not loaded yet; the modprobe option applies when it loads
-else:
-    os.write(pfd, b"0\n")
+for param, value in (("emulate_3button", b"0\n"), ("report_undeciphered", b"1\n")):
+    try:
+        pfd = os.open(f"/sys/module/hid_magicmouse/parameters/{param}", os.O_WRONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    except FileNotFoundError:
+        continue  # driver not loaded yet; the modprobe option applies when it loads
+    os.write(pfd, value)
     os.close(pfd)
 # Always load it: /dev/uinput exists as a static placeholder even when the module
 # is not loaded, and then there is no device for the rule to apply to.
@@ -266,4 +268,5 @@ systemctl --user enable --now magic-mouse.service
 sleep 1
 systemctl --user --no-pager --lines=5 status magic-mouse.service || true
 
-say "done. Tune ~/.config/magic-mouse/config.toml (applies live). Logs: journalctl --user -u magic-mouse -f"
+say "done. Turn each Magic Mouse off and on once: the driver reads its new options when a mouse connects."
+say "Tune ~/.config/magic-mouse/config.toml (applies live). Logs: journalctl --user -u magic-mouse -f"
