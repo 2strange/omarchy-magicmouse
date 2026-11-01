@@ -202,8 +202,8 @@ Panel {
     Item {
       width: parent.width
       height: labelText.implicitHeight
-      Text { id: labelText; text: row.label; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body; anchors.left: parent.left }
-      Text { text: row.valueText; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter }
+      Text { textFormat: Text.PlainText; id: labelText; text: row.label; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body; anchors.left: parent.left }
+      Text { textFormat: Text.PlainText; text: row.valueText; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter }
     }
     function snap(v) {
       var s = Math.round((v - row.minimum) / row.step) * row.step + row.minimum
@@ -246,8 +246,8 @@ Panel {
       anchors.rightMargin: Style.space(12)
       anchors.verticalCenter: parent.verticalCenter
       spacing: Style.space(2)
-      Text { text: srow.label; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body; width: parent.width; elide: Text.ElideRight }
-      Text { text: srow.description; visible: text !== ""; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; width: parent.width; wrapMode: Text.WordWrap }
+      Text { textFormat: Text.PlainText; text: srow.label; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body; width: parent.width; elide: Text.ElideRight }
+      Text { textFormat: Text.PlainText; text: srow.description; visible: text !== ""; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; width: parent.width; wrapMode: Text.WordWrap }
     }
     ToggleSwitch {
       id: sw
@@ -285,6 +285,7 @@ Panel {
           width: parent.width
           implicitHeight: Math.max(heroIcon.implicitHeight, heroLabels.implicitHeight)
           Text {
+            textFormat: Text.PlainText
             id: heroIcon
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
@@ -300,8 +301,8 @@ Panel {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             spacing: Style.space(2)
-            Text { text: "MagicMouse"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.title; font.bold: true; width: parent.width; elide: Text.ElideRight }
-            Text { text: root.batteryText !== "" ? root.batteryText : "MAC-LIKE ON OMARCHY"; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; font.bold: true; width: parent.width; elide: Text.ElideRight }
+            Text { textFormat: Text.PlainText; text: "MagicMouse"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.title; font.bold: true; width: parent.width; elide: Text.ElideRight }
+            Text { textFormat: Text.PlainText; text: root.batteryText !== "" ? root.batteryText : "MAC-LIKE ON OMARCHY"; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; font.bold: true; width: parent.width; elide: Text.ElideRight }
           }
         }
 
@@ -440,6 +441,7 @@ Panel {
           // ---------- Gestures ----------
           PanelSectionHeader { text: "GESTURES"; foreground: root.fg; fontFamily: root.fontFam }
           Text {
+            textFormat: Text.PlainText
             visible: root.tp
             width: parent.width
             text: "Touchpad mode: two fingers sideways switch workspaces with Hyprland's live swipe, like three fingers on the trackpad. End of row, empty workspaces and the trackpad's direction come from the Trackpad settings."
@@ -468,6 +470,7 @@ Panel {
             onChanged: function(v) { root.set("touchpad", "swipe_gain", Math.round(v * 10) / 10) }
           }
           Text {
+            textFormat: Text.PlainText
             visible: root.tp
             width: parent.width
             text: "The mouse is small: finger travel counts this many times during a swipe"
@@ -491,6 +494,7 @@ Panel {
             }
           }
           Text {
+            textFormat: Text.PlainText
             visible: !root.tp
             width: parent.width
             text: "Swipe distance applies to the two-finger swipe and the one-finger page flick"
@@ -509,7 +513,7 @@ Panel {
             spacing: Style.space(6)
             // only the default workspace actions know about an end; custom commands run as they are
             visible: !root.tp && String(root.val("gestures", "two_finger_swipe_left", "")).indexOf('workspace = "e') !== -1
-            Text { text: "At the last workspace"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body }
+            Text { textFormat: Text.PlainText; text: "At the last workspace"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body }
             ButtonGroup {
               width: parent.width
               options: [
@@ -557,8 +561,8 @@ Panel {
               anchors.rightMargin: Style.space(12)
               anchors.verticalCenter: parent.verticalCenter
               spacing: Style.space(2)
-              Text { text: "Touch preview"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body; width: parent.width; elide: Text.ElideRight }
-              Text { text: "Live view of every contact, its size and why the daemon scrolls or not"; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; width: parent.width; wrapMode: Text.WordWrap }
+              Text { textFormat: Text.PlainText; text: "Touch preview"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.body; width: parent.width; elide: Text.ElideRight }
+              Text { textFormat: Text.PlainText; text: "Live view of every contact, its size and why the daemon scrolls or not"; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; width: parent.width; wrapMode: Text.WordWrap }
             }
             PanelActionButton {
               id: previewButton
@@ -576,6 +580,7 @@ Panel {
             }
           }
           Text {
+            textFormat: Text.PlainText
             width: parent.width
             text: "A touch that starts in an edge zone holds the mouse: it scrolls only after sliding straight on for a while, so a finger resting there is ignored. In a sideways two-finger swipe it always counts. The back zone is the palm and is always ignored."
             color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; wrapMode: Text.WordWrap
@@ -617,6 +622,7 @@ Panel {
           }
 
           Text {
+            textFormat: Text.PlainText
             width: parent.width
             text: "More knobs: ~/.config/magic-mouse/config.toml"
             color: root.dim

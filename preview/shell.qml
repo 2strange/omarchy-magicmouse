@@ -178,8 +178,8 @@ ShellRoot {
             color: shell.roleColor.hover; opacity: 0.08
           }
           Rectangle { y: parent.height - height; width: parent.width; height: shell.zones[3] * parent.mmPx; color: shell.roleColor.palm; opacity: 0.10 }
-          Text { anchors.top: parent.top; anchors.topMargin: 8; anchors.horizontalCenter: parent.horizontalCenter; text: "front"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11 }
-          Text { visible: shell.zones[3] > 0; anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.horizontalCenter: parent.horizontalCenter; text: "palm"; color: shell.roleColor.palm; font.family: shell.mono; font.pixelSize: 11 }
+          Text { textFormat: Text.PlainText; anchors.top: parent.top; anchors.topMargin: 8; anchors.horizontalCenter: parent.horizontalCenter; text: "front"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11 }
+          Text { textFormat: Text.PlainText; visible: shell.zones[3] > 0; anchors.bottom: parent.bottom; anchors.bottomMargin: 8; anchors.horizontalCenter: parent.horizontalCenter; text: "palm"; color: shell.roleColor.palm; font.family: shell.mono; font.pixelSize: 11 }
 
           Repeater {
             model: shell.contacts
@@ -202,6 +202,7 @@ ShellRoot {
                 opacity: 0.35 + 0.65 * Math.min(1, major / Math.max(1, shell.rangeMajor[1] * 0.75))
               }
               Text {
+                textFormat: Text.PlainText
                 anchors.left: parent.right; anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 text: Math.round(major)
@@ -211,6 +212,7 @@ ShellRoot {
           }
         }
         Text {
+          textFormat: Text.PlainText
           anchors.top: shellOutline.bottom; anchors.topMargin: 6
           anchors.horizontalCenter: parent.horizontalCenter
           text: "y " + shell.rangeY[0] + " … " + shell.rangeY[1]
@@ -224,11 +226,13 @@ ShellRoot {
         spacing: 10
 
         Text {
+          textFormat: Text.PlainText
           text: shell.probeState()
           color: shell.fg; font.family: shell.mono; font.pixelSize: 16; font.bold: true
           width: parent.width; elide: Text.ElideRight
         }
         Text {
+          textFormat: Text.PlainText
           text: shell.fps + " frames/s   " + shell.contacts.length + " contact" + (shell.contacts.length === 1 ? "" : "s") + "   peak size " + Math.round(shell.peakMajor)
           color: shell.dim; font.family: shell.mono; font.pixelSize: 12
         }
@@ -238,12 +242,12 @@ ShellRoot {
           color: shell.scrolling || (shell.tp && shell.why.indexOf("touchpad:") === 0) ? "#3a3020" : shell.surface
           Column {
             anchors.fill: parent; anchors.margins: 10; spacing: 4
-            Text { text: shell.tp ? "TOUCHPAD MODE" : shell.scrolling ? "SCROLLING (" + shell.axis + ")" : shell.coasting ? "GLIDING" : "NOT SCROLLING"; color: shell.scrolling || (shell.tp && shell.why.indexOf("touchpad:") === 0) ? shell.roleColor.follow : shell.fg; font.family: shell.mono; font.pixelSize: 14; font.bold: true }
-            Text { text: shell.why || "–"; color: shell.fg; font.family: shell.mono; font.pixelSize: 12; width: parent.width; elide: Text.ElideRight }
+            Text { textFormat: Text.PlainText; text: shell.tp ? "TOUCHPAD MODE" : shell.scrolling ? "SCROLLING (" + shell.axis + ")" : shell.coasting ? "GLIDING" : "NOT SCROLLING"; color: shell.scrolling || (shell.tp && shell.why.indexOf("touchpad:") === 0) ? shell.roleColor.follow : shell.fg; font.family: shell.mono; font.pixelSize: 14; font.bold: true }
+            Text { textFormat: Text.PlainText; text: shell.why || "–"; color: shell.fg; font.family: shell.mono; font.pixelSize: 12; width: parent.width; elide: Text.ElideRight }
           }
         }
 
-        Text { text: "mouse moving: " + (shell.moving ? "yes" : "no"); color: shell.moving ? shell.roleColor.follow : shell.dim; font.family: shell.mono; font.pixelSize: 12 }
+        Text { textFormat: Text.PlainText; text: "mouse moving: " + (shell.moving ? "yes" : "no"); color: shell.moving ? shell.roleColor.follow : shell.dim; font.family: shell.mono; font.pixelSize: 12 }
 
         Row {
           spacing: 14
@@ -253,12 +257,12 @@ ShellRoot {
               required property var modelData
               spacing: 6
               Rectangle { width: 10; height: 10; radius: 5; color: shell.roleColor[modelData[0]]; anchors.verticalCenter: parent.verticalCenter }
-              Text { text: modelData[1]; color: shell.dim; font.family: shell.mono; font.pixelSize: 11 }
+              Text { textFormat: Text.PlainText; text: modelData[1]; color: shell.dim; font.family: shell.mono; font.pixelSize: 11 }
             }
           }
         }
 
-        Text { text: "TUNING  (applies when you let go)"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
+        Text { textFormat: Text.PlainText; text: "TUNING  (applies when you let go)"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
         Tune { label: "Touch start size"; section: "scroll"; key: "touch_start_size"; from: 0; to: 900; step: 10; fallback: 480; hint: "0 = off" }
         Tune { label: "Touch hold size"; section: "scroll"; key: "touch_hold_size"; from: 0; to: 900; step: 10; fallback: 300 }
         Tune { label: "Two-finger size"; section: "scroll"; key: "touch_pair_size"; from: 0; to: 900; step: 10; fallback: 250 }
@@ -272,7 +276,7 @@ ShellRoot {
         Tune { visible: shell.tp; label: "Touchpad scroll speed"; section: "touchpad"; key: "scroll_speed"; from: 0.05; to: 2; step: 0.025; decimals: 3; unit: "×"; fallback: 0.35 }
         Tune { visible: shell.tp; label: "Swipe boost"; section: "touchpad"; key: "swipe_gain"; from: 1; to: 5; step: 0.1; decimals: 1; unit: "×"; fallback: 2.7 }
 
-        Text { text: "SIZE PER CONTACT"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
+        Text { textFormat: Text.PlainText; text: "SIZE PER CONTACT"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
         Column {
           width: parent.width
           height: 3 * 16  // room for three contacts, always; more are not listed
@@ -287,7 +291,7 @@ ShellRoot {
               height: 10; radius: 3; anchors.verticalCenter: parent.verticalCenter
               color: shell.roleColor[modelData[5]] || shell.fg
             }
-            Text { anchors.right: parent.right; text: "#" + modelData[0] + "  " + modelData[3] + " × " + modelData[4] + "  " + (modelData[6] || 0) + "/s"; color: shell.fg; font.family: shell.mono; font.pixelSize: 11 }
+            Text { textFormat: Text.PlainText; anchors.right: parent.right; text: "#" + modelData[0] + "  " + modelData[3] + " × " + modelData[4] + "  " + (modelData[6] || 0) + "/s"; color: shell.fg; font.family: shell.mono; font.pixelSize: 11 }
             Repeater {  // touch start and hold sizes
               model: [shell.cfgVal("scroll", "touch_start_size", 0), shell.cfgVal("scroll", "touch_hold_size", 0)]
               delegate: Rectangle {
@@ -302,10 +306,11 @@ ShellRoot {
         }
         }
 
-        Text { text: "DECISIONS"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
+        Text { textFormat: Text.PlainText; text: "DECISIONS"; color: shell.dim; font.family: shell.mono; font.pixelSize: 11; font.bold: true; topPadding: 6 }
         Repeater {
           model: shell.log.slice().reverse()
           delegate: Text {
+            textFormat: Text.PlainText
             required property var modelData
             text: modelData.t + "  " + modelData.why
             color: shell.fg; font.family: shell.mono; font.pixelSize: 11
@@ -335,10 +340,12 @@ ShellRoot {
     width: parent.width; height: 34
     function snap(v) { return Math.max(from, Math.min(to, Math.round(v / step) * step)) }
     Text {
+      textFormat: Text.PlainText
       text: tune.label + (tune.hint ? "  (" + tune.hint + ")" : "")
       color: shell.fg; font.family: shell.mono; font.pixelSize: 12
     }
     Text {
+      textFormat: Text.PlainText
       anchors.right: parent.right
       text: tune.shown.toFixed(tune.decimals) + tune.unit
       color: tune.dragging ? shell.roleColor.follow : shell.fg; font.family: shell.mono; font.pixelSize: 12; font.bold: true
