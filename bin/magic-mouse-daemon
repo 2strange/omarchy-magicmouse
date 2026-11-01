@@ -91,6 +91,7 @@ FIRM_REPORTS = 3  # a finger must show this many big reports in a row, at scroll
 # 3 making touch, 4 touching, 5 breaking touch, 6 lingering, 7 out of range. The driver reports
 # every state but 0 as a contact; only these touch.
 FW_TOUCHING = (3, 4)
+FW_PAIR_GAP_MM = 30.0  # a firmware swipe pair lies this close (index and middle finger), not thumb and ring finger on both sides
 UNDECIPHERED = "/sys/module/hid_magicmouse/parameters/report_undeciphered"
 EDGE_STRAIGHT = 0.6  # an edge finger is released only when its travel is at least this share of its path
 JUMP_MM = 5.0  # a slot moving this far in one report without a new tracking id is a new finger
@@ -108,7 +109,7 @@ def EVIOCGMTSLOTS(length: int) -> int:
 class Touch:
     """One finger on the surface, from landing to lift."""
 
-    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size", "rate", "path", "edge0")
+    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size", "rate", "path", "edge0", "fw")
 
     def __init__(self, ts: float, x: int, y: int, grip: bool, palm: bool = False) -> None:
         self.x, self.y, self.grip, self.palm = x, y, grip or palm, palm
@@ -121,6 +122,7 @@ class Touch:
         self.rate = 0.0  # this finger's reports per second, smoothed (for the preview)
         self.path = 0.0  # distance travelled along the way, in touch units (a wobble adds up, a slide too)
         self.edge0 = grip and not palm  # landed in an edge zone (grip may be cleared later)
+        self.fw = -1  # the mouse's own contact state when it tells one (FW_TOUCHING), else -1
         self.hist: collections.deque = collections.deque([(ts, x, y)])
 
     def update(self, ts: float, x: int, y: int) -> None:
@@ -1787,7 +1789,20 @@ class Engine:
         if not fingers:
             self.tp_swiped = False
         cand = self.pick(fingers, ts) if fingers else None
-        if key is not None:
+        pair = self.fw_pair() if swipe_on and not self.tp_swiped else None
+        if pair is not None and (key is None or (len(key) == 1 and key[0] in pair and ts - self.tp_t0 < TP_PAIR_YOUNG)) \
+                and self.tp_engage(ts, pair):
+            # The mouse says both touch and they slide sideways side by side: the swipe, at once (a light
+            # swipe lasts only ~100 ms), edge fingers too, and from where they landed (catch-up).
+            key = pair
+            self.tp_pair_n = 0
+            self.tp_t0 = ts
+            self.tp_owed, self.tp_out = {}, {}
+            for t in key:
+                self.touches[t].grip = False
+                rx, ry = self.touches[t].recent()
+                self.tp_owed[t] = [-float(rx), -float(ry)]
+        elif key is not None:
             if len(key) == 1:
                 t1 = self.touches[key[0]]
                 dx, dy = t1.x - self.tp_from[0], t1.y - self.tp_from[1]
@@ -1880,6 +1895,28 @@ class Engine:
                 best = (m, t)
         return tuple(sorted((t1, best[1]))) if best else None
 
+    def fw_pair(self) -> tuple[int, ...] | None:
+        """Two fingers the mouse itself calls touching, side by side, sliding sideways together:
+        the workspace swipe. Edge fingers count: holding the mouse is not two neighbouring fingers
+        sliding the same way. None without the mouse's own touch state."""
+        live = [(t, o) for t, o in self.touches.items() if o.fw in FW_TOUCHING and not o.palm]
+        best = None
+        for i, (ta, a) in enumerate(live):
+            ax, ay = a.recent()
+            for tb, b in live[i + 1:]:
+                bx, by = b.recent()
+                ma, mb = abs(ax) / self.res_x, abs(bx) / self.res_x
+                if ax * bx <= 0 or min(ma, mb) < MOVING_MM or max(ma, mb) < MIN_SLIDE_MM \
+                        or min(ma, mb) < PAIR_RATIO * max(ma, mb):
+                    continue  # not both moving the same way, enough
+                if abs(ax + bx) < TP_SWIPE_RATIO * abs(ay + by):
+                    continue  # more up and down than sideways: a scroll
+                if math.hypot(a.x - b.x, a.y - b.y) / self.res_x > FW_PAIR_GAP_MM:
+                    continue
+                if best is None or ma + mb > best[0]:
+                    best = (ma + mb, tuple(sorted((ta, tb))))
+        return best[1] if best else None
+
     def swipe_pair(self, pair: tuple[int, ...]) -> bool:
         """Two fingers sliding sideways together: the workspace swipe, not a scroll."""
         vx = sum(self.touches[t].recent()[0] for t in pair) / self.res_x
@@ -1919,6 +1956,9 @@ class Engine:
         Where the mouse tells its own touch state (fw, touch_firmware on), that decides instead."""
         sc = self.cfg["scroll"]
         fw = fw if fw and sc.get("touch_firmware", True) else {}
+        if not fw:
+            for t in self.touches.values():
+                t.fw = -1
         start = max(float(sc.get("touch_start_size", 0.0)), 0.0)
         hold = min(max(float(sc.get("touch_hold_size", 0.0)), 0.0), start)
         pair = min(max(float(sc.get("touch_pair_size", 0.0)), 0.0), start) or hold
@@ -1941,7 +1981,7 @@ class Engine:
         for tid, gap in gaps.items():
             t = self.touches[tid]
             if tid in fw:
-                was, t.firm = t.ok, 0
+                was, t.firm, t.fw = t.ok, 0, fw[tid]
                 t.ok = fw[tid] in FW_TOUCHING
                 if t.ok and not was and not t.grip:
                     anchor = True

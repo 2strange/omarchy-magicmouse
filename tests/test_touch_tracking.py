@@ -280,6 +280,38 @@ class TouchpadMode(EngineCase):
             self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600), (RAW, 0x20))
         self.assertEqual(self.pad.calls[-1][0], [1])
 
+    def light_pair(self, x1, y1, x2, y2, dx, dy, n, state=0x40):
+        """Two fingers the mouse calls touching (or `state`), small, moving dx, dy per frame."""
+        self.frame((SLOT, 0), (TID, 1), (X, x1), (Y, y1), (MAJOR, 200), (RAW, state),
+                   (SLOT, 1), (TID, 2), (X, x2), (Y, y2), (MAJOR, 200), (RAW, state))
+        for i in range(1, n + 1):
+            self.frame((SLOT, 0), (X, x1 + dx * i), (Y, y1 + dy * i), (MAJOR, 200), (RAW, state),
+                       (SLOT, 1), (X, x2 + dx * i), (Y, y2 + dy * i), (MAJOR, 200), (RAW, state))
+
+    def test_firmware_light_quick_swipe_on_the_edge_is_a_swipe_at_once(self):
+        self.light_pair(1200, -200, 1180, 400, -60, 0, 4)  # right edge zone, ~45 ms
+        self.assertEqual(self.pad.calls[-1][0], [1, 2])
+
+    def test_firmware_pair_owes_the_way_from_landing(self):
+        self.light_pair(300, -200, 280, 400, -60, 0, 3)
+        first = next(c for c in self.pad.calls if len(c[0]) == 2)
+        self.assertIn(1, self.eng.tp_owed)  # it lands where the slide began, then catches up
+        self.assertTrue(first)
+
+    def test_firmware_pair_up_and_down_is_no_swipe(self):
+        self.light_pair(-100, -600, 300, -600, 0, 60, 8)
+        self.assertTrue(all(len(c[0]) < 2 for c in self.pad.calls))
+
+    def test_firmware_pair_far_apart_is_no_swipe(self):
+        # thumb on the left edge, ring finger on the right: the hand shifting the mouse, not a swipe
+        self.light_pair(-1080, 400, 1230, 400, 50, 0, 2)
+        self.assertIsNone(self.eng.fw_pair())
+        self.assertTrue(all(len(c[0]) < 2 for c in self.pad.calls))
+
+    def test_firmware_hovering_pair_is_no_swipe(self):
+        self.light_pair(300, -200, 280, 400, -60, 0, 8, state=0x20)
+        self.assertEqual(self.pad.calls[-1][0], [])
+
     def test_lift_lifts_the_touchpad(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
         self.frame((SLOT, 0), (Y, 40))
