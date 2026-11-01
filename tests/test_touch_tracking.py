@@ -24,7 +24,7 @@ except ImportError as exc:  # python-evdev missing
     daemon = None
     SKIP = f"cannot import the daemon: {exc}"
 
-SLOT, TID, X, Y, MAJOR = 47, 57, 53, 54, 48  # ABS_MT_* codes
+SLOT, TID, X, Y, MAJOR, MINOR = 47, 57, 53, 54, 48, 49  # ABS_MT_* codes
 
 
 class FakeUI:
@@ -53,7 +53,11 @@ class EngineCase(unittest.TestCase):
         self.t = 100.0
 
     def frame(self, *events):
-        """One input report: (code, value) ABS_MT events, then SYN_REPORT."""
+        """One input report: (code, value) ABS_MT events, then SYN_REPORT.
+        A new finger gets a width (TOUCH_MINOR) unless the frame sets one: a touch has one."""
+        if not any(code == MINOR for code, _ in events):
+            events = [ev for code, value in events
+                      for ev in (((code, value), (MINOR, 400)) if code == TID and value >= 0 else ((code, value),))]
         for code, value in events:
             self.eng.feed(types.SimpleNamespace(type=3, code=code, value=value, timestamp=lambda t=self.t: t))
         self.eng.feed(types.SimpleNamespace(type=0, code=0, value=0, timestamp=lambda t=self.t: t))
@@ -178,6 +182,11 @@ class TouchConfirm(EngineCase):
     def test_one_light_finger_alone_does_not_count(self):
         self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 0), (MAJOR, 280))
         self.slide(0, 10, 280)
+        self.assertFalse(self.eng.touches[1].ok)
+
+    def test_report_without_width_is_not_a_touch(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 1030), (Y, -1250), (MAJOR, 680), (MINOR, 0))
+        self.slide(0, 10, 680)
         self.assertFalse(self.eng.touches[1].ok)
 
     def test_off_counts_every_touch(self):
