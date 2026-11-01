@@ -868,6 +868,9 @@ TP_PAIR_FRAMES = 3  # a second finger joins the virtual touchpad after pairing t
 TP_PAIR_YOUNG = 0.15  # ...but only this soon after the first went down: a running scroll ignores other fingers
 TP_SWIPE_RATIO = 1.5  # two fingers go down as a pair (the workspace swipe) only when sliding this much more sideways
 TP_HOLD_SEC = 0.1  # a finger down on the virtual touchpad stays down this long while it reports too light
+TP_SCROLL_GAIN = 2.0  # one finger moves this much farther on the virtual touchpad (scroll_factor divided by it):
+# libinput only starts a scroll after about a millimetre, so this lets small, gentle scrolls through
+TP_CATCH_UP = 0.5  # share of the travel from before the touch went down that is still owed, kept per frame
 VPAD_EXTRA_MM = 12.0  # the added finger sits this far beside the first one
 VPAD_TOOLS = [e.BTN_TOOL_FINGER, e.BTN_TOOL_DOUBLETAP, e.BTN_TOOL_TRIPLETAP, e.BTN_TOOL_QUADTAP, e.BTN_TOOL_QUINTTAP]
 
@@ -913,7 +916,7 @@ class VPad:
         """fingers: (real tracking id, x, y) to put down; [] lifts everything.
         No virtual finger ever jumps: a finger keeps its virtual place, a new one lands
         relative to a finger that was already down, and the added finger moves along with it."""
-        gain = min(max(gain, 1.0), VPAD_GROW) if len(fingers) >= 2 else 1.0
+        gain = min(max(gain, 1.0), VPAD_GROW) if len(fingers) >= 2 else TP_SCROLL_GAIN
         if gain != self.gain:  # re-anchor, so no finger jumps when the gain changes
             self.anchor.clear()
             self.gain = gain
@@ -997,7 +1000,7 @@ def vpad_lua(cfg: dict) -> str:
     """Hyprland settings for the virtual touchpad only (the built-in trackpad keeps its own)."""
     tp = cfg["touchpad"]
     natural = "true" if cfg["scroll"].get("natural") else "false"
-    return (f'hl.device({{ name = "{VPAD_HYPR}", scroll_factor = {float(tp["scroll_speed"]):.3f}, '
+    return (f'hl.device({{ name = "{VPAD_HYPR}", scroll_factor = {float(tp["scroll_speed"]) / TP_SCROLL_GAIN:.3f}, '
             f'natural_scroll = {natural}, tap_to_click = false }})')
 
 
@@ -1015,6 +1018,7 @@ class Engine:
         self.tp_t0 = 0.0  # when the fingers on the virtual touchpad went down
         self.tp_light: dict[int, float] = {}  # finger down on the virtual touchpad -> since when it is too light
         self.tp_swiped = False  # a swipe ended with a finger still on: nothing more until all fingers lift
+        self.tp_owed: dict[int, list[float]] = {}  # finger -> travel from before it went down, still to replay
         self.why = ""  # why the last frame did (or did not) scroll; for the probe
         self.why_locked = False
         self.curve = AppleCurve(float(cfg["pointer"]["tracking_speed"]))
@@ -1535,7 +1539,9 @@ class Engine:
         moment while it slides stays down (TP_HOLD_SEC); a running scroll ignores any other
         finger; two fingers become the workspace swipe only when they slide sideways together
         from the start, and when one of them lifts the swipe is over (the other does not scroll
-        on); a finger leaves when it lifts or the hand takes over."""
+        on); a finger leaves only when it lifts: moving the mouse while scrolling is fine.
+        A single finger lands where its slide began and catches up over a few frames, so a
+        short flick is not cut to its tail."""
         gain = float(self.cfg["touchpad"]["swipe_gain"])
         key = self.tp_key
         if key is not None:
@@ -1563,10 +1569,6 @@ class Engine:
                     self.tp_pair_n = 0
             else:
                 self.tp_pair_n = 0
-            pointer = self.pointer_mm(ts, MOVE_WINDOW)
-            if pointer >= MIN_SLIDE_MM and pointer > self.key_recent_mm(key):
-                key = None  # the mouse moves farther than the fingers slide: this is mousing now
-                self.why = "mousing: touchpad fingers lifted"
         elif self.tp_swiped:
             self.why = "swipe done: lift all fingers"
         elif cand is not None:
@@ -1577,9 +1579,13 @@ class Engine:
                 key = cand
                 self.tp_pair_n = 0
                 self.tp_t0 = ts
+                if len(key) == 1:  # land where the slide began: a short flick counts from its start
+                    rx, ry = self.touches[key[0]].recent()
+                    self.tp_owed = {key[0]: [-float(rx), -float(ry)]}
         self.tp_key = key
         self.primary = key
         self.tp_light = {t: v for t, v in self.tp_light.items() if key and t in key}
+        self.tp_owed = {t: v for t, v in self.tp_owed.items() if key and t in key}
         if key is None:
             if not fingers:
                 light = [t.size for t in self.touches.values() if not t.grip]
@@ -1587,7 +1593,16 @@ class Engine:
                             else "only grip fingers" if self.touches else "no touch")
             self.vpad.update([], gain)
             return
-        self.vpad.update([(t, self.touches[t].x, self.touches[t].y) for t in key], gain)
+        pos = []
+        for t in key:
+            ox, oy = self.tp_owed.get(t, (0.0, 0.0))
+            pos.append((t, self.touches[t].x + ox, self.touches[t].y + oy))
+            if t in self.tp_owed:  # catch up over a few frames, not in one jump
+                ox, oy = ox * TP_CATCH_UP, oy * TP_CATCH_UP
+                self.tp_owed[t] = [ox, oy]
+                if math.hypot(ox, oy) < 1.0:
+                    del self.tp_owed[t]
+        self.vpad.update(pos, gain)
         self.why = f"touchpad: {len(key)} finger{'s' if len(key) > 1 else ''} -> {len(key) + 1}" + \
             (" (swipe)" if len(key) >= 2 else " (scroll)") + (" held" if self.tp_light else "")
 

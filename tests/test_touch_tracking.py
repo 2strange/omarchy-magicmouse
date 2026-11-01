@@ -189,9 +189,11 @@ class TouchConfirm(EngineCase):
 class FakePad:
     def __init__(self):
         self.calls = []
+        self.pos = []
 
     def update(self, fingers, gain):
         self.calls.append(([f[0] for f in fingers], gain))
+        self.pos.append([(f[1], f[2]) for f in fingers])
 
 
 @unittest.skipIf(SKIP, SKIP)
@@ -334,6 +336,25 @@ class TouchpadSteadiness(EngineCase):
         for i in range(15, 30):  # the other finger slides on
             self.frame((SLOT, 1), (Y, 450 + 40 * (i - 15)))
         self.assertEqual(self.pad.calls[-1][0], [])
+
+    def test_moving_the_mouse_while_scrolling_keeps_the_finger_down(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        for i in range(1, 10):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600))
+        for i in range(10, 25):  # the hand moves the mouse too, farther than the finger slides
+            self.eng.feed(types.SimpleNamespace(type=2, code=0, value=30, timestamp=lambda t=self.t: t))
+            self.frame((SLOT, 0), (Y, 400 + 5 * (i - 10)), (MAJOR, 600))
+        first = next(i for i, c in enumerate(self.pad.calls) if c[0])
+        self.assertTrue(all(c[0] == [1] for c in self.pad.calls[first:]))
+
+    def test_short_flick_lands_where_it_began(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
+        for i in range(1, 16):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600))
+        first = next(i for i, c in enumerate(self.pad.calls) if c[0])
+        y_down = self.pad.pos[first][0][1]
+        self.assertLess(y_down, 40 * (first + 1) - 40)  # behind the finger: the slide so far is replayed
+        self.assertAlmostEqual(self.pad.pos[-1][0][1], self.eng.touches[1].y, delta=2)  # caught up
 
     def test_finger_staying_light_lifts(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
