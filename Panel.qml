@@ -302,7 +302,10 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             spacing: Style.space(2)
             Text { textFormat: Text.PlainText; text: "MagicMouse"; color: root.fg; font.family: root.fontFam; font.pixelSize: Style.font.title; font.bold: true; width: parent.width; elide: Text.ElideRight }
-            Text { textFormat: Text.PlainText; text: root.batteryText !== "" ? root.batteryText : "MAC-LIKE ON OMARCHY"; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; font.bold: true; width: parent.width; elide: Text.ElideRight }
+            Repeater {  // one line per connected mouse
+              model: (root.batteryText !== "" ? root.batteryText : "MAC-LIKE ON OMARCHY").split("\n")
+              Text { required property var modelData; textFormat: Text.PlainText; text: modelData; color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; font.bold: true; width: parent.width; elide: Text.ElideRight }
+            }
           }
         }
 

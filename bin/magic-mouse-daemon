@@ -422,19 +422,21 @@ def is_magic_mouse(dev: InputDevice) -> bool:
     )
 
 
-def find_mouse() -> InputDevice | None:
+def find_mice(skip: set[str]) -> list[InputDevice]:
+    """Every Magic Mouse not in skip (paths already grabbed)."""
+    found = []
     for path in sorted(glob.glob("/dev/input/event*")):
+        if path in skip:
+            continue
         try:
             dev = InputDevice(path)
         except OSError:
             continue
-        if dev.name in (VIRT_NAME, VPAD_NAME):
+        if dev.name not in (VIRT_NAME, VPAD_NAME) and is_magic_mouse(dev):
+            found.append(dev)
+        else:
             dev.close()
-            continue
-        if is_magic_mouse(dev):
-            return dev
-        dev.close()
-    return None
+    return found
 
 
 def make_uinput() -> UInput:
@@ -2345,24 +2347,39 @@ class Engine:
 
 
 # --------------------------------------------------------------------------- main loop
-def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: HyprEvents,
-                bluez: BluezBattery | None = None) -> None:
-    log(f"grab {dev.path} ({dev.name} {dev.info.vendor:04x}:{dev.info.product:04x})")
-    dev.grab()
-    eng.attach(dev)
-    mtime = config_mtime(cfg_path)
-    next_cfg_check = time.monotonic() + 1.0
-    hidraw = hidraw_for(dev)
-    next_battery = 0.0
-    next_kernel_battery = 0.0  # the kernel's charge, for Bluetooth settings (BluezBattery)
-    queried: int | None = None  # the charge the mouse told us itself this session
-    write_status({"connected": True, "model": dev.name, "ts": time.time()})
-    vpad_cfg = None  # Hyprland settings last applied to the virtual touchpad
-    vpad_retry = 0.0  # after a failed apply (Hyprland not up yet), try again from then
-    hypr_conn = hypr.connects
+class Session:
+    """One grabbed Magic Mouse: its own Engine (touch tracking, virtual touchpad), battery and
+    Hyprland settings for its touchpad. All mice share the config, the virtual mouse and Hyprland."""
 
-    def sync_vpad() -> None:
-        nonlocal vpad_cfg, vpad_retry
+    def __init__(self, dev: InputDevice, ui: UInput, cfg: dict, verbose: bool, bluez: BluezBattery | None) -> None:
+        self.dev, self.bluez = dev, bluez
+        self.eng = Engine(cfg, ui, verbose)
+        self.hidraw = hidraw_for(dev)
+        self.next_battery = 0.0
+        self.next_kernel_battery = 0.0  # the kernel's charge, for Bluetooth settings (BluezBattery)
+        self.queried: int | None = None  # the charge the mouse told us itself this session
+        self.battery: tuple[int, bool] | None = None  # (percent, charging) as last known, for the bar
+        self.vpad_cfg: str | None = None  # Hyprland settings last applied to the virtual touchpad
+        self.vpad_retry = 0.0  # after a failed apply (Hyprland not up yet), try again from then
+        log(f"grab {dev.path} ({dev.name} {dev.info.vendor:04x}:{dev.info.product:04x})")
+        dev.grab()
+        self.eng.attach(dev)
+        self.sync_vpad()
+
+    def geometry(self) -> dict:
+        """The probe's hello for this mouse: name and touch surface."""
+        dev = self.dev
+        geo = {"model": dev.name, "product": f"{dev.info.product:04x}", "res": TOUCH_UNITS_PER_MM}
+        for key, code in (("x", e.ABS_MT_POSITION_X), ("y", e.ABS_MT_POSITION_Y), ("major", e.ABS_MT_TOUCH_MAJOR)):
+            try:
+                info = dev.absinfo(code)
+                geo[key] = [info.min, info.max]
+            except OSError:
+                pass
+        return geo
+
+    def sync_vpad(self) -> None:
+        eng = self.eng
         want = bool(eng.cfg["touchpad"]["enabled"])
         if want and eng.vpad is None:
             try:
@@ -2373,103 +2390,78 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
                 return
             eng.stop_coast("touchpad mode")
             eng.scrolling = False
-            eng.tp_key = None
-            eng.tp_light.clear()
-            eng.tp_owed.clear()
-            eng.tp_out.clear()
-            eng.tp_swiped = False
-            eng.tp_pair_n = 0
-            vpad_cfg = None
+            self.reset_tp()
+            self.vpad_cfg = None
         elif not want and eng.vpad is not None:
             eng.vpad.close()
             eng.vpad = None
-            eng.tp_key = None
-            eng.tp_light.clear()
-            eng.tp_owed.clear()
-            eng.tp_out.clear()
-            eng.tp_swiped = False
-            eng.tp_pair_n = 0
+            self.reset_tp()
             log("touchpad mode off")
         if eng.vpad is not None:
             lua = vpad_lua(eng.cfg)
-            if lua != vpad_cfg:
+            if lua != self.vpad_cfg:
                 reply = hypr_request("eval " + lua)
-                vpad_cfg = lua if reply is not None and reply.strip() == "ok" else None
-                if vpad_cfg is None:
-                    vpad_retry = time.monotonic() + HyprEvents.RETRY_SEC
+                self.vpad_cfg = lua if reply is not None and reply.strip() == "ok" else None
+                if self.vpad_cfg is None:
+                    self.vpad_retry = time.monotonic() + HyprEvents.RETRY_SEC
 
-    try:
-        sync_vpad()
-        if eng.probe:
-            geo = {"model": dev.name, "product": f"{dev.info.product:04x}", "res": TOUCH_UNITS_PER_MM}
-            for key, code in (("x", e.ABS_MT_POSITION_X), ("y", e.ABS_MT_POSITION_Y), ("major", e.ABS_MT_TOUCH_MAJOR)):
-                try:
-                    info = dev.absinfo(code)
-                    geo[key] = [info.min, info.max]
-                except OSError:
-                    pass
-            eng.probe.hello = geo
-            eng.probe.send(dict(geo, type="hello"))
-        while True:
-            now = time.monotonic()
-            if eng.cfg["battery"]["enabled"] and now >= next_battery:
-                next_battery = now + max(float(eng.cfg["battery"]["poll_minutes"]), 1.0) * 60.0
-                got = query_battery(hidraw) if hidraw else None
-                if got:
-                    percent, charging = got
-                    queried = percent
-                    if bluez and eng.cfg["battery"].get("bluez", True):
-                        bluez.set(dev.uniq, percent)
-                    write_status({"connected": True, "model": dev.name, "percent": percent,
-                                  "charging": charging, "ts": time.time()})
-                    log(f"battery {percent}%" + (" charging" if charging else ""))
-                elif hidraw is None:
-                    log("battery: no hidraw node found for the mouse")
-            if bluez and eng.cfg["battery"]["enabled"] and eng.cfg["battery"].get("bluez", True) \
-                    and now >= next_kernel_battery:
-                next_kernel_battery = now + 60.0
-                pct = kernel_battery(dev) or queried  # the kernel follows the mouse; our query fills in until it knows
-                if pct is not None:
-                    bluez.set(dev.uniq, pct)
-            hypr.connect(now)
-            if hypr.connects != hypr_conn:  # a new Hyprland (or a reconnect): settings are gone
-                hypr_conn = hypr.connects
-                vpad_cfg = None
-            if eng.vpad is not None and vpad_cfg is None and now >= vpad_retry:
-                sync_vpad()
-            hypr.sync_binding(bool(eng.cfg["buttons"]["control_click"]), now)
-            timeout = TICK if eng.coasting else 0.25
-            fds = [dev.fd] + ([hypr] if hypr.sock else []) + (eng.probe.fds() if eng.probe else [])
-            r, _, _ = select.select(fds, [], [], timeout)
-            if eng.probe:
-                eng.probe.handle(r)
-            now = time.monotonic()
-            if dev.fd in r:
-                try:
-                    for ev in dev.read():
-                        eng.feed(ev)
-                except OSError as exc:
-                    log(f"device gone: {exc}")
-                    return
-            if hypr in r:
-                for line in hypr.read_lines():
-                    if line == CONTROL_CLICK_EVENT:
-                        eng.control_click(time.time())
-                    elif line.startswith("configreloaded>>"):
-                        hypr.resync()  # a reload drops bindings added at runtime
-                        vpad_cfg = None  # ...and the virtual touchpad's settings
-                        sync_vpad()
-            if eng.coasting:
-                eng.tick(time.time())
-            if now >= next_cfg_check:
-                next_cfg_check = now + 1.0
-                m = config_mtime(cfg_path)
-                if m != mtime:
-                    mtime = m
-                    eng.update_config(load_config(cfg_path))
-                    log("config reloaded")
-                    sync_vpad()
-    finally:
+    def reset_tp(self) -> None:
+        eng = self.eng
+        eng.tp_key = None
+        eng.tp_light.clear()
+        eng.tp_owed.clear()
+        eng.tp_out.clear()
+        eng.tp_swiped = False
+        eng.tp_pair_n = 0
+
+    def poll(self, now: float) -> bool:
+        """Battery and a pending touchpad settings retry. True if the charge changed (status to write)."""
+        eng, dev, changed = self.eng, self.dev, False
+        bat = eng.cfg["battery"]
+        bluez = self.bluez if bat.get("bluez", True) else None
+        if bat["enabled"] and now >= self.next_battery:
+            self.next_battery = now + max(float(bat["poll_minutes"]), 1.0) * 60.0
+            got = query_battery(self.hidraw) if self.hidraw else None
+            if got:
+                self.queried = got[0]
+                changed, self.battery = got != self.battery, got
+                if bluez:
+                    bluez.set(dev.uniq, got[0])
+                log(f"battery {got[0]}%" + (" charging" if got[1] else ""))
+            elif self.hidraw is None:
+                log("battery: no hidraw node found for the mouse")
+        if bat["enabled"] and now >= self.next_kernel_battery:
+            self.next_kernel_battery = now + 60.0
+            kernel = kernel_battery(dev)
+            if kernel is not None and (self.battery is None or self.battery[0] != kernel):
+                # some mice never answer our query (EIO): the kernel's charge is all there is
+                self.battery = (kernel, self.battery[1] if self.battery else False)
+                changed = True
+            pct = kernel or self.queried  # the kernel follows the mouse; our query fills in until it knows
+            if bluez and pct is not None:
+                bluez.set(dev.uniq, pct)
+        if eng.vpad is not None and self.vpad_cfg is None and now >= self.vpad_retry:
+            self.sync_vpad()
+        return changed
+
+    def status(self) -> dict:
+        d = {"model": self.dev.name, "address": self.dev.uniq or ""}
+        if self.battery:
+            d["percent"], d["charging"] = self.battery
+        return d
+
+    def read(self) -> bool:
+        """Feed what the mouse sent. False when it is gone."""
+        try:
+            for ev in self.dev.read():
+                self.eng.feed(ev)
+        except OSError as exc:
+            log(f"device gone: {exc}")
+            return False
+        return True
+
+    def close(self) -> None:
+        eng, dev = self.eng, self.dev
         if eng.vpad is not None:
             eng.vpad.close()
             eng.vpad = None
@@ -2482,10 +2474,121 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
         eng.reset_touch()
         if eng.probe:
             eng.probe.send({"type": "disconnected"})
-        write_status({"connected": False, "model": dev.name, "ts": time.time()})
-        if bluez:
-            bluez.clear(dev.uniq)
-        log("released grab")
+            eng.probe = None
+        if self.bluez:
+            self.bluez.clear(dev.uniq)
+        log(f"released grab ({dev.name})")
+
+
+def publish_status(sessions: dict[str, Session]) -> None:
+    """battery.json for the bar: every mouse under "mice"; the top level is the emptiest one
+    (the bar's colour warns about it), as before a single mouse."""
+    mice = [s.status() for s in sessions.values()]
+    if not mice:
+        write_status({"connected": False, "mice": [], "ts": time.time()})
+        return
+    known = [m for m in mice if "percent" in m]
+    top = min(known, key=lambda m: m["percent"]) if known else mice[0]
+    write_status(dict(top, connected=True, mice=mice, ts=time.time()))
+
+
+def run(ui: UInput, cfg_path: str, verbose: bool, probe: Probe | None, hypr: HyprEvents,
+        bluez: BluezBattery | None, record) -> None:
+    """Grab every Magic Mouse that shows up, all in one select loop. The probe (preview window)
+    follows the mouse last touched."""
+    sessions: dict[str, Session] = {}
+    active: Session | None = None
+    cfg = load_config(cfg_path)
+    mtime = config_mtime(cfg_path)
+    next_cfg_check = next_scan = 0.0
+    hypr_conn = hypr.connects
+    publish_status(sessions)
+
+    def make_active(s: Session | None) -> None:
+        nonlocal active
+        if s is active:
+            return
+        if active is not None:
+            active.eng.probe = None
+        active = s
+        if probe and s is not None:
+            s.eng.probe = probe
+            probe.hello = s.geometry()
+            probe.send(dict(probe.hello, type="hello"))
+        elif probe:
+            probe.send({"type": "disconnected"})
+
+    def drop(path: str) -> None:
+        s = sessions.pop(path)
+        s.close()
+        if s is active:
+            make_active(next(iter(sessions.values()), None))
+        publish_status(sessions)
+
+    try:
+        while True:
+            now = time.monotonic()
+            if now >= next_scan:
+                next_scan = now + RESCAN_SEC
+                for dev in find_mice(set(sessions)):
+                    try:
+                        s = Session(dev, ui, cfg, verbose, bluez)
+                    except OSError as exc:
+                        log(f"cannot grab {dev.path}: {exc}")
+                        dev.close()
+                        continue
+                    s.eng.record = record
+                    sessions[dev.path] = s
+                    if active is None:
+                        make_active(s)
+                    publish_status(sessions)
+            if any([s.poll(now) for s in sessions.values()]):
+                publish_status(sessions)
+            hypr.connect(now)
+            if hypr.connects != hypr_conn:  # a new Hyprland (or a reconnect): settings are gone
+                hypr_conn = hypr.connects
+                for s in sessions.values():
+                    s.vpad_cfg = None
+            hypr.sync_binding(bool(cfg["buttons"]["control_click"]) and bool(sessions), now)
+            coasting = any(s.eng.coasting for s in sessions.values())
+            timeout = TICK if coasting else 0.25
+            fds = [s.dev.fd for s in sessions.values()] + ([hypr] if hypr.sock else []) \
+                + (probe.fds() if probe else [])
+            r, _, _ = select.select(fds, [], [], timeout)
+            if probe:
+                probe.handle(r)
+            now = time.monotonic()
+            for path, s in list(sessions.items()):
+                if s.dev.fd in r:
+                    if not s.read():
+                        drop(path)
+                    elif s is not active and s.eng.touches:
+                        make_active(s)  # the preview shows the mouse being touched
+            if hypr in r:
+                for line in hypr.read_lines():
+                    if line == CONTROL_CLICK_EVENT and active is not None:
+                        active.eng.control_click(time.time())
+                    elif line.startswith("configreloaded>>"):
+                        hypr.resync()  # a reload drops bindings added at runtime
+                        for s in sessions.values():
+                            s.vpad_cfg = None  # ...and the virtual touchpads' settings
+                            s.sync_vpad()
+            for s in sessions.values():
+                if s.eng.coasting:
+                    s.eng.tick(time.time())
+            if now >= next_cfg_check:
+                next_cfg_check = now + 1.0
+                m = config_mtime(cfg_path)
+                if m != mtime:
+                    mtime = m
+                    cfg = load_config(cfg_path)
+                    for s in sessions.values():
+                        s.eng.update_config(cfg)
+                        s.sync_vpad()
+                    log("config reloaded")
+    finally:
+        for path in list(sessions):
+            drop(path)
 
 
 def main() -> int:
@@ -2498,46 +2601,41 @@ def main() -> int:
     args = ap.parse_args()
 
     if args.list:
-        dev = find_mouse()
-        if not dev:
+        mice = find_mice(set())
+        if not mice:
             print("no Magic Mouse found (is it connected? is hid_magicmouse bound?)")
             return 1
-        print(f"{dev.path}: {dev.name} {dev.info.vendor:04x}:{dev.info.product:04x}")
+        for dev in mice:
+            print(f"{dev.path}: {dev.name} {dev.info.vendor:04x}:{dev.info.product:04x}")
         return 0
 
     cfg = load_config(args.config)
     log(f"magic-mouse-daemon pid={os.getpid()} config={args.config}")
     ui = make_uinput()
     log(f"virtual device '{VIRT_NAME}' ready")
-    eng = Engine(cfg, ui, args.verbose)
+    record = None
     if args.record:
-        eng.record = open(args.record, "a", buffering=1)
+        record = open(args.record, "a", buffering=1)
         log(f"recording raw input to {args.record}")
+    probe = None
     if not args.no_probe:
-        eng.probe = Probe()
-        eng.probe.open()
+        probe = Probe()
+        probe.open()
     hypr = HyprEvents()
     bluez = BluezBattery() if cfg["battery"]["enabled"] and cfg["battery"].get("bluez", True) else None
     # systemctl stop sends SIGTERM; exit through the finally blocks so buttons
     # are released and the Control-click binding is taken back out of Hyprland.
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     try:
-        while True:
-            dev = find_mouse()
-            if dev is None:
-                time.sleep(RESCAN_SEC)
-                continue
-            eng.update_config(load_config(args.config))
-            run_session(dev, ui, eng, args.config, hypr, bluez)
-            time.sleep(RESCAN_SEC)
+        run(ui, args.config, args.verbose, probe, hypr, bluez, record)
     except KeyboardInterrupt:
         log("interrupt")
     finally:
         if hypr.sock and hypr.bound:
             hypr.sync_binding(False, time.monotonic())
         hypr.close()
-        if eng.probe:
-            eng.probe.close()
+        if probe:
+            probe.close()
         ui.close()
     return 0
 

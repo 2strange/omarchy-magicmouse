@@ -120,10 +120,15 @@ BarWidget {
     if ("hostWidget" in target) target.hostWidget = root
     if ("batteryText" in target) target.batteryText = root.batteryLine
   }
-  // one line for the panel header; any change in it (another mouse, its charge) goes to the panel
-  readonly property string batteryLine: root.connected
-    ? (root.known ? root.percent + "% · " + (root.charging ? "charging · " : "") : "") + root.modelName
-    : "not connected"
+  // every mouse the daemon drives (status.mice); the top level of the status is the emptiest one
+  readonly property var mice: status && status.connected === true && Array.isArray(status.mice) ? status.mice : []
+  function miceLine(m) {
+    return (m.percent !== undefined ? m.percent + "% · " + (m.charging === true ? "charging · " : "") : "") + String(m.model || "Mouse")
+  }
+  // the panel header, one line per mouse; any change in it (another mouse, a charge) goes to the panel
+  readonly property string batteryLine: !root.connected ? "not connected"
+    : root.mice.length > 1 ? root.mice.map(root.miceLine).join("\n")
+    : (root.known ? root.percent + "% · " + (root.charging ? "charging · " : "") : "") + root.modelName
   onBarChanged: injectPanel()
   onSettingsChanged: injectPanel()
   onBatteryLineChanged: injectPanel()
@@ -165,7 +170,9 @@ BarWidget {
     active: root.low
     // amber while low, the theme's urgent red once critical (the theme has no amber of its own)
     activeColor: root.critical ? (root.bar ? root.bar.urgent : "#a55555") : Qt.tint(button.foreground, "#b0e0a030")
-    tooltipText: root.connected ? root.modelName + (root.known ? " battery " + root.percent + "% (" + root.stateText + ")" : " battery: waiting for the mouse to report") : ""
+    tooltipText: !root.connected ? ""
+      : root.mice.length > 1 ? root.mice.map(root.miceLine).join("\n")
+      : root.modelName + (root.known ? " battery " + root.percent + "% (" + root.stateText + ")" : " battery: waiting for the mouse to report")
     onPressed: function(b) {
       if (!root.bar) return
       if (b === Qt.RightButton) root.bar.run("omarchy-shell shell toggle omarchy.bluetooth")
