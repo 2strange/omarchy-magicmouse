@@ -233,6 +233,9 @@ DEFAULTS = {
     "battery": {
         "enabled": True,  # ask the mouse for its charge (needs the udev rule for /dev/hidraw access)
         "poll_minutes": 15.0,
+        # Tell BlueZ the charge, so Bluetooth settings (the Omarchy panel too) show it next to the mouse.
+        # BlueZ knows no battery for a classic Bluetooth mouse on its own.
+        "bluez": True,
     },
     "momentum": {
         "enabled": True,
@@ -578,6 +581,136 @@ def write_status(data: dict) -> None:
     except OSError as exc:
         log(f"status: not publishing battery status to {STATUS_DIR}: {exc} "
             "(fix or remove that directory; the next status write retries)")
+
+
+def kernel_battery(dev: InputDevice) -> int | None:
+    """The charge the kernel publishes for the mouse (power_supply hid-<address>-battery), if it knows one."""
+    if not dev.uniq:
+        return None
+    for p in glob.glob(f"/sys/class/power_supply/hid-{dev.uniq.lower()}-battery*/capacity"):
+        try:
+            value = int(open(p).read().strip())
+        except (OSError, ValueError):
+            continue
+        if 0 < value <= 100:  # 0 = the mouse has not reported yet
+            return value
+    return None
+
+
+class BluezBattery:
+    """Tells BlueZ the mouse's charge through its BatteryProvider API (org.bluez.BatteryProviderManager1),
+    so every Bluetooth UI shows it. Runs a GLib main loop in a thread for BlueZ's calls; set() and
+    clear() hand over to it. Without python-gobject or BlueZ it logs once and does nothing."""
+
+    ROOT = "/io/github/twostrange/magicmouse/battery"
+    MANAGER_XML = (
+        '<node><interface name="org.freedesktop.DBus.ObjectManager">'
+        '<method name="GetManagedObjects"><arg type="a{oa{sa{sv}}}" direction="out"/></method>'
+        '<signal name="InterfacesAdded"><arg type="o"/><arg type="a{sa{sv}}"/></signal>'
+        '<signal name="InterfacesRemoved"><arg type="o"/><arg type="as"/></signal>'
+        '</interface></node>')
+    PROVIDER_XML = (
+        '<node><interface name="org.bluez.BatteryProvider1">'
+        '<property name="Device" type="o" access="read"/>'
+        '<property name="Percentage" type="y" access="read"/>'
+        '<property name="Source" type="s" access="read"/>'
+        '</interface></node>')
+
+    def __init__(self) -> None:
+        self.bus = None
+        self.adapters: set[str] = set()  # adapters we registered with
+        self.objects: dict[str, tuple[int, str, int]] = {}  # our path -> (registration id, device path, percent)
+        try:
+            import gi
+            gi.require_version("Gio", "2.0")
+            from gi.repository import Gio, GLib
+        except (ImportError, ValueError) as exc:
+            log(f"battery: no python-gobject, not telling Bluetooth settings the charge ({exc})")
+            return
+        self.Gio, self.GLib = Gio, GLib
+        try:
+            self.bus = Gio.bus_get_sync(Gio.BusType.SYSTEM, None)
+            self.manager_info = Gio.DBusNodeInfo.new_for_xml(self.MANAGER_XML).interfaces[0]
+            self.provider_info = Gio.DBusNodeInfo.new_for_xml(self.PROVIDER_XML).interfaces[0]
+            self.bus.register_object(self.ROOT, self.manager_info, self.on_manager_call, None, None)
+        except Exception as exc:  # GLib.Error
+            log(f"battery: no system bus for Bluetooth settings: {exc}")
+            self.bus = None
+            return
+        threading.Thread(target=GLib.MainLoop().run, daemon=True).start()
+
+    def on_manager_call(self, conn, sender, path, iface, method, params, invocation) -> None:
+        GLib = self.GLib
+        objects = {p: {"org.bluez.BatteryProvider1": self.props(dev, pct)} for p, (_, dev, pct) in self.objects.items()}
+        invocation.return_value(GLib.Variant("(a{oa{sa{sv}}})", (objects,)))
+
+    def props(self, dev: str, pct: int) -> dict:
+        V = self.GLib.Variant
+        return {"Device": V("o", dev), "Percentage": V("y", pct), "Source": V("s", "magic-mouse-daemon")}
+
+    def get_prop(self, conn, sender, path, iface, name):
+        _, dev, pct = self.objects[path]
+        return self.props(dev, pct)[name]
+
+    def device_path(self, address: str) -> str | None:
+        """BlueZ's object for the device with this address (/org/bluez/hciN/dev_XX_...)."""
+        reply = self.bus.call_sync("org.bluez", "/", "org.freedesktop.DBus.ObjectManager", "GetManagedObjects",
+                                   None, None, self.Gio.DBusCallFlags.NONE, 2000, None)
+        for path, ifaces in reply.unpack()[0].items():
+            d = ifaces.get("org.bluez.Device1")
+            if d and str(d.get("Address", "")).lower() == address.lower():
+                return path
+        return None
+
+    def set(self, address: str, percent: int) -> None:
+        if self.bus and address:
+            self.GLib.idle_add(self._set, address, int(percent))
+
+    def clear(self, address: str) -> None:
+        if self.bus and address:
+            self.GLib.idle_add(self._clear, address)
+
+    def _path(self, address: str) -> str:
+        return f"{self.ROOT}/dev_{address.upper().replace(':', '_')}"
+
+    def _set(self, address: str, percent: int) -> bool:
+        GLib, path = self.GLib, self._path(address)
+        try:
+            if path in self.objects:
+                reg, dev, old = self.objects[path]
+                if old != percent:
+                    self.objects[path] = (reg, dev, percent)
+                    self.bus.emit_signal(None, path, "org.freedesktop.DBus.Properties", "PropertiesChanged",
+                                         GLib.Variant("(sa{sv}as)", ("org.bluez.BatteryProvider1",
+                                                                     {"Percentage": GLib.Variant("y", percent)}, [])))
+                return False
+            dev = self.device_path(address)
+            if dev is None:
+                return False  # BlueZ does not know the mouse (yet); the next poll tries again
+            adapter = dev.rsplit("/", 1)[0]
+            reg = self.bus.register_object(path, self.provider_info, None, self.get_prop, None)
+            self.objects[path] = (reg, dev, percent)
+            if adapter not in self.adapters:
+                self.bus.call_sync("org.bluez", adapter, "org.bluez.BatteryProviderManager1", "RegisterBatteryProvider",
+                                   GLib.Variant("(o)", (self.ROOT,)), None, self.Gio.DBusCallFlags.NONE, 5000, None)
+                self.adapters.add(adapter)  # BlueZ now asks GetManagedObjects and picks the battery up
+            else:
+                self.bus.emit_signal(None, self.ROOT, "org.freedesktop.DBus.ObjectManager", "InterfacesAdded",
+                                     GLib.Variant("(oa{sa{sv}})", (path, {"org.bluez.BatteryProvider1": self.props(dev, percent)})))
+            log(f"battery: {percent}% handed to Bluetooth settings")
+        except Exception as exc:  # GLib.Error: BlueZ gone, no BatteryProviderManager1, ...
+            log(f"battery: Bluetooth settings: {exc}")
+            self.objects.pop(path, None)
+        return False
+
+    def _clear(self, address: str) -> bool:
+        path = self._path(address)
+        if path in self.objects:
+            reg, _, _ = self.objects.pop(path)
+            self.bus.unregister_object(reg)
+            self.bus.emit_signal(None, self.ROOT, "org.freedesktop.DBus.ObjectManager", "InterfacesRemoved",
+                                 self.GLib.Variant("(oas)", (path, ["org.bluez.BatteryProvider1"])))
+        return False
 
 
 # --------------------------------------------------------------------------- actions
@@ -2172,7 +2305,8 @@ class Engine:
 
 
 # --------------------------------------------------------------------------- main loop
-def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: HyprEvents) -> None:
+def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: HyprEvents,
+                bluez: BluezBattery | None = None) -> None:
     log(f"grab {dev.path} ({dev.name} {dev.info.vendor:04x}:{dev.info.product:04x})")
     dev.grab()
     eng.attach(dev)
@@ -2180,6 +2314,8 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
     next_cfg_check = time.monotonic() + 1.0
     hidraw = hidraw_for(dev)
     next_battery = 0.0
+    next_kernel_battery = 0.0  # the kernel's charge, for Bluetooth settings (BluezBattery)
+    queried: int | None = None  # the charge the mouse told us itself this session
     write_status({"connected": True, "model": dev.name, "ts": time.time()})
     vpad_cfg = None  # Hyprland settings last applied to the virtual touchpad
     vpad_retry = 0.0  # after a failed apply (Hyprland not up yet), try again from then
@@ -2241,11 +2377,20 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
                 got = query_battery(hidraw) if hidraw else None
                 if got:
                     percent, charging = got
+                    queried = percent
+                    if bluez and eng.cfg["battery"].get("bluez", True):
+                        bluez.set(dev.uniq, percent)
                     write_status({"connected": True, "model": dev.name, "percent": percent,
                                   "charging": charging, "ts": time.time()})
                     log(f"battery {percent}%" + (" charging" if charging else ""))
                 elif hidraw is None:
                     log("battery: no hidraw node found for the mouse")
+            if bluez and eng.cfg["battery"]["enabled"] and eng.cfg["battery"].get("bluez", True) \
+                    and now >= next_kernel_battery:
+                next_kernel_battery = now + 60.0
+                pct = kernel_battery(dev) or queried  # the kernel follows the mouse; our query fills in until it knows
+                if pct is not None:
+                    bluez.set(dev.uniq, pct)
             hypr.connect(now)
             if hypr.connects != hypr_conn:  # a new Hyprland (or a reconnect): settings are gone
                 hypr_conn = hypr.connects
@@ -2298,6 +2443,8 @@ def run_session(dev: InputDevice, ui: UInput, eng: Engine, cfg_path: str, hypr: 
         if eng.probe:
             eng.probe.send({"type": "disconnected"})
         write_status({"connected": False, "model": dev.name, "ts": time.time()})
+        if bluez:
+            bluez.clear(dev.uniq)
         log("released grab")
 
 
@@ -2330,6 +2477,7 @@ def main() -> int:
         eng.probe = Probe()
         eng.probe.open()
     hypr = HyprEvents()
+    bluez = BluezBattery() if cfg["battery"]["enabled"] and cfg["battery"].get("bluez", True) else None
     # systemctl stop sends SIGTERM; exit through the finally blocks so buttons
     # are released and the Control-click binding is taken back out of Hyprland.
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
@@ -2340,7 +2488,7 @@ def main() -> int:
                 time.sleep(RESCAN_SEC)
                 continue
             eng.update_config(load_config(args.config))
-            run_session(dev, ui, eng, args.config, hypr)
+            run_session(dev, ui, eng, args.config, hypr, bluez)
             time.sleep(RESCAN_SEC)
     except KeyboardInterrupt:
         log("interrupt")

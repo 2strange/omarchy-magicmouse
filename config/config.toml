@@ -74,6 +74,7 @@ show_percent = true  # show the number next to the mouse icon in the bar
 [battery]
 enabled = true       # ask the mouse for its charge at connect and every poll_minutes (needs the udev rule)
 poll_minutes = 15
+bluez = true         # show the charge in Bluetooth settings too (tells BlueZ; needs python-gobject)
 
 [momentum]
 enabled = true
