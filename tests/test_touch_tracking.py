@@ -332,8 +332,8 @@ class TouchpadMode(EngineCase):
         for i in range(1, 4):
             self.frame((SLOT, 0), (X, 60 - 60 * i), (MAJOR, 200), (RAW, 0x40),
                        (SLOT, 1), (X, 280 - 60 * i), (MAJOR, 200), (RAW, 0x40))
-        if len(self.pad.calls[-1][0]) == 2 and 1 in self.eng.tp_key:
-            self.assertNotIn(1, self.eng.tp_owed)
+        self.assertEqual(self.eng.tp_key, (1, 2))
+        self.assertNotIn(1, self.eng.tp_owed)
 
     def test_lift_lifts_the_touchpad(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
