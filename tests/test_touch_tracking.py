@@ -365,6 +365,34 @@ class TouchpadSteadiness(EngineCase):
         self.assertLess(y_down, 40 * (first + 1) - 40)  # behind the finger: the slide so far is replayed
         self.assertAlmostEqual(self.pad.pos[-1][0][1], self.eng.touches[1].y, delta=2)  # caught up
 
+    def test_swipe_with_a_finger_from_the_edge_is_a_swipe(self):
+        self.cfg["scroll"]["edge_left_mm"] = 13.0
+        self.frame((SLOT, 0), (TID, 1), (X, -700), (Y, -1000), (MAJOR, 600))  # 10 mm from the left edge
+        self.frame((SLOT, 1), (TID, 2), (X, 200), (Y, -1100), (MAJOR, 600))
+        for i in range(1, 25):
+            self.frame((SLOT, 0), (X, -700 + 45 * i), (SLOT, 1), (X, 200 + 45 * i))
+        self.assertEqual(self.pad.calls[-1][0], [1, 2])
+
+    def test_one_finger_sideways_then_a_second_joins_is_a_swipe(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 200), (Y, -1100), (MAJOR, 600))
+        for i in range(1, 30):
+            ev = [(SLOT, 0), (X, 200 + 30 * i)]
+            if i == 20:
+                ev += [(SLOT, 1), (TID, 2), (X, -500), (Y, -1000), (MAJOR, 600)]
+            elif i > 20:
+                ev += [(SLOT, 1), (X, -500 + 30 * (i - 20))]
+            self.frame(*ev)
+        self.assertEqual(self.pad.calls[-1][0], [1, 2])
+
+    def test_wobbling_edge_finger_is_not_released(self):
+        self.cfg["scroll"]["edge_right_mm"] = 13.0
+        self.cfg["scroll"]["edge_release_mm"] = 4.0
+        self.frame((SLOT, 0), (TID, 1), (X, 1030), (Y, -1290), (MAJOR, 760))
+        for i in range(1, 60):  # back and forth by 2-3 mm and slowly creeping 5 mm, as a finger resting on the corner
+            self.frame((SLOT, 0), (X, 1030 - 3 * i - (100 if i % 8 < 4 else 0)), (Y, -1290 - (30 if i % 6 < 3 else 0)))
+        self.assertTrue(self.eng.touches[1].grip)
+        self.assertTrue(all(not c[0] for c in self.pad.calls))
+
     def test_finger_staying_light_lifts(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
         for i in range(1, 10):

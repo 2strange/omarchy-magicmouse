@@ -86,6 +86,7 @@ BRIDGE_MS = 0.06
 # again without a new tracking id.
 STALE_SEC = 0.3
 FIRM_REPORTS = 3  # a finger must show this many big reports in a row, at scroll.touch_rate or faster
+EDGE_STRAIGHT = 0.6  # an edge finger is released only when its travel is at least this share of its path
 JUMP_MM = 5.0  # a slot moving this far in one report without a new tracking id is a new finger
 # Free (diagonal) scrolling: the smaller axis is dropped while it is below this share of
 # the larger one, so a straight scroll does not wobble sideways.
@@ -101,7 +102,7 @@ def EVIOCGMTSLOTS(length: int) -> int:
 class Touch:
     """One finger on the surface, from landing to lift."""
 
-    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size", "rate")
+    __slots__ = ("x", "y", "x0", "y0", "ptr0", "grip", "palm", "hist", "firm", "ok", "last_rep", "size", "rate", "path")
 
     def __init__(self, ts: float, x: int, y: int, grip: bool, palm: bool = False) -> None:
         self.x, self.y, self.grip, self.palm = x, y, grip or palm, palm
@@ -112,9 +113,11 @@ class Touch:
         self.last_rep: float | None = None
         self.size = 0
         self.rate = 0.0  # this finger's reports per second, smoothed (for the preview)
+        self.path = 0.0  # distance travelled along the way, in touch units (a wobble adds up, a slide too)
         self.hist: collections.deque = collections.deque([(ts, x, y)])
 
     def update(self, ts: float, x: int, y: int) -> None:
+        self.path += math.hypot(x - self.x, y - self.y)
         self.x, self.y = x, y
         self.hist.append((ts, x, y))
         while len(self.hist) > 2 and self.hist[1][0] <= ts - MOVE_WINDOW:
@@ -1016,6 +1019,7 @@ class Engine:
         self.tp_key: tuple[int, ...] | None = None  # the fingers down on the virtual touchpad
         self.tp_pair_n = 0  # frames a second finger has been pairing with the one down
         self.tp_t0 = 0.0  # when the fingers on the virtual touchpad went down
+        self.tp_from: tuple[float, float] = (0.0, 0.0)  # where a single finger went down (is it going sideways?)
         self.tp_light: dict[int, float] = {}  # finger down on the virtual touchpad -> since when it is too light
         self.tp_swiped = False  # a swipe ended with a finger still on: nothing more until all fingers lift
         self.tp_owed: dict[int, list[float]] = {}  # finger -> travel from before it went down, still to replay
@@ -1563,12 +1567,18 @@ class Engine:
             self.tp_swiped = False
         cand = self.pick(fingers, ts) if fingers else None
         if key is not None:
-            if len(key) == 1 and cand is not None and len(cand) == 2 and key[0] in cand \
-                    and ts - self.tp_t0 < TP_PAIR_YOUNG and self.swipe_pair(cand):
-                self.tp_pair_n += 1  # the second finger landed a moment later: a swipe after all
+            if len(key) == 1:
+                t1 = self.touches[key[0]]
+                dx, dy = t1.x - self.tp_from[0], t1.y - self.tp_from[1]
+                sideways = abs(dx) >= TP_SWIPE_RATIO * abs(dy)
+                cand = self.swipe_partner(key[0]) if sideways or ts - self.tp_t0 < TP_PAIR_YOUNG else None
+            if len(key) == 1 and cand is not None:
+                self.tp_pair_n += 1  # a second finger goes sideways along: a swipe after all
                 if self.tp_pair_n >= TP_PAIR_FRAMES:
                     key = cand
                     self.tp_pair_n = 0
+                    for t in key:
+                        self.touches[t].grip = False
             else:
                 self.tp_pair_n = 0
         elif self.tp_swiped:
@@ -1577,12 +1587,17 @@ class Engine:
             if len(cand) == 2 and not self.swipe_pair(cand):
                 # up and down, the fingers scroll together: one is enough (more would be a swipe)
                 cand = (max(cand, key=lambda t: math.hypot(*self.touches[t].recent())),)
+            if len(cand) == 1:
+                cand = self.swipe_partner(cand[0]) or cand  # sideways with a finger from the edge
             if self.tp_engage(ts, cand):
                 key = cand
                 self.tp_pair_n = 0
                 self.tp_t0 = ts
+                for t in key:
+                    self.touches[t].grip = False  # an edge finger in a swipe slides: it is a finger now
                 if len(key) == 1:  # land where the slide began: a short flick counts from its start
                     rx, ry = self.touches[key[0]].recent()
+                    self.tp_from = (self.touches[key[0]].x - rx, self.touches[key[0]].y - ry)
                     self.tp_owed = {key[0]: [-float(rx), -float(ry)]}
         self.tp_key = key
         self.primary = key
@@ -1607,6 +1622,23 @@ class Engine:
         self.vpad.update(pos, gain)
         self.why = f"touchpad: {len(key)} finger{'s' if len(key) > 1 else ''} -> {len(key) + 1}" + \
             (" (swipe)" if len(key) >= 2 else " (scroll)") + (" held" if self.tp_light else "")
+
+    def swipe_partner(self, t1: int) -> tuple[int, ...] | None:
+        """t1 and another confirmed finger sliding sideways the same way, as a sorted pair. The
+        other may have landed on an edge: holding the mouse there is ignored, a swipe is not."""
+        ax, ay = self.touches[t1].recent()
+        if abs(ax) < TP_SWIPE_RATIO * abs(ay) or abs(ax) / self.res_x < PAIR_MOVING_MM:
+            return None
+        best = None
+        for t, o in self.touches.items():
+            if t == t1 or o.palm or not o.ok:
+                continue
+            bx, by = o.recent()
+            m = abs(bx) / self.res_x
+            if bx * ax > 0 and m >= MOVING_MM and abs(bx) >= TP_SWIPE_RATIO * abs(by) \
+                    and m >= PAIR_RATIO * abs(ax) / self.res_x and (best is None or m > best[0]):
+                best = (m, t)
+        return tuple(sorted((t1, best[1]))) if best else None
 
     def swipe_pair(self, pair: tuple[int, ...]) -> bool:
         """Two fingers sliding sideways together: the workspace swipe, not a scroll."""
@@ -1681,6 +1713,8 @@ class Engine:
         hand_mm = (self.ptr_total - t.ptr0) * 25.4 / max(float(self.cfg["pointer"]["cpi"]), 1.0)
         if travel < float(sc["edge_release_mm"]) + POINTER_RATIO * hand_mm:
             return False  # drift, or the finger just rides along while the hand moves the mouse
+        if travel < EDGE_STRAIGHT * t.path / self.res_x:
+            return False  # it wobbles back and forth (a finger resting on the edge), it does not slide
         rx, ry = t.recent()
         slide = math.hypot(rx, ry) / self.res_x
         return slide >= MIN_SLIDE_MM and slide > POINTER_RATIO * self.pointer_mm(ts, MOVE_WINDOW)
