@@ -86,6 +86,11 @@ BRIDGE_MS = 0.06
 # again without a new tracking id.
 STALE_SEC = 0.3
 FIRM_REPORTS = 3  # a finger must show this many big reports in a row, at scroll.touch_rate or faster
+# The mouse firmware's own contact state, the upper nibble of the byte hid-magicmouse sends as
+# EV_MSC/MSC_RAW with report_undeciphered=1 (macOS MTTouchState): 1 start in range, 2 hovering,
+# 3 making touch, 4 touching, 5 breaking touch, 6 lingering, 7 out of range. The driver reports
+# every state but 0 as a contact; only these touch.
+FW_TOUCHING = (3, 4)
 EDGE_STRAIGHT = 0.6  # an edge finger is released only when its travel is at least this share of its path
 JUMP_MM = 5.0  # a slot moving this far in one report without a new tracking id is a new finger
 # Free (diagonal) scrolling: the smaller axis is dropped while it is below this share of
@@ -179,6 +184,10 @@ DEFAULTS = {
         # so a wobble on the spot is no scroll back and forth. A slide runs on without a jerk, a turn
         # costs this much travel. 0 = off.
         "touch_reverse_mm": 0.5,
+        # Trust the mouse's own touch state where the driver passes it on (hid_magicmouse
+        # report_undeciphered=1): a finger counts exactly while the firmware says it touches,
+        # the size rules above apply only without it.
+        "touch_firmware": True,
         "free_axis": False,  # diagonal scrolling: both axes at once instead of locking to one per scroll
         # A touch that lands this close to the left, right or front edge counts as holding the mouse...
         "edge_left_mm": 3.0,
@@ -1088,6 +1097,8 @@ class Engine:
         self.f_reported: set[int] = set()  # the same, kept for touch() after the frame is closed
         self.slot_seen: dict[int, float] = {}  # slot -> last report that mentioned it
         self.parked: dict[int, list] = {}  # slots expired for silence; restored if they speak again
+        self.slot_fw: dict[int, int] = {}  # slot -> the firmware's contact state (see FW_TOUCHING)
+        self.fw_seen = False  # the driver passes the firmware state on (report_undeciphered)
         self.parked_touch: dict[int, Touch] = {}  # their Touch objects, so a restore is not a new landing
         self.pending_lift: float | None = None  # apparent lift; end scroll if nothing returns within BRIDGE_MS
         self.touches: dict[int, Touch] = {}  # tracking_id -> Touch
@@ -1142,6 +1153,7 @@ class Engine:
 
     def reset_touch(self) -> None:
         self.slots.clear()
+        self.slot_fw.clear()
         self.parked.clear()
         self.parked_touch.clear()
         self.slot_seen.clear()
@@ -1180,6 +1192,7 @@ class Engine:
         self.parked.clear()
         self.parked_touch.clear()
         self.slot_seen.clear()
+        self.slot_fw.clear()  # not readable by ioctl: known again with the next report
         self.slots = {
             i: [cols[e.ABS_MT_TRACKING_ID][i], cols[e.ABS_MT_POSITION_X][i], cols[e.ABS_MT_POSITION_Y][i],
                 cols[e.ABS_MT_TOUCH_MAJOR][i], cols[e.ABS_MT_TOUCH_MINOR][i]]
@@ -1247,6 +1260,13 @@ class Engine:
             if ev.code in (e.BTN_LEFT, e.BTN_RIGHT, e.BTN_MIDDLE):
                 self.f_btn.append((ev.code, ev.value))
             return
+        if ev.type == e.EV_MSC:
+            if ev.code == e.MSC_RAW:  # follows the slot's ABS_MT_* events
+                self.slot_fw[self.cur_slot] = ev.value >> 4
+                if not self.fw_seen:
+                    self.fw_seen = True
+                    log("touch: the mouse's own touch state is available (report_undeciphered)")
+            return
         if ev.type == e.EV_ABS:
             # A HID touch report lists every live contact. Remember which slots
             # were addressed so process_frame can treat the rest as lifts; the
@@ -1259,6 +1279,7 @@ class Engine:
                 if self.cur_slot not in self.slots and ev.code != e.ABS_MT_TRACKING_ID and self.cur_slot in self.parked:
                     self.slots[self.cur_slot] = self.parked.pop(self.cur_slot)  # still the same finger
                 if ev.code == e.ABS_MT_TRACKING_ID:
+                    self.slot_fw.pop(self.cur_slot, None)
                     old = self.parked.pop(self.cur_slot, None)  # a new finger (or a lift) in this slot
                     if old:
                         self.parked_touch.pop(old[0], None)
@@ -1307,6 +1328,7 @@ class Engine:
         for s in stale:
             del self.slots[s]
             self.slot_seen.pop(s, None)
+            self.slot_fw.pop(s, None)
         self.f_reported = set(self.mt_seen)
         self.mt_frame = False
         self.mt_seen.clear()
@@ -1472,6 +1494,7 @@ class Engine:
         # a report with no width (TOUCH_MINOR 0) is a finger hovering over the edge, often with
         # half its coordinates missing: it counts as size 0, never as a touch
         reports = {v[0]: (v[3] if v[4] > 0 else 0) for s, v in self.slots.items() if v[0] >= 0 and s in self.f_reported}
+        fw = {v[0]: self.slot_fw[s] for s, v in self.slots.items() if v[0] >= 0 and s in self.slot_fw}
         parked_ids = {v[0] for v in self.parked.values()}
         for tid in [t for t in self.touches if t not in live]:
             gone = self.touches.pop(tid)
@@ -1517,7 +1540,7 @@ class Engine:
                     if self.verbose:
                         log(f"edge finger {tid} released")
 
-        self.confirm_touches(ts, reports)
+        self.confirm_touches(ts, reports, fw)
         self.why_locked = False  # a gesture's reason must not be overwritten later in the frame
         fingers = sorted(tid for tid, t in self.touches.items() if not t.grip and t.ok)
         if self.vpad is not None:
@@ -1727,12 +1750,14 @@ class Engine:
         straight = float(self.cfg["scroll"].get("touch_straight", 0.0))
         return straight > 0 and t.straightness() < straight
 
-    def confirm_touches(self, ts: float, reports: dict[int, int]) -> None:
+    def confirm_touches(self, ts: float, reports: dict[int, int], fw: dict[int, int] | None = None) -> None:
         """Hysteresis on contact size: a finger counts once it touches firmly (big and
         closely spaced reports) and keeps counting until its size drops below the hold size.
         Two fingers on the small surface rarely press firmly (one often comes in from the side),
-        so two fingers at touch_pair_size or more count at once, both of them."""
+        so two fingers at touch_pair_size or more count at once, both of them.
+        Where the mouse tells its own touch state (fw, touch_firmware on), that decides instead."""
         sc = self.cfg["scroll"]
+        fw = fw if fw and sc.get("touch_firmware", True) else {}
         start = max(float(sc.get("touch_start_size", 0.0)), 0.0)
         hold = min(max(float(sc.get("touch_hold_size", 0.0)), 0.0), start)
         pair = min(max(float(sc.get("touch_pair_size", 0.0)), 0.0), start) or hold
@@ -1754,6 +1779,13 @@ class Engine:
         anchor = any(t.ok for t in present)
         for tid, gap in gaps.items():
             t = self.touches[tid]
+            if tid in fw:
+                was, t.firm = t.ok, 0
+                t.ok = fw[tid] in FW_TOUCHING
+                if t.ok and not was and not t.grip:
+                    anchor = True
+                    self.stop_coast("touch")
+                continue
             size = t.size
             if t.ok:
                 if size < hold:

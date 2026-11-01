@@ -38,6 +38,7 @@ touch_front_mm = 13      # ...within this far of the front, easing back to touch
 touch_straight = 0.5     # touchpad mode: a finger goes down (or joins) only while sliding this straight
                          # (start-to-end distance / path; a hover wobbling on the spot ~0.1, slides 0.77+). 0 = off
 touch_reverse_mm = 0.5   # touchpad mode: play before a finger down moves the other way, so a wobble scrolls nothing. 0 = off
+touch_firmware = true   # touchpad mode: trust the mouse's own touch state (needs hid_magicmouse report_undeciphered=1); the size rules apply only without it
 
 [buttons]
 middle = "left"      # click in the centre zone: "left" (macOS has no middle click), "middle" (paste on Linux), "right"

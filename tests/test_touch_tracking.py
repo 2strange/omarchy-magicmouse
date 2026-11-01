@@ -25,6 +25,7 @@ except ImportError as exc:  # python-evdev missing
     SKIP = f"cannot import the daemon: {exc}"
 
 SLOT, TID, X, Y, MAJOR, MINOR = 47, 57, 53, 54, 48, 49  # ABS_MT_* codes
+RAW = "raw"  # EV_MSC/MSC_RAW: the firmware state byte (report_undeciphered), state << 4
 
 
 class FakeUI:
@@ -59,7 +60,8 @@ class EngineCase(unittest.TestCase):
             events = [ev for code, value in events
                       for ev in (((code, value), (MINOR, 400)) if code == TID and value >= 0 else ((code, value),))]
         for code, value in events:
-            self.eng.feed(types.SimpleNamespace(type=3, code=code, value=value, timestamp=lambda t=self.t: t))
+            typ, code = (4, 3) if code == RAW else (3, code)
+            self.eng.feed(types.SimpleNamespace(type=typ, code=code, value=value, timestamp=lambda t=self.t: t))
         self.eng.feed(types.SimpleNamespace(type=0, code=0, value=0, timestamp=lambda t=self.t: t))
         if self.eng.coasting:
             self.eng.tick(self.t)
@@ -248,6 +250,35 @@ class TouchpadMode(EngineCase):
             self.frame((SLOT, 0), (X, -300 + 30 * i), (SLOT, 1), (X, 300 + 28 * i))
         self.assertEqual(self.pad.calls[-1][0], [1, 2])
         self.assertFalse(self.actions)  # no workspace action of our own
+
+    def test_firmware_hover_never_touches_however_big(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 900), (RAW, 0x20))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 900), (RAW, 0x20))
+        self.assertEqual(self.pad.calls[-1][0], [])
+
+    def test_firmware_touch_counts_however_small(self):
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 100), (RAW, 0x30))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 100), (RAW, 0x40))
+        self.assertEqual(self.pad.calls[-1][0], [1])
+
+    def test_firmware_break_and_linger_lift(self):
+        # big as it still is, a finger the mouse calls lifted lifts (after the usual TP_HOLD_SEC bridge)
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600), (RAW, 0x40))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600), (RAW, 0x40))
+        self.frame((SLOT, 0), (Y, 800), (MAJOR, 600), (RAW, 0x50))
+        for _ in range(int(daemon.TP_HOLD_SEC / 0.011) + 2):
+            self.frame((SLOT, 0), (Y, 800), (MAJOR, 600), (RAW, 0x60))
+        self.assertEqual(self.pad.calls[-1][0], [])
+
+    def test_firmware_state_off_falls_back_to_size(self):
+        self.cfg["scroll"]["touch_firmware"] = False
+        self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600), (RAW, 0x20))
+        for i in range(1, 20):
+            self.frame((SLOT, 0), (Y, 40 * i), (MAJOR, 600), (RAW, 0x20))
+        self.assertEqual(self.pad.calls[-1][0], [1])
 
     def test_lift_lifts_the_touchpad(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
