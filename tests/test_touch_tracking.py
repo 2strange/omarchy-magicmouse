@@ -324,6 +324,17 @@ class TouchpadSteadiness(EngineCase):
         first = next(i for i, c in enumerate(self.pad.calls) if c[0])
         self.assertTrue(all(c[0] == [1] for c in self.pad.calls[first:]))
 
+    def test_finger_left_after_a_swipe_does_not_scroll(self):
+        self.frame((SLOT, 0), (TID, 1), (X, -300), (Y, 400), (MAJOR, 600),
+                   (SLOT, 1), (TID, 2), (X, 300), (Y, 450), (MAJOR, 600))
+        for i in range(1, 15):
+            self.frame((SLOT, 0), (X, -300 + 40 * i), (SLOT, 1), (X, 300 + 40 * i))
+        self.assertEqual(self.pad.calls[-1][0], [1, 2])
+        self.frame((SLOT, 0), (TID, -1))
+        for i in range(15, 30):  # the other finger slides on
+            self.frame((SLOT, 1), (Y, 450 + 40 * (i - 15)))
+        self.assertEqual(self.pad.calls[-1][0], [])
+
     def test_finger_staying_light_lifts(self):
         self.frame((SLOT, 0), (TID, 1), (X, 0), (Y, 0), (MAJOR, 600))
         for i in range(1, 10):

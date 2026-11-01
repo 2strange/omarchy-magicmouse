@@ -1014,6 +1014,7 @@ class Engine:
         self.tp_pair_n = 0  # frames a second finger has been pairing with the one down
         self.tp_t0 = 0.0  # when the fingers on the virtual touchpad went down
         self.tp_light: dict[int, float] = {}  # finger down on the virtual touchpad -> since when it is too light
+        self.tp_swiped = False  # a swipe ended with a finger still on: nothing more until all fingers lift
         self.why = ""  # why the last frame did (or did not) scroll; for the probe
         self.why_locked = False
         self.curve = AppleCurve(float(cfg["pointer"]["tracking_speed"]))
@@ -1533,7 +1534,8 @@ class Engine:
         rides along while the hand moves the mouse); a finger that reports too light for a
         moment while it slides stays down (TP_HOLD_SEC); a running scroll ignores any other
         finger; two fingers become the workspace swipe only when they slide sideways together
-        from the start; a finger leaves when it lifts or the hand takes over."""
+        from the start, and when one of them lifts the swipe is over (the other does not scroll
+        on); a finger leaves when it lifts or the hand takes over."""
         gain = float(self.cfg["touchpad"]["swipe_gain"])
         key = self.tp_key
         if key is not None:
@@ -1545,7 +1547,12 @@ class Engine:
                 elif t in self.touches and not self.touches[t].grip \
                         and ts - self.tp_light.setdefault(t, ts) < TP_HOLD_SEC:
                     keep.append(t)  # lighter for a moment while it slides: still the same touch
-            key = tuple(keep) or None  # one of two lifted: keep the other
+            if len(key) >= 2 and len(keep) < len(key):
+                keep = []  # one finger of a swipe lifted: the swipe is over, the other must not scroll
+                self.tp_swiped = True
+            key = tuple(keep) or None
+        if not fingers:
+            self.tp_swiped = False
         cand = self.pick(fingers, ts) if fingers else None
         if key is not None:
             if len(key) == 1 and cand is not None and len(cand) == 2 and key[0] in cand \
@@ -1560,6 +1567,8 @@ class Engine:
             if pointer >= MIN_SLIDE_MM and pointer > self.key_recent_mm(key):
                 key = None  # the mouse moves farther than the fingers slide: this is mousing now
                 self.why = "mousing: touchpad fingers lifted"
+        elif self.tp_swiped:
+            self.why = "swipe done: lift all fingers"
         elif cand is not None:
             if len(cand) == 2 and not self.swipe_pair(cand):
                 # up and down, the fingers scroll together: one is enough (more would be a swipe)
