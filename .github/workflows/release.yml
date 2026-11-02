@@ -50,7 +50,7 @@ jobs:
         working-directory: daemon-rs
         run: |
           cargo build --release --locked --target "$TARGET"
-          file "target/$TARGET/release/magic-mouse-daemon" | tee /dev/stderr | grep -q 'statically linked'
+          file "target/$TARGET/release/magic-mouse-daemon" | tee /dev/stderr | grep -Eq 'statically linked|static-pie linked'
 
       - name: Golden traces (Python v1.4.1 behaviour)
         # compare.py needs only the standard library; python-evdev is needed by golden.py
