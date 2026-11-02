@@ -303,6 +303,10 @@ impl DeviceInfo for MouseInfo {
         self.abs_info(code).map(|a| (a.minimum, a.maximum))
     }
 
+    fn abs_value(&self, code: u16) -> Option<i32> {
+        self.abs_info(code).map(|a| a.value)
+    }
+
     fn mt_slots(&self, code: u16) -> Option<Vec<i32>> {
         let n = (self.abs_info(ABS_MT_SLOT)?.maximum + 1).max(0) as usize;
         let mut buf = vec![0i32; n + 1];
