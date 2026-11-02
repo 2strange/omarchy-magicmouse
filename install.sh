@@ -73,10 +73,11 @@ daemon_download() {
     || { say "download failed (no release asset for v$version, or offline)"; return 1; }
   local want got
   want="$(head -c 64 "$tmp/$ASSET.sha256")"
-  [[ $want =~ ^[0-9a-f]{64}$ ]] || { say "the downloaded .sha256 is not a SHA-256 sum"; return 1; }
+  # A download that arrived but does not check out is not "offline": stop, do not fall back quietly.
+  [[ $want =~ ^[0-9a-f]{64}$ ]] || die "the downloaded .sha256 is not a SHA-256 sum: not installing anything"
   got="$(sha256sum "$tmp/$ASSET" | cut -d' ' -f1)"
-  [ "$got" = "$want" ] || { say "checksum mismatch for $ASSET (got $got, want $want): not installing it"; return 1; }
-  [ "$(head -c 4 "$tmp/$ASSET" | od -An -c | tr -d ' ')" = '177ELF' ] || { say "$ASSET is not an ELF binary: not installing it"; return 1; }
+  [ "$got" = "$want" ] || die "checksum mismatch for $ASSET (got $got, want $want): not installing it"
+  [ "$(head -c 4 "$tmp/$ASSET" | od -An -c | tr -d ' ')" = '177ELF' ] || die "$ASSET is not an ELF binary: not installing it"
   put_daemon "$tmp/$ASSET" || return 1
   say "daemon $version (SHA-256 $got) -> ~/.local/bin/magic-mouse-daemon"
 }

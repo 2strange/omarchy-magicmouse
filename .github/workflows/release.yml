@@ -12,8 +12,10 @@ on:
     tags: ["v*"]
   workflow_dispatch: {}  # build and test only; uploads happen for tags
 
+# Build and test with a read-only token (build scripts and proc macros of the crates run there);
+# only the small release job, which runs no repository code, may write.
 permissions:
-  contents: write  # create the release / upload assets
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -21,10 +23,12 @@ env:
   ASSET: magic-mouse-daemon-x86_64-linux
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          persist-credentials: false
 
       - name: Tag matches manifest.json
         if: startsWith(github.ref, 'refs/tags/')
@@ -34,8 +38,8 @@ jobs:
 
       - name: Toolchain
         run: |
-          rustup toolchain install stable --profile minimal
-          rustup default stable
+          rustup toolchain install 1.99.1 --profile minimal  # pinned: the build the release was tested with
+          rustup default 1.99.1
           rustup target add "$TARGET"
 
       - name: Unit tests
@@ -61,21 +65,32 @@ jobs:
           cp "daemon-rs/target/$TARGET/release/magic-mouse-daemon" "dist/$ASSET"
           (cd dist && sha256sum "$ASSET" > "$ASSET.sha256" && cat "$ASSET.sha256")
 
-      - name: Attach to the release
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256" --clobber
-          else
-            gh release create "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256" \
-              --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
-          fi
-
-      - name: Keep the build (manual runs)
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+      - name: Keep the build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
           name: ${{ env.ASSET }}
           path: dist/
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # create the release / upload assets
+      actions: read    # fetch the build job's artifact
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Attach to the release
+        # No checkout, no repository code: only the two files the build job made.
+        # No --clobber: assets of a release are never replaced silently.
+        run: |
+          gh run download "$GITHUB_RUN_ID" -n "$ASSET" -D dist
+          (cd dist && sha256sum -c "$ASSET.sha256")
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256"
+          else
+            gh release create "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256" \
+              --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
+          fi

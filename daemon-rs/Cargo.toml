@@ -1,6 +1,6 @@
 [package]
 name = "magic-mouse-daemon"
-version = "2.0.0-dev"
+version = "2.0.0"
 edition = "2021"
 license = "MIT"
 description = "Magic Mouse daemon for Omarchy: touchpad-style scrolling, gestures, battery"
