@@ -609,9 +609,10 @@ pub fn step_fallback(forward: bool, cfg: &Config) -> String {
 // --------------------------------------------------------------------------- vpad
 
 /// Every mouse has its own virtual touchpad, all with the same name; Hyprland names the second one
-/// "...-1", the third "...-2". A rule for the plain name only would leave them on the global touchpad
-/// settings (the built-in trackpad's, e.g. 4x the scroll speed), so cover them all (Python `VPAD_HYPR_NAMES`).
-pub const VPAD_HYPR_SUFFIXES: [&str; 4] = ["", "-1", "-2", "-3"];
+/// "...-1", the third "...-2" (the lowest free number; freed numbers are reused). A rule for the plain
+/// name only would leave them on the global touchpad settings (the built-in trackpad's, e.g. 4x the
+/// scroll speed), so cover up to eight mice (Python `VPAD_HYPR_NAMES`; README "Limits").
+pub const VPAD_HYPR_SUFFIXES: [&str; 8] = ["", "-1", "-2", "-3", "-4", "-5", "-6", "-7"];
 
 /// Python `vpad_lua(cfg)`: Hyprland settings for the virtual touchpads only.
 pub fn vpad_lua(cfg: &Config) -> String {
@@ -727,7 +728,7 @@ mod tests {
             } else {
                 "false"
             };
-            let want: Vec<String> = ["", "-1", "-2", "-3"]
+            let want: Vec<String> = ["", "-1", "-2", "-3", "-4", "-5", "-6", "-7"]
                 .iter()
                 .map(|sfx| {
                     format!(

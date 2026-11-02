@@ -270,7 +270,7 @@ comments, `magic-mouse-config get` prints the effective settings.
 - In touchpad mode the trackpad settings that Hyprland applies to every touchpad (the
   three-finger gesture, end of row, empty workspaces) are shared with your built-in
   trackpad. Scroll speed, natural scrolling, the swipe on/off and its direction (same as
-  the trackpad or reversed) are set for the mouse alone.
+  the trackpad or reversed) are set for the mice alone, for up to eight connected at once.
 - The mouse is smaller than a trackpad: a full-hand swipe as on a Magic Trackpad does not
   fit, hence the swipe boost.
 - Two fingers that really slide while the hand holds the mouse can move the workspace, and
