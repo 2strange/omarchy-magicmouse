@@ -420,8 +420,8 @@ impl Engine {
         let Some(dev) = self.dev.as_ref() else {
             return;
         };
-        let Some((_, slot_max)) = dev.abs_range(ABS_MT_SLOT) else {
-            log("touch state: no ABS_MT_SLOT range");
+        let (Some((_, slot_max)), Some(cur)) = (dev.abs_range(ABS_MT_SLOT), dev.abs_value(ABS_MT_SLOT)) else {
+            log("touch state: no ABS_MT_SLOT info");
             return;
         };
         let n = (slot_max as i64 + 1).max(0) as usize;
@@ -444,8 +444,6 @@ impl Engine {
                 }
             }
         }
-        // ABS_MT_SLOT's current value: not in DeviceInfo yet (see the report), the slot 0 then
-        let cur = 0;
         self.parked.clear();
         self.parked_touch.clear();
         self.slot_seen.clear();
@@ -2689,6 +2687,9 @@ max_seconds = 2.5
                 _ => vec![0, 44, 0, 0],
             })
         }
+        fn abs_value(&self, code: u16) -> Option<i32> {
+            (code == ABS_MT_SLOT).then_some(2)
+        }
         fn active_keys(&self) -> Vec<u16> {
             vec![]
         }
@@ -2704,6 +2705,7 @@ max_seconds = 2.5
         assert_eq!((c.eng.x_min, c.eng.x_max, c.eng.y_min, c.eng.y_max), (-1000, 1000, -1500, 2000));
         assert_eq!(c.eng.slots.keys(), vec![1]);
         assert_eq!(c.eng.slots[1], [5, 11, 22, 33, 44]);
+        assert_eq!(c.eng.cur_slot, 2);
     }
 
     #[test]
