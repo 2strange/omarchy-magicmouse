@@ -546,8 +546,8 @@ fn main() {
     if STOP.load(Ordering::SeqCst) {
         log("interrupt");
     }
-    if hypr.is_connected() && hypr.bound {
-        hypr.sync_binding(false, 0.0);
+    if hypr.is_connected() && hypr.bound == Some(true) {
+        hypr.sync_binding(false, f64::MAX); // past any retry wait: take the binding out now
     }
     hypr.close();
     if let Some(p) = probe {
