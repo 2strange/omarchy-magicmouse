@@ -27,6 +27,25 @@ The driver has a switch, `report_undeciphered`, that hands the byte on as it is.
 installer sets it, and the daemon now counts a finger exactly while the mouse says it
 touches. No kernel patch. The size rules stay as the fallback when the switch is off.
 
+### 2.0: the same daemon, now in Rust
+
+Version 2.0 changes nothing you see or set: same settings, same panel, same feel. Underneath,
+the daemon is now one Rust binary of about 3 MB. No Python, no `python-evdev`, no
+`python-gobject` to install, nothing that a Python update can break.
+
+The daemon reads every report the mouse sends while a finger is on it, so it should be
+light. Measured on our Late 2013 MacBook Pro (Core i7-4850HQ, 13 years old):
+
+| | 1.x (Python) | 2.0 (Rust) |
+|---|---|---|
+| CPU while scrolling | about 15% | about 1–1.5% |
+| CPU while idle | 0% | 0% |
+| Memory | about 42 MB | about 6 MB |
+| Engine, 94,000 recorded touch events | 3.2 s | 0.36 s |
+
+A newer machine will need even less. The port is held to the Python daemon: 32 recorded and
+synthetic sessions must give exactly the same output (see Development).
+
 ## What it does
 
 A small daemon grabs the mouse and turns its touch surface into something Linux
@@ -263,7 +282,9 @@ short-lived child (`status-reader.py`) under `timeout`, never inside the shell.
   --golden daemon-rs/tests/golden --run daemon-rs/target/release/magic-mouse-daemon --exact
 ```
 
-The golden traces pin the Rust daemon to the Python daemon's behaviour. A tag `v<version>`
+New work goes into the Rust daemon (`daemon-rs/`). The Python daemon of 1.x stays in `bin/`
+as the reference for the golden traces (and as `install.sh --python`); tag `v1.4.1` is its
+last release. The golden traces pin the Rust daemon to the Python daemon's behaviour. A tag `v<version>`
 (matching `manifest.json`) runs `.github/workflows/release.yml`: tests, golden traces, a
 static musl build, and the binary plus `.sha256` attached to the release.
 
