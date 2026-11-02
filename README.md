@@ -122,9 +122,9 @@ understands well:
   a right click is a switch.
 - **Workspaces at the ends.** In touchpad mode Hyprland's swipe decides (with the
   [Mac Trackpad plugin](https://github.com/2strange/omarchy-mactrackpad), Fingers 3: stop, open a
-  new one or wrap around, which switches when the swipe ends; empty workspaces count). Without touchpad mode the daemon switches by itself: stop, open a
-  new one, or wrap around, and empty workspaces count, so you can always reach a workspace
-  to start something on.
+  new one or wrap around, which switches when the swipe ends; empty workspaces count).
+  Without touchpad mode the daemon switches by itself: stop, open a new one, or wrap around,
+  and empty workspaces count, so you can always reach a workspace to start something on.
 - **Without touchpad mode** the daemon scrolls by itself: start threshold, natural or wheel
   direction, diagonal scrolling, momentum, one-finger page flick and a two-finger
   workspace switch. Useful on a compositor without trackpad gestures.
