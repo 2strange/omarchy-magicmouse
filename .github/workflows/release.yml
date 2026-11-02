@@ -1,6 +1,9 @@
 # Release: on a tag v<manifest version>, test the Rust daemon, check it against the Python
 # daemon's golden traces, build a static x86_64 binary and attach it (plus its SHA-256) to
-# the GitHub release of that tag. install.sh downloads exactly these two assets.
+# the GitHub release of that tag, with a build provenance attestation for the binary.
+# install.sh does not trust the release: it installs only the binary whose SHA-256 is pinned in
+# daemon.lock, so after a release its digest (printed in step "Assets") is committed there, and
+# that commit is the one to review.
 #
 # Static musl build: no glibc symbol versions, so the binary runs on any x86_64 Linux,
 # whatever glibc the runner or the user has. All dependencies are pure Rust (no C code),
@@ -76,18 +79,28 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # create the release / upload assets
-      actions: read    # fetch the build job's artifact
+      contents: write      # create the release / upload assets
+      actions: read        # fetch the build job's artifact
+      id-token: write      # sign the provenance attestation (Sigstore)
+      attestations: write  # store it, for `gh attestation verify`
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
-      - name: Attach to the release
+      - name: Fetch the build
         # No checkout, no repository code: only the two files the build job made.
-        # No --clobber: assets of a release are never replaced silently.
         run: |
           gh run download "$GITHUB_RUN_ID" -n "$ASSET" -D dist
           (cd dist && sha256sum -c "$ASSET.sha256")
+
+      - name: Build provenance attestation
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: dist/${{ env.ASSET }}
+
+      - name: Attach to the release
+        # No --clobber: assets of a release are never replaced silently.
+        run: |
           if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
             gh release upload "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256"
           else

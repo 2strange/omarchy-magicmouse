@@ -77,9 +77,10 @@ No async runtime of our own; one `poll(2)` loop like the Python `select` loop.
 
 ## Packaging (later, Bender)
 
-GitHub Actions builds `x86_64-unknown-linux-gnu` (static-ish, `--release`), attaches
-`magic-mouse-daemon-x86_64` + `.sha256` to the release. `install.sh` downloads the binary for the
-tagged version, checks the sum, installs to `~/.local/bin/magic-mouse-daemon`. Python daemon stays in
+GitHub Actions builds `x86_64-unknown-linux-musl` (static, `--release`), attaches
+`magic-mouse-daemon-x86_64-linux` + `.sha256` and a provenance attestation to the release.
+`install.sh` downloads the binary pinned in `daemon.lock`, checks it against the digest pinned
+there (not the release's `.sha256`), installs to `~/.local/bin/magic-mouse-daemon`. Python daemon stays in
 the repo until 2.0 is accepted.
 
 ## Integration notes (Bob)

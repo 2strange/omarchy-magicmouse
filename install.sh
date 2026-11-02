@@ -38,14 +38,14 @@ ask() {  # ask "question" -> 0 for yes
 
 # ---------------------------------------------------------------------------
 # The daemon. 2.0 is one Rust binary; users do not need Rust. In order:
-#   1. the prebuilt binary attached to the GitHub release of this plugin's version
-#      (manifest.json), over HTTPS, checked against the release's SHA-256 before it is
-#      made executable or installed; it is never run here, and never as root;
+#   1. the prebuilt binary named in daemon.lock, downloaded over HTTPS from that GitHub
+#      release and checked against the SHA-256 pinned in daemon.lock (this commit, not the
+#      release) before it is made executable or installed; it is never run here, and never
+#      as root;
 #   2. a local build with cargo, when cargo is installed (daemon-rs/);
 #   3. the Python daemon (bin/magic-mouse-daemon) with python-evdev, as up to 1.4.
 # ---------------------------------------------------------------------------
 REPO="2strange/omarchy-magicmouse"
-ASSET="magic-mouse-daemon-x86_64-linux"
 dest="$HOME/.local/bin/magic-mouse-daemon"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
@@ -62,24 +62,25 @@ pkg_add() {  # pkg_add package
 daemon_download() {
   [ "$(uname -m)" = x86_64 ] || { say "no prebuilt daemon for $(uname -m)"; return 1; }
   command -v curl >/dev/null 2>&1 || { say "curl is missing: cannot download the daemon"; return 1; }
-  local version url
-  version="$(/usr/bin/python3 -I -c 'import json, sys; print(json.load(open(sys.argv[1]))["version"])' "$here/manifest.json")" \
-    || { say "cannot read the version from manifest.json"; return 1; }
-  [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+([.+-][0-9A-Za-z.-]+)?$ ]] || { say "odd version in manifest.json: $version"; return 1; }
-  url="https://github.com/$REPO/releases/download/v$version/$ASSET"
-  say "downloading the daemon $version: $url"
+  local tag asset want extra
+  [ -f "$here/daemon.lock" ] || { say "no daemon.lock in this checkout"; return 1; }
+  local pins
+  pins="$(grep -v '^[[:space:]]*\(#\|$\)' "$here/daemon.lock")"
+  [ "$(printf '%s\n' "$pins" | wc -l)" = 1 ] || die "daemon.lock must pin exactly one daemon: not installing anything"
+  read -r tag asset want extra <<<"$pins"
+  [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.+-][0-9A-Za-z.-]+)?$ && $asset =~ ^[A-Za-z0-9._-]+$ \
+     && $want =~ ^[0-9a-f]{64}$ && -z $extra ]] || die "daemon.lock is malformed: not installing anything"
+  local url="https://github.com/$REPO/releases/download/$tag/$asset"
+  say "downloading the daemon $tag: $url"
   local get=(curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location --retry 2 --max-time 120)
-  "${get[@]}" -o "$tmp/$ASSET" "$url" && "${get[@]}" -o "$tmp/$ASSET.sha256" "$url.sha256" \
-    || { say "download failed (no release asset for v$version, or offline)"; return 1; }
-  local want got
-  want="$(head -c 64 "$tmp/$ASSET.sha256")"
+  "${get[@]}" -o "$tmp/$asset" "$url" || { say "download failed (offline, or no asset $asset in $tag)"; return 1; }
+  local got
   # A download that arrived but does not check out is not "offline": stop, do not fall back quietly.
-  [[ $want =~ ^[0-9a-f]{64}$ ]] || die "the downloaded .sha256 is not a SHA-256 sum: not installing anything"
-  got="$(sha256sum "$tmp/$ASSET" | cut -d' ' -f1)"
-  [ "$got" = "$want" ] || die "checksum mismatch for $ASSET (got $got, want $want): not installing it"
-  [ "$(head -c 4 "$tmp/$ASSET" | od -An -c | tr -d ' ')" = '177ELF' ] || die "$ASSET is not an ELF binary: not installing it"
-  put_daemon "$tmp/$ASSET" || return 1
-  say "daemon $version (SHA-256 $got) -> ~/.local/bin/magic-mouse-daemon"
+  got="$(sha256sum "$tmp/$asset" | cut -d' ' -f1)"
+  [ "$got" = "$want" ] || die "checksum mismatch for $asset $tag (got $got, daemon.lock pins $want): not installing it"
+  [ "$(head -c 4 "$tmp/$asset" | od -An -c | tr -d ' ')" = '177ELF' ] || die "$asset is not an ELF binary: not installing it"
+  put_daemon "$tmp/$asset" || return 1
+  say "daemon $tag (SHA-256 $got) -> ~/.local/bin/magic-mouse-daemon"
 }
 
 daemon_build() {

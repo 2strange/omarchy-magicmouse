@@ -193,10 +193,14 @@ omarchy plugin add https://github.com/2strange/omarchy-magicmouse --enable
 ~/.config/omarchy/plugins/io.github.2strange.magicmouse/install.sh
 ```
 
-The installer downloads the daemon for the plugin's version
-(`magic-mouse-daemon-x86_64-linux` from the release `v<version>`) over HTTPS and checks it
-against the release's SHA-256 before installing it to `~/.local/bin`; it never runs the
-download, and the daemon never runs as root. `install.sh --build` builds it with cargo
+The installer downloads the one daemon pinned in [`daemon.lock`](daemon.lock) (release tag,
+asset, SHA-256) over HTTPS and checks it against the SHA-256 **in that file**, not against
+anything in the release, before installing it to `~/.local/bin`. So the commit you install
+decides the exact bytes; a changed release cannot change them, it only makes the install stop.
+It never runs the download, and the daemon never runs as root. `daemon.lock` also names the
+build: v2.0.0 was built by the [release workflow run](https://github.com/2strange/omarchy-magicmouse/actions/runs/41421554038)
+from tag v2.0.0, whose log shows the same digest; later releases also carry a build provenance
+attestation (`gh attestation verify magic-mouse-daemon-x86_64-linux -R 2strange/omarchy-magicmouse`). `install.sh --build` builds it with cargo
 instead, `install.sh --python` installs the Python daemon.
 
 Pair the mouse over Bluetooth as usual; the daemon waits for it and takes it over whenever
@@ -320,7 +324,9 @@ New work goes into the Rust daemon (`daemon-rs/`). The Python daemon of 1.x stay
 as the reference for the golden traces (and as `install.sh --python`); tag `v1.4.1` is its
 last release. The golden traces pin the Rust daemon to the Python daemon's behaviour. A tag `v<version>`
 (matching `manifest.json`) runs `.github/workflows/release.yml`: tests, golden traces, a
-static musl build, and the binary plus `.sha256` attached to the release.
+static musl build, the binary plus `.sha256` attached to the release, and a build provenance
+attestation. The release does not decide what users install: commit the new digest (printed in
+the step "Assets") to `daemon.lock`, and that commit is the release users get.
 
 The tests drive the daemon's engine with synthetic touch frames (touch tracking, touch
 check, the mouse's contact state, touchpad mode and the swipe pair, workspace ends).
