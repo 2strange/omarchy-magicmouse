@@ -1,0 +1,27 @@
+# the config the recordings were made with (2026-11-01), without comments
+[pointer]
+tracking_speed = 0.875
+[scroll]
+touch_front_mm = 13
+touch_front_size = 510
+edge_release_mm = 5
+edge_front_mm = 2
+touch_pair_size = 280
+touch_rate = 36
+touch_hold_size = 250
+touch_start_size = 280
+free_axis = true
+edge_back_mm = 30
+edge_right_mm = 23
+edge_left_mm = 5
+natural = false
+speed = 1.7
+start_mm = 0.2
+[gestures]
+invert_swipe = true
+swipe_pages = false
+swipe_mm = 6.0
+[momentum]
+decay = 0.975
+[touchpad]
+scroll_speed = 0.2

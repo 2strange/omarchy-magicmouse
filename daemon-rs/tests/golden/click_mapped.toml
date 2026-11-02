@@ -1,0 +1,7 @@
+[buttons]
+right_click = false
+middle = "right"
+[pointer]
+tracking_speed = 1.5
+smoothing_ms = 10
+click_hold_ms = 0
