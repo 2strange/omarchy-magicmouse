@@ -1,0 +1,19 @@
+[package]
+name = "magic-mouse-daemon"
+version = "2.0.0-dev"
+edition = "2021"
+license = "MIT"
+description = "Magic Mouse daemon for Omarchy: touchpad-style scrolling, gestures, battery"
+
+[dependencies]
+evdev = "0.12"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+zbus = { version = "4", default-features = false, features = ["blocking"] }
+libc = "0.2"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
