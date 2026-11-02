@@ -226,6 +226,12 @@ impl DeviceInfo for ReplayDevice {
             _ => None,
         }
     }
+    fn abs_value(&self, code: u16) -> Option<i32> {
+        match code {
+            ABS_MT_SLOT => Some(self.state.borrow().slot),
+            _ => None,
+        }
+    }
     fn mt_slots(&self, code: u16) -> Option<Vec<i32>> {
         let col = match code {
             ABS_MT_TRACKING_ID => Some(0),
