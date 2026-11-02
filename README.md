@@ -199,12 +199,14 @@ anything in the release, before installing it to `~/.local/bin` and starting it 
 So the commit you install decides the exact bytes of the prebuilt daemon: a different file
 stops the install, and so does a missing one (it never quietly builds something else).
 `daemon.lock` also names the build. From v2.0.1 on, each release binary has a build provenance
-attestation; check a downloaded file against the workflow, the tag and its exact commit with
+attestation; check a downloaded file against the workflow, the tag and its exact commit, from
+this checkout (the first line must succeed, or the commit would not be checked at all):
 
 ```sh
+source_sha=$(git rev-parse --verify 'refs/tags/v2.0.1^{commit}') &&
 gh attestation verify magic-mouse-daemon-x86_64-linux -R 2strange/omarchy-magicmouse \
   --signer-workflow 2strange/omarchy-magicmouse/.github/workflows/release.yml \
-  --source-ref refs/tags/v2.0.1 --source-digest "$(git rev-list -n1 v2.0.1)" --deny-self-hosted-runners
+  --source-ref refs/tags/v2.0.1 --source-digest "$source_sha" --deny-self-hosted-runners
 ```
 
 `install.sh --build` builds the daemon with your Rust toolchain instead (the source is this

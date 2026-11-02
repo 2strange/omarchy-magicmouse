@@ -39,6 +39,7 @@ tmp="$(mktemp -d)"
 
 FAKE_CURL = r"""#!/bin/sh
 # fake curl: copy $FAKE_ASSET to the -o target, or fail like a 404 when FAKE_FAIL is set
+echo "$*" >> "$FAKE_LOG"
 out=""
 while [ $# -gt 0 ]; do [ "$1" = -o ] && { out="$2"; shift; }; shift; done
 [ -z "${FAKE_FAIL:-}" ] || exit 22
@@ -63,7 +64,9 @@ class Download(unittest.TestCase):
 
     def run_download(self, **env):
         script = STUBS + f'trap \'rm -rf "$tmp"\' EXIT\nhere="{self.dir}"\n' + function("daemon_download") + "\nrc=0; daemon_download || rc=$?; echo rc=$rc\n"
-        e = dict(os.environ, PATH=f"{self.dir / 'bin'}:{os.environ['PATH']}", FAKE_ASSET=str(self.asset), **env)
+        self.log = self.dir / "curl.log"
+        e = dict(os.environ, PATH=f"{self.dir / 'bin'}:{os.environ['PATH']}", FAKE_ASSET=str(self.asset),
+                 FAKE_LOG=str(self.log), **env)
         return subprocess.run(["bash", "-c", script], capture_output=True, text=True, env=e).stdout
 
     def test_pinned_digest_installs(self):
@@ -71,6 +74,10 @@ class Download(unittest.TestCase):
         out = self.run_download()
         self.assertIn(f"INSTALLED {self.digest}", out)
         self.assertIn("rc=0", out)
+        calls = self.log.read_text().splitlines()
+        self.assertEqual(len(calls), 1)  # the asset only: no .sha256 from the release
+        self.assertIn("--proto =https", calls[0])
+        self.assertIn("https://github.com/owner/repo/releases/download/v2.0.0/asset-name", calls[0])
 
     def test_other_bytes_stop_before_install(self):
         self.lock(f"v2.0.0 asset-name {'0' * 64}\n")
