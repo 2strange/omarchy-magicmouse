@@ -447,7 +447,7 @@ Panel {
             textFormat: Text.PlainText
             visible: root.tp
             width: parent.width
-            text: "Touchpad mode: two fingers sideways switch workspaces with Hyprland's live swipe, like three fingers on the trackpad. End of row, empty workspaces and the trackpad's direction come from the Trackpad settings."
+            text: "Touchpad mode: two fingers sideways switch workspaces with Hyprland's live swipe, like three fingers on the trackpad. End of row, empty workspaces and the trackpad's direction come from the Mac Trackpad settings."
             color: root.dim; font.family: root.fontFam; font.pixelSize: Style.font.caption; wrapMode: Text.WordWrap
           }
           SwitchRow {

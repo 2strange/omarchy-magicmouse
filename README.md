@@ -29,6 +29,10 @@ two-finger swipe moves the workspace, and a hovering finger no longer flickers. 
 Mouse 2 even keeps a text selection while dragging, which it no longer did on the Mac.
 Every setting is there to get you closer on your own mouse and your own hand.
 
+**Pairs with [Mac Trackpad](https://github.com/2strange/omarchy-mactrackpad).** In touchpad
+mode the mouse's workspace swipe is that plugin's gesture, so both swipe the same way: end of
+row, empty workspaces and direction are set once, on its Swipe tab.
+
 ### The breakthrough: the mouse knows when a finger touches
 
 For two days we tuned size thresholds, front zones, a wobble rule and a little play
@@ -116,7 +120,7 @@ understands well:
   kernel's centre "middle click" zone (paste on Linux) is a left click. Control + click as
   a right click is a switch.
 - **Workspaces at the ends.** In touchpad mode Hyprland's swipe decides (with the
-  [Trackpad plugin](https://github.com/2strange/omarchy-trackpad): stop or open a new one,
+  [Mac Trackpad plugin](https://github.com/2strange/omarchy-mactrackpad): stop or open a new one,
   empty workspaces count). Without touchpad mode the daemon switches by itself: stop, open a
   new one, or wrap around, and empty workspaces count, so you can always reach a workspace
   to start something on.
@@ -174,7 +178,7 @@ only). Nothing is sent while no preview is connected; `--no-probe` turns it off.
   hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
   ```
 
-  or use the [Trackpad plugin](https://github.com/2strange/omarchy-trackpad), which adds it
+  or use the [Mac Trackpad plugin](https://github.com/2strange/omarchy-mactrackpad), which adds it
   and also sets what happens at the last workspace and whether empty ones count. Both your
   trackpad and the mouse use that one gesture.
 
