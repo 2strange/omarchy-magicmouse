@@ -50,6 +50,26 @@ Output trace, one line per call the Engine makes on the outside world, in order:
 
 Everything talks through the traits in `src/iface.rs`. Changing `iface.rs` = ask Bob.
 
+## Engine API (fixed, Henry implements, Sonde/Bob call it)
+
+```rust
+pub struct Engine { /* Python Engine fields; pub where Session/probe need them */ }
+impl Engine {
+    pub fn new(cfg: Config, verbose: bool, ui: Box<dyn Output>, actions: Box<dyn Actions>) -> Self;
+    pub fn set_config(&mut self, cfg: Config);              // live reload (Python: eng.cfg = ...)
+    pub fn set_vpad(&mut self, vpad: Option<Box<dyn TouchpadOut>>);
+    pub fn set_probe(&mut self, probe: Option<Box<dyn ProbeSink>>);
+    pub fn attach(&mut self, dev: Box<dyn DeviceInfo>);
+    pub fn feed(&mut self, ev: Event);
+    pub fn tick(&mut self, now: f64);
+    pub fn coasting(&self) -> bool;
+    pub fn release_buttons(&mut self);
+    pub fn reset_touch(&mut self);
+}
+```
+
+The shared virtual mouse is shared via `Rc<RefCell<..>>` behind the `Output` impl (Bob's business).
+
 ## Crates
 
 `evdev` (devices + uinput), `serde`/`serde_json`, `toml`, `zbus` (blocking API, BlueZ), `libc`.
