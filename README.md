@@ -30,8 +30,9 @@ Mouse 2 even keeps a text selection while dragging, which it no longer did on th
 Every setting is there to get you closer on your own mouse and your own hand.
 
 **Pairs with [Mac Trackpad](https://github.com/2strange/omarchy-mactrackpad).** In touchpad
-mode the mouse's workspace swipe is that plugin's gesture, so both swipe the same way: end of
-row, empty workspaces and direction are set once, on its Swipe tab.
+mode the mouse sends three fingers, so with that plugin's Fingers set to 3 the mouse's workspace
+swipe is its gesture and both swipe the same way: end of row, empty workspaces and direction
+are set once, on its Swipe tab.
 
 ### The breakthrough: the mouse knows when a finger touches
 
@@ -120,8 +121,8 @@ understands well:
   kernel's centre "middle click" zone (paste on Linux) is a left click. Control + click as
   a right click is a switch.
 - **Workspaces at the ends.** In touchpad mode Hyprland's swipe decides (with the
-  [Mac Trackpad plugin](https://github.com/2strange/omarchy-mactrackpad): stop or open a new one,
-  empty workspaces count). Without touchpad mode the daemon switches by itself: stop, open a
+  [Mac Trackpad plugin](https://github.com/2strange/omarchy-mactrackpad), Fingers 3: stop, open a
+  new one or wrap around, which switches when the swipe ends; empty workspaces count). Without touchpad mode the daemon switches by itself: stop, open a
   new one, or wrap around, and empty workspaces count, so you can always reach a workspace
   to start something on.
 - **Without touchpad mode** the daemon scrolls by itself: start threshold, natural or wheel
