@@ -76,6 +76,8 @@ pub trait Actions {
 pub trait DeviceInfo {
     /// (min, max) of an ABS axis, None if unknown.
     fn abs_range(&self, code: u16) -> Option<(i32, i32)>;
+    /// Current value of an ABS axis (Python: `dev.absinfo(code).value`, e.g. ABS_MT_SLOT in sync_mt).
+    fn abs_value(&self, code: u16) -> Option<i32>;
     /// EVIOCGMTSLOTS for one ABS_MT_* code: the value per slot.
     fn mt_slots(&self, code: u16) -> Option<Vec<i32>>;
     fn active_keys(&self) -> Vec<u16>;
