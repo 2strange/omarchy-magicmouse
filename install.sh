@@ -337,7 +337,7 @@ if command -v omarchy-shell >/dev/null 2>&1; then
     rm -rf "$plugins_dir/$plugin_id"
     mkdir -p "$plugins_dir/$plugin_id"
     cp -r "$here/manifest.json" "$here/BarWidget.qml" "$here/Panel.qml" "$here/status-reader.py" "$here/README.md" "$here/LICENSE" "$plugins_dir/$plugin_id/"
-    [ -f "$here/preview-touch.png" ] && cp "$here/preview-touch.png" "$plugins_dir/$plugin_id/"
+    [ -f "$here/preview.png" ] && cp "$here/preview.png" "$plugins_dir/$plugin_id/"
     cp -r "$here/preview" "$plugins_dir/$plugin_id/"  # the touch preview window
   fi
   omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true

@@ -19,7 +19,9 @@ Make an Apple Magic Mouse feel like it does on a Mac, on [Omarchy](https://omarc
 your two fingers and lets you change your mind halfway, no scrolling while your finger only
 hovers, and a pointer that slows down for small targets the way macOS does.
 
-![The touch preview: every contact on the mouse, its size and what the daemon decides](preview-touch.png)
+![MagicMouse: battery in Bluetooth settings, the bar menu with two mice, its Touch and Gestures tabs and the live touch preview](preview.png)
+
+<p align="center"><sub>Screenshots from our MacBook Pro with two mice connected. Colors and fonts follow your Omarchy theme.</sub></p>
 
 It will never be a Mac. But on our two mice (a Magic Mouse 1 and a Magic Mouse 2) it now
 feels about **98% like one**: scrolling glides and stops and turns on the spot, a light
@@ -59,6 +61,19 @@ light. Measured on our Late 2013 MacBook Pro (Core i7-4850HQ, 13 years old):
 
 A newer machine will need even less. The port is held to the Python daemon: 32 recorded and
 synthetic sessions must give exactly the same output (see Development).
+
+## A look around
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/bluetooth.png" alt="Omarchy's Bluetooth menu showing both Magic Mice with their battery level"><br><strong>Battery where you look for it</strong><br>Each mouse's charge shows up in Omarchy's own Bluetooth menu, not only in the bar.</td>
+    <td width="50%"><img src="docs/images/menu-gestures.png" alt="The MagicMouse menu on the Gestures tab: two-finger workspace swipe, reverse direction, swipe boost"><br><strong>One menu for every mouse</strong><br>All connected mice with their battery at the top; pointer, scroll, gestures and touch settings below, applied live.</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/menu-touch.png" alt="The Touch tab with edge zones, palm zone and the button that opens the touch preview"><br><strong>Your hand, your zones</strong><br>Edge and palm zones per side, so a finger that only holds the mouse never scrolls.</td>
+    <td width="50%"><img src="docs/images/touch-preview.png" alt="The touch preview: two contacts on the mouse, their size, the mouse's own touch state and the daemon's decisions"><br><strong>See what the mouse feels</strong><br>The touch preview shows every contact, its size, the mouse's own touch state and why the daemon scrolls or not.</td>
+  </tr>
+</table>
 
 ## What it does
 
