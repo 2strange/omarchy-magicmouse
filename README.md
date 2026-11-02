@@ -205,8 +205,9 @@ downloaded file with
 ```sh
 gh attestation verify magic-mouse-daemon-x86_64-linux -R 2strange/omarchy-magicmouse \
   --signer-workflow 2strange/omarchy-magicmouse/.github/workflows/release.yml --source-ref refs/tags/v2.0.1
-``` `install.sh --build` builds it with cargo
-instead, `install.sh --python` installs the Python daemon.
+```
+
+`install.sh --build` builds it with cargo instead, `install.sh --python` installs the Python daemon.
 
 Pair the mouse over Bluetooth as usual; the daemon waits for it and takes it over whenever
 it connects. **After the first install, turn each mouse off and on once**: the driver reads
