@@ -1,0 +1,5319 @@
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 19
+S
+S
+W 2 12 34
+W 2 11 -47
+S
+S
+S
+S
+W 2 12 9
+S
+S
+S
+W 2 11 14
+S
+S
+S
+S
+S
+W 2 12 -22
+W 2 11 7
+S
+S
+S
+W 2 12 5
+W 2 11 -2
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -10
+W 2 11 14
+S
+S
+S
+S
+W 2 11 -20
+S
+S
+S
+S
+W 2 12 -10
+W 2 11 11
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+S
+S
+S
+S
+W 2 12 -1
+S
+S
+S
+W 2 12 -4
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+W 2 11 -5
+S
+S
+S
+S
+W 2 12 7
+W 2 11 -11
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+W 2 12 2
+W 2 11 -2
+S
+W 2 12 9
+W 2 11 -8
+S
+S
+W 2 12 2
+S
+S
+W 2 12 1
+S
+W 2 11 4
+S
+S
+W 2 11 7
+S
+S
+W 2 12 -1
+S
+W 2 12 -2
+W 2 11 4
+S
+S
+S
+W 2 12 -2
+S
+S
+S
+W 2 12 -2
+S
+S
+W 2 12 -7
+W 2 11 7
+S
+W 2 12 -2
+W 2 11 1
+S
+W 2 12 -2
+W 2 11 1
+S
+S
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 12 -1
+W 2 11 2
+S
+S
+S
+W 2 12 1
+S
+S
+S
+W 2 12 -11
+W 2 11 5
+S
+W 2 12 -8
+W 2 11 2
+S
+W 2 12 -8
+W 2 11 5
+S
+W 2 12 -6
+S
+S
+W 2 12 -5
+S
+S
+W 2 11 -6
+S
+W 2 12 4
+W 2 11 -4
+S
+W 2 12 6
+W 2 11 -5
+S
+W 2 12 7
+W 2 11 -6
+S
+W 2 12 18
+W 2 11 -19
+S
+W 2 12 5
+W 2 11 -6
+S
+W 2 12 2
+W 2 11 -5
+S
+S
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+W 2 12 1
+S
+S
+W 2 12 1
+W 2 11 2
+S
+S
+W 2 12 1
+S
+W 2 12 1
+W 2 11 1
+S
+W 2 12 2
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -5
+W 2 11 -2
+S
+W 2 12 -7
+W 2 11 -6
+S
+W 2 12 -4
+W 2 11 -1
+S
+W 2 12 -6
+W 2 11 -6
+S
+S
+W 2 11 -1
+S
+W 2 12 -5
+W 2 11 -4
+S
+W 2 12 -2
+S
+W 2 12 -2
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+S
+S
+W 2 11 1
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+W 2 12 1
+W 2 11 1
+S
+W 2 12 2
+S
+W 2 12 2
+S
+W 2 12 2
+S
+W 2 12 2
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 1
+S
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -2
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+W 2 12 -1
+S
+S
+W 2 11 -1
+S
+W 2 12 -1
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 12 1
+S
+W 2 12 2
+S
+S
+W 2 12 2
+W 2 11 -1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 1
+W 2 11 1
+S
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 11 1
+S
+W 2 12 2
+W 2 11 1
+S
+W 2 12 2
+S
+W 2 12 2
+W 2 11 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -15
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 12 12
+S
+W 2 12 -14
+W 2 11 2
+S
+W 2 12 -6
+W 2 11 -9
+S
+W 2 11 3
+S
+W 2 11 -7
+S
+W 2 12 16
+W 2 11 5
+S
+W 2 12 -7
+W 2 11 13
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+S
+W 2 12 -1
+W 2 11 -1
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 12 2
+S
+W 2 12 2
+S
+W 2 12 7
+S
+W 2 12 1
+S
+W 2 12 5
+S
+S
+S
+S
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 2
+S
+W 2 12 1
+S
+W 2 12 2
+S
+W 2 12 2
+S
+S
+S
+S
+S
+S
+W 2 12 1
+S
+W 2 12 2
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 2
+S
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 1
+S
+W 2 12 1
+W 2 11 1
+S
+S
+S
+W 2 12 1
+W 2 11 1
+S
+W 2 12 1
+W 2 11 2
+S
+W 2 12 2
+S
+W 2 11 1
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -4
+S
+W 2 12 -5
+S
+W 2 12 -1
+S
+W 2 12 -5
+S
+W 2 12 -1
+S
+W 2 12 -2
+S
+W 2 12 -5
+S
+S
+S
+W 2 12 -1
+S
+S
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+W 2 12 -2
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+W 2 12 -2
+S
+W 2 12 -1
+S
+W 2 12 -2
+S
+S
+S
+S
+S
+S
+W 2 12 1
+S
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 2
+W 2 11 1
+S
+W 2 12 1
+W 2 11 1
+S
+W 2 12 2
+S
+W 2 12 2
+S
+W 2 12 2
+S
+W 2 12 5
+S
+W 2 12 1
+S
+W 2 12 2
+S
+W 2 12 7
+S
+W 2 12 3
+S
+W 2 12 6
+S
+W 2 12 1
+S
+W 2 12 2
+S
+W 2 12 2
+S
+S
+W 2 12 1
+S
+S
+S
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 2
+S
+W 2 12 1
+S
+W 2 12 2
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 1
+S
+S
+S
+S
+S
+S
+S
+W 2 12 1
+S
+W 2 12 1
+S
+S
+S
+S
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 12 -2
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 12 -2
+S
+W 2 12 -1
+S
+S
+S
+W 2 12 -1
+S
+S
+S
+W 2 12 1
+S
+S
+W 2 12 2
+S
+W 2 12 1
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+W 2 12 1
+S
+W 2 11 -1
+S
+W 2 12 1
+W 2 11 -1
+S
+W 2 12 1
+S
+W 2 11 -1
+S
+W 2 12 1
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+S
+S
+S
+S
+S
+W 2 12 1
+S
+W 2 12 1
+S
+S
+W 2 12 1
+S
+S
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+W 2 12 -2
+S
+W 2 12 -1
+S
+W 2 12 -2
+S
+S
+S
+S
+W 2 12 2
+S
+W 2 12 1
+S
+W 2 12 2
+S
+W 2 12 1
+S
+W 2 12 4
+S
+S
+W 2 12 2
+S
+W 2 12 1
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -6
+S
+W 2 11 -10
+S
+W 2 11 -17
+S
+W 2 11 -12
+S
+W 2 11 -12
+S
+W 2 11 -13
+S
+W 2 11 -14
+S
+W 2 11 -13
+S
+W 2 11 -20
+S
+W 2 11 -12
+W 2 8 -1
+S
+W 2 11 -25
+S
+W 2 11 -17
+S
+W 2 11 -9
+S
+W 2 11 -15
+S
+W 2 11 -12
+S
+W 2 11 -11
+S
+W 2 11 -9
+S
+W 2 11 -8
+S
+W 2 11 -12
+W 2 8 -1
+S
+W 2 11 -9
+S
+W 2 11 -11
+S
+W 2 11 -6
+S
+W 2 11 -15
+S
+W 2 11 -12
+S
+W 2 11 -14
+S
+W 2 11 -7
+S
+W 2 11 -15
+S
+W 2 11 -11
+S
+W 2 11 -5
+S
+W 2 11 -12
+W 2 8 -1
+S
+W 2 11 -5
+S
+W 2 11 -12
+S
+W 2 11 -16
+S
+S
+S
+S
+S
+S
+W 2 11 -49
+S
+W 2 11 -6
+S
+S
+W 2 11 -3
+S
+W 2 11 -6
+S
+W 2 11 -6
+S
+W 2 11 -7
+S
+W 2 11 -6
+W 2 8 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -6
+S
+S
+W 2 11 -2
+S
+W 2 11 -6
+S
+S
+W 2 11 -2
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+S
+W 2 11 -2
+S
+W 2 11 -5
+S
+S
+W 2 11 -1
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+W 2 8 -1
+S
+W 2 11 -3
+S
+S
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+S
+S
+W 2 11 -2
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+S
+S
+W 2 11 -2
+S
+S
+S
+W 2 11 -2
+S
+S
+S
+W 2 11 -2
+S
+S
+S
+W 2 11 -2
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+W 2 11 8
+S
+W 2 11 10
+S
+W 2 11 10
+S
+W 2 11 7
+S
+W 2 11 14
+S
+W 2 11 10
+S
+W 2 11 12
+S
+W 2 11 6
+S
+W 2 11 14
+S
+W 2 11 7
+S
+W 2 11 13
+S
+W 2 11 5
+S
+W 2 11 9
+W 2 8 1
+S
+W 2 11 12
+S
+W 2 11 6
+S
+W 2 11 12
+S
+W 2 11 11
+S
+W 2 11 10
+S
+W 2 11 11
+S
+W 2 11 13
+S
+W 2 11 7
+S
+W 2 11 11
+S
+W 2 11 9
+S
+W 2 11 9
+S
+W 2 11 8
+W 2 8 1
+S
+W 2 11 7
+S
+W 2 11 8
+S
+W 2 11 2
+S
+W 2 11 12
+S
+W 2 11 4
+S
+W 2 11 11
+S
+W 2 12 6
+W 2 11 9
+S
+W 2 11 6
+S
+W 2 12 5
+W 2 11 9
+S
+W 2 12 5
+W 2 11 12
+S
+W 2 11 2
+S
+W 2 12 2
+W 2 11 8
+S
+W 2 11 6
+S
+W 2 11 4
+S
+W 2 11 2
+S
+W 2 11 5
+S
+W 2 11 2
+S
+W 2 11 7
+W 2 8 1
+S
+W 2 11 7
+S
+W 2 11 2
+S
+W 2 11 9
+S
+W 2 11 6
+S
+W 2 11 7
+S
+W 2 11 7
+S
+W 2 11 7
+S
+W 2 11 10
+S
+W 2 11 4
+S
+W 2 11 7
+S
+W 2 11 10
+S
+W 2 11 10
+S
+W 2 11 9
+S
+W 2 11 10
+S
+W 2 11 12
+S
+W 2 11 12
+W 2 8 1
+S
+W 2 11 13
+S
+W 2 11 9
+S
+W 2 11 17
+S
+W 2 11 7
+S
+W 2 11 16
+S
+W 2 11 6
+S
+W 2 11 15
+S
+W 2 11 6
+S
+W 2 11 12
+S
+W 2 11 11
+W 2 8 1
+S
+W 2 11 10
+S
+W 2 11 7
+S
+W 2 11 9
+S
+W 2 11 9
+S
+W 2 11 7
+S
+W 2 11 10
+S
+W 2 11 1
+S
+W 2 11 7
+S
+W 2 11 6
+S
+W 2 11 1
+S
+W 2 11 7
+S
+W 2 11 2
+S
+W 2 11 6
+S
+W 2 11 2
+S
+W 2 11 4
+S
+W 2 11 5
+S
+W 2 11 2
+S
+W 2 11 4
+S
+W 2 11 2
+S
+W 2 11 2
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -4
+W 2 11 -9
+S
+W 2 11 -9
+S
+W 2 11 -8
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -1
+S
+W 2 11 -6
+S
+W 2 11 -1
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -4
+S
+W 2 11 -11
+S
+W 2 11 -10
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -6
+S
+W 2 11 -9
+S
+W 2 11 -8
+S
+W 2 11 -12
+S
+W 2 11 -8
+S
+W 2 11 -5
+S
+W 2 11 -7
+S
+W 2 11 -11
+S
+W 2 11 -10
+S
+W 2 11 -6
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -2
+S
+W 2 11 -5
+S
+W 2 11 -7
+W 2 8 -1
+S
+W 2 11 -7
+S
+W 2 11 -10
+S
+W 2 11 -7
+S
+W 2 11 -8
+S
+W 2 11 -14
+S
+W 2 11 -7
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -1
+S
+W 2 11 -5
+S
+W 2 11 -1
+S
+W 2 11 -7
+S
+W 2 11 -1
+S
+W 2 11 -7
+S
+W 2 11 -4
+S
+W 2 11 -7
+S
+W 2 11 -2
+S
+W 2 11 -6
+W 2 8 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -10
+S
+W 2 11 -11
+S
+W 2 11 -12
+S
+W 2 11 -12
+S
+W 2 11 -13
+S
+W 2 11 -17
+S
+W 2 11 -18
+S
+W 2 11 -18
+S
+W 2 11 -18
+W 2 8 -1
+S
+W 2 11 -18
+S
+W 2 11 -19
+S
+W 2 11 -19
+S
+W 2 11 -18
+S
+W 2 11 -19
+S
+W 2 11 -10
+S
+W 2 11 -22
+W 2 8 -1
+S
+W 2 11 -8
+S
+W 2 11 -13
+S
+W 2 11 -15
+S
+W 2 11 -11
+S
+W 2 11 -11
+S
+W 2 11 -13
+S
+W 2 11 -19
+S
+W 2 11 -11
+S
+W 2 11 -16
+W 2 8 -1
+S
+W 2 11 -8
+S
+W 2 11 -17
+S
+W 2 11 -6
+S
+W 2 11 -9
+S
+W 2 11 -8
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -5
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 12 -2
+W 2 11 1
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 12 -2
+W 2 11 1
+S
+W 2 12 -6
+W 2 11 4
+S
+W 2 11 6
+S
+W 2 12 -6
+W 2 11 14
+S
+W 2 11 16
+S
+W 2 11 21
+S
+W 2 11 24
+S
+W 2 11 25
+S
+W 2 11 17
+W 2 8 1
+S
+W 2 11 24
+S
+W 2 11 23
+S
+W 2 11 13
+S
+W 2 11 19
+S
+W 2 11 25
+S
+W 2 11 24
+W 2 8 1
+S
+W 2 11 12
+S
+W 2 11 17
+S
+W 2 11 18
+S
+W 2 11 11
+S
+W 2 11 15
+S
+W 2 11 13
+S
+W 2 11 11
+S
+W 2 11 9
+W 2 8 1
+S
+W 2 11 8
+S
+W 2 11 5
+S
+W 2 11 5
+S
+W 2 11 5
+S
+W 2 11 4
+S
+W 2 11 7
+S
+W 2 11 6
+S
+W 2 11 10
+S
+W 2 11 11
+S
+W 2 11 11
+S
+W 2 11 12
+S
+W 2 11 13
+S
+W 2 11 12
+S
+W 2 11 14
+W 2 8 1
+S
+W 2 11 7
+S
+W 2 11 18
+S
+W 2 11 13
+S
+W 2 11 12
+S
+W 2 11 14
+S
+W 2 11 13
+S
+W 2 11 8
+S
+W 2 11 15
+S
+W 2 11 13
+W 2 8 1
+S
+W 2 11 6
+S
+W 2 11 15
+S
+W 2 11 6
+S
+W 2 11 10
+S
+W 2 11 8
+S
+W 2 11 8
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 5
+S
+W 2 11 5
+S
+W 2 11 2
+S
+W 2 11 8
+S
+W 2 12 2
+W 2 11 4
+S
+S
+S
+S
+S
+S
+S
+W 2 11 10
+S
+W 2 11 11
+S
+W 2 11 13
+S
+W 2 11 14
+S
+W 2 11 13
+S
+W 2 11 14
+S
+W 2 11 13
+S
+W 2 11 21
+S
+W 2 11 20
+W 2 8 1
+S
+W 2 11 21
+S
+W 2 11 19
+S
+W 2 11 26
+S
+W 2 11 13
+S
+W 2 11 18
+S
+W 2 11 19
+W 2 8 1
+S
+W 2 11 18
+S
+W 2 11 17
+S
+W 2 11 17
+S
+W 2 11 17
+S
+W 2 11 10
+S
+W 2 11 19
+S
+W 2 11 8
+S
+W 2 11 11
+W 2 8 1
+S
+W 2 11 10
+S
+W 2 11 9
+S
+W 2 11 8
+S
+W 2 11 7
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 5
+S
+W 2 11 6
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 2
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -6
+S
+W 2 11 -9
+S
+W 2 11 -9
+S
+W 2 11 -10
+S
+W 2 11 -20
+S
+W 2 11 -18
+S
+W 2 11 -13
+S
+W 2 11 -18
+S
+W 2 11 -17
+W 2 8 -1
+S
+W 2 11 -10
+S
+W 2 11 -14
+S
+W 2 11 -12
+S
+W 2 11 -10
+S
+W 2 11 -9
+S
+W 2 11 -11
+S
+W 2 11 -7
+S
+W 2 11 -9
+S
+W 2 11 -9
+S
+W 2 11 -9
+S
+W 2 11 -7
+S
+W 2 11 -9
+S
+W 2 11 -12
+W 2 8 -1
+S
+W 2 11 -6
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -6
+S
+W 2 11 -9
+S
+W 2 11 -10
+S
+W 2 11 -16
+S
+W 2 11 -11
+S
+W 2 11 -16
+S
+W 2 11 -15
+S
+W 2 11 -8
+W 2 8 -1
+S
+W 2 11 -11
+S
+W 2 11 -10
+S
+W 2 11 -14
+S
+W 2 11 -2
+S
+W 2 11 -12
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -6
+S
+W 2 11 -6
+S
+W 2 12 -4
+W 2 11 -6
+S
+W 2 11 -9
+S
+W 2 11 -6
+S
+W 2 11 -12
+S
+W 2 11 -10
+S
+W 2 11 -12
+S
+W 2 11 -12
+S
+W 2 11 -8
+S
+W 2 11 -11
+S
+W 2 11 -14
+S
+W 2 11 -11
+W 2 8 -1
+S
+W 2 11 -11
+S
+W 2 11 -6
+S
+W 2 11 -14
+S
+W 2 11 -10
+S
+W 2 11 -9
+S
+W 2 11 -10
+S
+W 2 11 -8
+S
+W 2 11 -6
+S
+W 2 11 -12
+S
+W 2 11 -2
+S
+W 2 11 -12
+S
+W 2 11 -2
+S
+W 2 11 -8
+S
+W 2 11 -11
+W 2 8 -1
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -7
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -6
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -12
+S
+W 2 11 -6
+S
+W 2 11 -9
+S
+W 2 11 -11
+S
+W 2 11 -9
+S
+W 2 11 -5
+S
+W 2 11 -13
+S
+W 2 11 -5
+W 2 8 -1
+S
+W 2 11 -12
+S
+W 2 11 -9
+S
+W 2 11 -6
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -6
+S
+W 2 11 -2
+S
+W 2 11 -6
+S
+W 2 11 -1
+S
+W 2 11 -6
+S
+W 2 11 -2
+S
+W 2 11 -6
+S
+W 2 11 -2
+S
+W 2 11 -7
+S
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+S
+W 2 11 -1
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -9
+S
+W 2 11 -5
+S
+W 2 11 -11
+S
+W 2 11 -9
+S
+W 2 11 -7
+S
+W 2 11 -13
+S
+W 2 11 -7
+S
+W 2 11 -14
+S
+W 2 11 -6
+S
+W 2 11 -13
+S
+W 2 11 -7
+S
+W 2 11 -9
+W 2 8 -1
+S
+W 2 11 -13
+S
+W 2 11 -10
+S
+W 2 11 -7
+S
+W 2 11 -14
+S
+W 2 11 -11
+S
+W 2 11 -12
+S
+W 2 11 -7
+S
+W 2 11 -9
+S
+W 2 11 -15
+S
+W 2 11 -2
+S
+W 2 11 -12
+S
+S
+W 2 11 -3
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -5
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -9
+S
+W 2 11 -6
+S
+W 2 11 -8
+S
+W 2 11 -9
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -11
+S
+W 2 11 -9
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 4
+S
+W 2 11 8
+S
+W 2 11 14
+S
+W 2 11 10
+S
+W 2 11 15
+S
+W 2 11 16
+S
+W 2 11 16
+S
+W 2 11 17
+S
+W 2 11 15
+S
+W 2 11 10
+W 2 8 1
+S
+W 2 11 12
+S
+W 2 11 11
+S
+W 2 11 8
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 2
+S
+W 2 11 6
+S
+W 2 11 2
+S
+W 2 11 8
+S
+W 2 11 2
+S
+W 2 11 7
+S
+W 2 11 5
+S
+W 2 11 8
+S
+W 2 11 4
+S
+W 2 11 10
+S
+W 2 11 7
+S
+W 2 11 7
+S
+W 2 11 7
+W 2 8 1
+S
+W 2 11 11
+S
+W 2 11 5
+S
+W 2 11 6
+S
+W 2 11 7
+S
+W 2 11 4
+S
+W 2 11 2
+S
+W 2 11 6
+S
+W 2 11 1
+S
+W 2 11 5
+S
+W 2 11 5
+S
+W 2 11 2
+S
+W 2 11 6
+S
+S
+W 2 11 1
+S
+W 2 11 1
+S
+S
+W 2 11 2
+S
+W 2 11 1
+S
+S
+S
+S
+W 2 12 6
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 13
+S
+W 2 11 17
+S
+W 2 11 14
+S
+W 2 11 17
+S
+W 2 11 11
+S
+W 2 11 15
+S
+W 2 11 14
+S
+W 2 11 12
+S
+W 2 11 12
+W 2 8 1
+S
+W 2 11 9
+S
+W 2 11 9
+S
+W 2 11 8
+S
+W 2 11 8
+S
+W 2 11 7
+S
+W 2 11 6
+S
+W 2 11 7
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 5
+S
+W 2 11 5
+S
+W 2 11 1
+S
+W 2 11 6
+S
+W 2 11 2
+S
+W 2 11 5
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+W 2 8 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+S
+W 2 12 -1
+S
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+W 2 12 -2
+S
+W 2 12 -2
+S
+W 2 12 -9
+S
+W 2 12 -5
+S
+W 2 12 -4
+S
+W 2 12 -6
+S
+W 2 12 -5
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -7
+S
+W 2 12 -16
+S
+W 2 12 -18
+S
+W 2 12 -14
+S
+W 2 12 -18
+S
+W 2 12 -18
+S
+W 2 12 -17
+S
+W 2 12 -37
+W 2 6 -1
+S
+W 2 12 -14
+S
+W 2 12 -13
+S
+W 2 12 -12
+S
+W 2 12 -16
+S
+W 2 12 -20
+S
+W 2 12 -6
+S
+W 2 12 -10
+S
+W 2 12 -9
+W 2 6 -1
+S
+W 2 12 -11
+S
+W 2 12 -1
+S
+S
+W 2 12 -4
+S
+W 2 12 -6
+S
+W 2 12 -5
+S
+W 2 12 -5
+S
+W 2 12 -7
+S
+W 2 12 -5
+S
+W 2 12 -8
+S
+W 2 12 -3
+S
+W 2 12 -5
+S
+W 2 12 -7
+S
+W 2 12 -4
+S
+W 2 12 -4
+S
+W 2 12 -7
+S
+W 2 12 -9
+S
+W 2 12 -7
+S
+W 2 12 -7
+S
+W 2 12 -8
+S
+W 2 12 -8
+W 2 6 -1
+S
+W 2 12 -5
+S
+S
+W 2 12 -4
+S
+W 2 12 -8
+S
+W 2 12 -9
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 12
+S
+W 2 12 9
+S
+W 2 12 9
+S
+S
+S
+S
+S
+S
+S
+S
+K 1 1 wrap dispatch hl.dsp.focus({ workspace = "e+1" })
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 19
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -8
+S
+W 2 12 -12
+S
+W 2 12 -14
+S
+W 2 12 -22
+S
+W 2 12 -23
+S
+W 2 12 -30
+S
+S
+S
+S
+S
+K 0 1 wrap dispatch hl.dsp.focus({ workspace = "e-1" })
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 12
+W 2 11 -5
+S
+W 2 12 12
+W 2 11 -4
+S
+W 2 12 13
+W 2 11 -5
+S
+W 2 12 12
+W 2 11 -5
+S
+W 2 12 11
+W 2 11 -4
+S
+W 2 12 15
+S
+W 2 12 13
+S
+W 2 12 19
+S
+S
+W 2 12 25
+W 2 6 1
+S
+W 2 12 22
+S
+W 2 12 48
+S
+W 2 12 31
+S
+W 2 12 32
+W 2 6 1
+S
+W 2 12 49
+S
+W 2 12 30
+S
+W 2 12 43
+W 2 6 1
+S
+W 2 12 41
+S
+W 2 12 60
+W 2 6 1
+S
+W 2 12 26
+S
+W 2 12 27
+S
+W 2 12 29
+S
+W 2 12 8
+S
+S
+W 2 12 7
+S
+W 2 12 -5
+S
+W 2 12 -2
+S
+S
+S
+S
+S
+S
+W 2 12 59
+W 2 6 1
+S
+W 2 12 8
+S
+S
+W 2 12 4
+S
+W 2 12 8
+S
+S
+W 2 12 3
+S
+W 2 12 8
+S
+S
+W 2 12 2
+S
+W 2 12 7
+S
+S
+S
+W 2 12 -5
+S
+W 2 12 -4
+S
+W 2 12 -7
+S
+W 2 12 -10
+S
+W 2 12 -14
+S
+W 2 12 -37
+S
+W 2 12 -27
+S
+W 2 12 -28
+W 2 6 -1
+S
+S
+W 2 12 -38
+S
+W 2 12 -32
+S
+W 2 12 -37
+S
+W 2 12 -45
+W 2 6 -1
+S
+W 2 12 -9
+S
+S
+S
+S
+S
+W 2 12 -110
+W 2 6 -1
+S
+W 2 12 -15
+S
+W 2 12 -15
+S
+S
+W 2 12 -12
+S
+W 2 12 -14
+S
+W 2 12 -14
+S
+S
+W 2 12 -10
+W 2 6 -1
+S
+W 2 12 -13
+S
+S
+W 2 12 -6
+S
+W 2 12 -13
+S
+S
+W 2 12 -5
+S
+W 2 12 -12
+S
+S
+W 2 12 -4
+S
+W 2 12 -12
+S
+S
+W 2 12 -4
+S
+W 2 12 -11
+S
+W 2 12 -11
+S
+W 2 12 -11
+S
+W 2 12 -11
+S
+W 2 12 -10
+W 2 6 -1
+S
+W 2 12 -10
+S
+W 2 12 -10
+S
+W 2 12 -9
+S
+S
+W 2 12 -5
+S
+W 2 12 -9
+S
+W 2 12 -9
+S
+W 2 12 -9
+S
+W 2 12 -8
+S
+W 2 12 -8
+S
+S
+W 2 12 -5
+S
+W 2 12 -8
+S
+W 2 12 -8
+S
+W 2 12 -8
+S
+W 2 12 -7
+S
+S
+W 2 12 -2
+W 2 6 -1
+S
+W 2 12 -7
+S
+W 2 12 -7
+S
+S
+W 2 12 -5
+S
+W 2 12 -6
+S
+S
+W 2 12 -3
+S
+W 2 12 -6
+S
+S
+W 2 12 -3
+S
+W 2 12 -6
+S
+S
+S
+W 2 12 -11
+W 2 11 5
+S
+W 2 12 -11
+S
+W 2 12 -14
+S
+W 2 12 -18
+S
+W 2 12 -21
+S
+W 2 12 -50
+W 2 6 -1
+S
+W 2 12 -30
+S
+W 2 12 -45
+S
+W 2 12 -49
+W 2 6 -1
+S
+S
+W 2 12 -37
+S
+W 2 12 -33
+S
+W 2 12 -48
+W 2 6 -1
+S
+W 2 12 -30
+S
+W 2 12 -33
+S
+W 2 12 -30
+S
+W 2 12 -22
+W 2 6 -1
+S
+W 2 12 -43
+S
+W 2 12 -13
+S
+W 2 12 -16
+S
+W 2 12 -4
+S
+S
+W 2 12 -11
+S
+S
+S
+S
+S
+S
+W 2 12 -94
+W 2 6 -1
+S
+W 2 12 -13
+S
+W 2 12 -13
+S
+S
+W 2 12 -9
+S
+W 2 12 -12
+S
+W 2 12 -12
+W 2 6 -1
+S
+W 2 12 -11
+S
+W 2 12 -11
+S
+W 2 12 -11
+S
+S
+W 2 12 -7
+S
+W 2 12 -10
+S
+W 2 12 -10
+S
+S
+W 2 12 -9
+S
+W 2 12 -10
+S
+S
+W 2 12 -3
+S
+W 2 12 -10
+S
+S
+W 2 12 -3
+S
+W 2 12 -9
+S
+S
+W 2 12 -5
+S
+W 2 12 -8
+S
+W 2 12 -9
+W 2 6 -1
+S
+W 2 12 -8
+S
+W 2 12 -8
+S
+S
+W 2 12 -1
+S
+W 2 12 -8
+S
+S
+W 2 12 -4
+S
+W 2 12 -8
+S
+S
+W 2 12 -2
+S
+W 2 12 -8
+S
+S
+W 2 12 -2
+S
+W 2 12 -7
+S
+S
+W 2 12 -3
+S
+W 2 12 -7
+S
+S
+W 2 12 -3
+S
+W 2 12 -7
+S
+S
+W 2 12 -2
+S
+W 2 12 -6
+S
+S
+W 2 12 -3
+S
+W 2 12 -6
+S
+W 2 12 -6
+S
+S
+W 2 12 -5
+S
+W 2 12 -6
+S
+W 2 12 -5
+W 2 6 -1
+S
+W 2 12 -6
+S
+W 2 12 -5
+S
+W 2 12 -5
+S
+S
+W 2 12 -3
+S
+W 2 12 -5
+S
+W 2 12 -5
+S
+S
+W 2 12 -3
+S
+W 2 12 -5
+S
+S
+W 2 12 -2
+S
+W 2 12 -4
+S
+S
+W 2 12 -2
+S
+W 2 12 -5
+S
+S
+W 2 12 -1
+S
+W 2 12 -4
+S
+S
+W 2 12 -2
+S
+W 2 12 -4
+S
+S
+W 2 12 -1
+S
+W 2 12 -4
+S
+S
+W 2 12 -2
+S
+W 2 12 -4
+S
+S
+W 2 12 -1
+S
+W 2 12 -4
+S
+S
+W 2 12 -1
+S
+W 2 12 -4
+S
+S
+S
+W 2 12 -40
+S
+S
+S
+S
+K 0 1 wrap dispatch hl.dsp.focus({ workspace = "e-1" })
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -22
+S
+W 2 12 -19
+S
+W 2 12 -14
+S
+W 2 12 -20
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 4
+S
+W 2 12 6
+S
+W 2 12 10
+S
+W 2 12 14
+S
+W 2 12 15
+S
+W 2 12 44
+S
+W 2 12 27
+W 2 6 1
+S
+W 2 12 26
+S
+W 2 12 74
+S
+W 2 12 32
+W 2 6 1
+S
+W 2 12 31
+S
+W 2 12 44
+S
+S
+W 2 12 26
+S
+W 2 12 32
+W 2 6 1
+S
+W 2 12 35
+S
+W 2 12 65
+W 2 6 1
+S
+W 2 12 28
+S
+W 2 12 34
+S
+W 2 12 72
+W 2 6 1
+S
+W 2 12 33
+S
+W 2 12 27
+S
+W 2 12 29
+S
+W 2 12 64
+W 2 6 1
+S
+W 2 12 9
+S
+S
+S
+S
+S
+S
+W 2 12 151
+W 2 6 1
+S
+W 2 12 21
+S
+W 2 12 20
+W 2 6 1
+S
+W 2 12 19
+S
+S
+W 2 12 20
+S
+W 2 12 18
+S
+W 2 12 18
+S
+W 2 12 18
+S
+W 2 12 18
+W 2 6 1
+S
+W 2 12 16
+S
+W 2 12 17
+S
+W 2 12 16
+S
+W 2 12 16
+S
+W 2 12 15
+S
+W 2 12 15
+S
+W 2 12 14
+S
+W 2 12 14
+W 2 6 1
+S
+W 2 12 14
+S
+W 2 12 14
+S
+W 2 12 13
+S
+S
+W 2 12 6
+S
+W 2 12 13
+S
+W 2 12 12
+S
+W 2 12 12
+S
+W 2 12 12
+S
+S
+W 2 12 3
+S
+W 2 12 11
+S
+W 2 12 11
+W 2 6 1
+S
+S
+W 2 12 8
+S
+W 2 12 11
+S
+S
+W 2 12 4
+S
+W 2 12 10
+S
+S
+W 2 12 5
+S
+W 2 12 10
+S
+W 2 12 9
+S
+S
+W 2 12 7
+S
+W 2 12 9
+S
+S
+W 2 12 4
+S
+W 2 12 8
+S
+S
+W 2 12 5
+S
+W 2 12 8
+S
+W 2 12 9
+S
+S
+W 2 12 6
+W 2 6 1
+S
+W 2 12 8
+S
+W 2 12 7
+S
+S
+W 2 12 7
+S
+W 2 12 7
+S
+S
+W 2 12 3
+S
+W 2 12 7
+S
+S
+W 2 12 3
+S
+W 2 12 7
+S
+S
+W 2 12 2
+S
+W 2 12 7
+S
+S
+W 2 12 4
+S
+W 2 12 6
+S
+S
+W 2 12 3
+S
+W 2 12 6
+S
+S
+W 2 12 2
+S
+W 2 12 6
+S
+W 2 12 6
+S
+S
+W 2 12 5
+S
+W 2 12 5
+S
+S
+W 2 12 2
+S
+W 2 12 5
+S
+W 2 12 5
+S
+S
+W 2 12 4
+S
+W 2 12 5
+W 2 6 1
+S
+W 2 12 5
+S
+S
+W 2 12 5
+S
+W 2 12 5
+S
+S
+W 2 12 1
+S
+W 2 12 5
+S
+S
+W 2 12 1
+S
+W 2 12 5
+S
+S
+W 2 12 2
+S
+W 2 12 4
+S
+S
+S
+W 2 12 6
+S
+W 2 12 7
+S
+W 2 12 2
+S
+W 2 12 5
+S
+W 2 12 6
+S
+W 2 12 8
+S
+S
+S
+S
+S
+S
+K 1 1 wrap dispatch hl.dsp.focus({ workspace = "e+1" })
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S

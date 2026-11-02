@@ -1,0 +1,6 @@
+[touchpad]
+enabled = false
+[momentum]
+decay = 0.995
+max_seconds = 2.5
+flick = 500

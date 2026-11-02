@@ -1,0 +1,7 @@
+[touchpad]
+enabled = false
+[scroll]
+free_axis = true
+horizontal = true
+[momentum]
+decay = 0.985
