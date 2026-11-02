@@ -34,7 +34,7 @@ Output trace, one line per call the Engine makes on the outside world, in order:
     S                                 # virtual mouse syn
     P <gain> <mirror 0|1> <id:x:y,...>  # virtual touchpad update (x, y rounded to 6 decimals)
     X <cmd>                           # run_action
-    K <forward 0|1>                   # workspace_step
+    K <forward 0|1> <include_empty 0|1> <end> <fallback>   # workspace_step (fallback = rest of line)
     B <json>                          # probe frame (only with --probe; sorted keys)
 
 ## Crate layout and owners (exclusive write per file)

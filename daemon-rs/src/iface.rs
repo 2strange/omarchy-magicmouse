@@ -65,10 +65,11 @@ pub trait ProbeSink {
     fn send(&mut self, json: &serde_json::Value);
 }
 
-/// What the Engine starts outside itself (Python: `run_action(cmd)`, `workspace_step(forward, ...)`).
+/// What the Engine starts outside itself (Python: `run_action(cmd)`,
+/// `workspace_step(forward, end, fallback, include_empty)` with the same arguments).
 pub trait Actions {
     fn run_action(&mut self, cmd: &str);
-    fn workspace_step(&mut self, forward: bool, cfg: &Config);
+    fn workspace_step(&mut self, forward: bool, end: &str, fallback: &str, include_empty: bool);
 }
 
 /// What the Engine reads from the grabbed device (Python: `dev.absinfo`, EVIOCGMTSLOTS, `active_keys`, capabilities).
