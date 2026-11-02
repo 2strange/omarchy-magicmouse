@@ -75,7 +75,7 @@ The shared virtual mouse is shared via `Rc<RefCell<..>>` behind the `Output` imp
 `evdev` (devices + uinput), `serde`/`serde_json`, `toml`, `zbus` (blocking API, BlueZ), `libc`.
 No async runtime of our own; one `poll(2)` loop like the Python `select` loop.
 
-## Packaging (later, Bender)
+## Packaging (plan from the port; as built: release.yml, daemon.lock, install.sh)
 
 GitHub Actions builds `x86_64-unknown-linux-musl` (static, `--release`), attaches
 `magic-mouse-daemon-x86_64-linux` + `.sha256` to the release and records a build provenance

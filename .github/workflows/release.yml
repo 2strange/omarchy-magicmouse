@@ -49,6 +49,9 @@ jobs:
         working-directory: daemon-rs
         run: cargo test --locked
 
+      - name: Installer and config tests (Python; daemon tests skip without python-evdev)
+        run: python3 -m unittest discover -s tests -v
+
       - name: Release build (static)
         working-directory: daemon-rs
         run: |
@@ -99,14 +102,27 @@ jobs:
           subject-path: dist/${{ env.ASSET }}
 
       - name: Attach to the release
-        # No --clobber: assets of a release are never replaced silently. Releases are immutable
-        # once published, so a published release made by hand can never get its assets.
+        # Never --clobber, never replace an asset: releases are immutable once published. A re-run
+        # accepts an existing release only if it holds exactly these files (same SHA-256); a draft
+        # gets the missing ones and is then published; anything else stops with an error.
         run: |
-          if draft="$(gh release view "$GITHUB_REF_NAME" --json isDraft -q .isDraft 2>/dev/null)"; then
-            [ "$draft" = true ] || { echo "::error::release $GITHUB_REF_NAME was published without assets (made by hand?); releases are immutable: delete it and use a new tag"; exit 1; }
-            gh release upload "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256"
-            gh release edit "$GITHUB_REF_NAME" --draft=false
-          else
+          if rel="$(gh release view "$GITHUB_REF_NAME" --json isDraft,assets 2>err.txt)"; then  # finds drafts too
+            draft="$(jq -r .isDraft <<<"$rel")"
+            for f in "$ASSET" "$ASSET.sha256"; do
+              want="sha256:$(sha256sum "dist/$f" | cut -d' ' -f1)"
+              have="$(jq -r --arg n "$f" '[.assets[] | select(.name == $n) | (.digest // "no-digest")][0] // ""' <<<"$rel")"
+              [ "$have" != no-digest ] || { echo "::error::gh does not report asset digests: cannot check $f"; exit 1; }
+              if [ -z "$have" ]; then
+                [ "$draft" = true ] || { echo "::error::published release $GITHUB_REF_NAME lacks $f; releases are immutable: delete it and use a new tag"; exit 1; }
+                gh release upload "$GITHUB_REF_NAME" "dist/$f"
+              elif [ "$have" != "$want" ]; then
+                echo "::error::$f in release $GITHUB_REF_NAME is $have, this build made $want: not replacing it"; exit 1
+              fi
+            done
+            [ "$draft" != true ] || gh release edit "$GITHUB_REF_NAME" --draft=false
+          elif grep -q "release not found" err.txt; then
             gh release create "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256" \
               --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
+          else
+            echo "::error::cannot look up release $GITHUB_REF_NAME: $(cat err.txt)"; exit 1
           fi

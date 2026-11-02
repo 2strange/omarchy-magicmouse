@@ -13,13 +13,16 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 say() { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
 die() { printf '\033[1;31m==> error:\033[0m %s\n' "$*" >&2; exit 1; }
 ASSUME_YES=0
-MODE=auto  # auto: release binary, else local cargo build, else the Python daemon
+MODE=auto  # auto: the release binary pinned in daemon.lock, nothing else (see below)
 usage() {
   cat <<'USAGE'
 Usage: ./install.sh [--yes] [--build | --python]
   --yes      do not ask before appending the Hyprland snippet
   --build    build the daemon from daemon-rs/ with cargo instead of downloading it
+             (no x86_64, or offline; needs Rust)
   --python   install the Python daemon (bin/magic-mouse-daemon, needs python-evdev)
+By default only the prebuilt daemon pinned in daemon.lock is installed; if it cannot
+be downloaded, the installer stops instead of quietly building something else.
 USAGE
 }
 for arg in "$@"; do case "$arg" in
@@ -37,13 +40,14 @@ ask() {  # ask "question" -> 0 for yes
 [ "$(id -u)" -ne 0 ] || die "run install.sh as your user, not as root (it asks for sudo itself, once)"
 
 # ---------------------------------------------------------------------------
-# The daemon. 2.0 is one Rust binary; users do not need Rust. In order:
-#   1. the prebuilt binary named in daemon.lock, downloaded over HTTPS from that GitHub
-#      release and checked against the SHA-256 pinned in daemon.lock (this commit, not the
-#      release) before it is made executable or installed; it is never run here, and never
-#      as root;
-#   2. a local build with cargo, when cargo is installed (daemon-rs/);
-#   3. the Python daemon (bin/magic-mouse-daemon) with python-evdev, as up to 1.4.
+# The daemon. 2.0 is one Rust binary; users do not need Rust.
+#   default:  the prebuilt binary named in daemon.lock, downloaded over HTTPS from that GitHub
+#             release and checked against the SHA-256 pinned in daemon.lock (this commit, not
+#             the release) before it is made executable, installed and started as your user
+#             service (never as root). If it cannot be had, the install stops: the commit
+#             decides the bytes, not the network.
+#   --build:  a local build with cargo from daemon-rs/ (your toolchain, Cargo.lock --locked);
+#   --python: the Python daemon (bin/magic-mouse-daemon) with python-evdev, as up to 1.4.
 # ---------------------------------------------------------------------------
 REPO="2strange/omarchy-magicmouse"
 dest="$HOME/.local/bin/magic-mouse-daemon"
@@ -86,9 +90,17 @@ daemon_download() {
 daemon_build() {
   [ -f "$here/daemon-rs/Cargo.toml" ] || { say "no daemon-rs/ in this checkout"; return 1; }
   command -v cargo >/dev/null 2>&1 || { say "cargo is missing: cannot build the daemon"; return 1; }
+  local host out
+  host="$(rustc -vV 2>/dev/null | sed -n 's/^host: //p')"
+  [ -n "$host" ] || { say "rustc is missing: cannot build the daemon"; return 1; }
   say "building the daemon with cargo (a few minutes)"
-  cargo build --release --locked --manifest-path "$here/daemon-rs/Cargo.toml" || { say "cargo build failed"; return 1; }
-  put_daemon "$here/daemon-rs/target/release/magic-mouse-daemon" || return 1
+  # A fresh target dir and an explicit target: CARGO_TARGET_DIR, build.target-dir or build.target
+  # cannot make us install an older binary from somewhere else.
+  cargo build --release --locked --manifest-path "$here/daemon-rs/Cargo.toml" \
+    --target "$host" --target-dir "$tmp/target" || { say "cargo build failed"; return 1; }
+  out="$tmp/target/$host/release/magic-mouse-daemon"
+  [ -x "$out" ] || { say "cargo did not produce $out"; return 1; }
+  put_daemon "$out" || return 1
   say "daemon (built here) -> ~/.local/bin/magic-mouse-daemon"
 }
 
@@ -106,7 +118,7 @@ daemon_python() {
 }
 
 case "$MODE" in
-  auto) daemon_download || daemon_build || { say "falling back to the Python daemon"; daemon_python; } ;;
+  auto) daemon_download || die "could not install the daemon pinned in daemon.lock; run ./install.sh --build (needs Rust) or ./install.sh --python" ;;
   build) daemon_build || die "could not build the daemon" ;;
   python) daemon_python ;;
 esac

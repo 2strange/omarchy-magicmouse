@@ -167,10 +167,10 @@ only). Nothing is sent while no preview is connected; `--no-probe` turns it off.
   runs the installer's root step and the bar widget's status reader).
 - Nothing else: the daemon is one prebuilt binary (x86_64, statically linked), downloaded
   by the installer from this plugin's GitHub release. You do not need Rust.
-- Other machines, or no network: with `cargo` installed the installer builds the daemon
-  from `daemon-rs/` instead. Without either it falls back to the Python daemon of 1.x,
-  which needs `python-evdev` and, for the battery in Bluetooth settings, `python-gobject`
-  (the installer adds both in that case only).
+- Other machines, or no network: the installer stops rather than install something else.
+  Choose `./install.sh --build` (needs Rust) to build the daemon from `daemon-rs/`, or
+  `./install.sh --python` for the Python daemon of 1.x, which needs `python-evdev` and, for
+  the battery in Bluetooth settings, `python-gobject` (the installer adds both then only).
 - **For the workspace swipe in touchpad mode,** Hyprland needs a three-finger workspace
   gesture. Omarchy ships it commented out in `~/.config/hypr/input.lua`; remove the `--`
   in front of
@@ -195,19 +195,20 @@ omarchy plugin add https://github.com/2strange/omarchy-magicmouse --enable
 
 The installer downloads the one daemon pinned in [`daemon.lock`](daemon.lock) (release tag,
 asset, SHA-256) over HTTPS and checks it against the SHA-256 **in that file**, not against
-anything in the release, before installing it to `~/.local/bin`. So the commit you install
-decides the exact bytes; a changed release cannot change them: a different file stops the
-install, and a missing one makes it build from this checkout's source instead.
-It never runs the download, and the daemon never runs as root. `daemon.lock` also names the
-build. From v2.0.1 on, each release binary has a build provenance attestation; check a
-downloaded file with
+anything in the release, before installing it to `~/.local/bin` and starting it as your user service (never as root).
+So the commit you install decides the exact bytes of the prebuilt daemon: a different file
+stops the install, and so does a missing one (it never quietly builds something else).
+`daemon.lock` also names the build. From v2.0.1 on, each release binary has a build provenance
+attestation; check a downloaded file against the workflow, the tag and its exact commit with
 
 ```sh
 gh attestation verify magic-mouse-daemon-x86_64-linux -R 2strange/omarchy-magicmouse \
-  --signer-workflow 2strange/omarchy-magicmouse/.github/workflows/release.yml --source-ref refs/tags/v2.0.1
+  --signer-workflow 2strange/omarchy-magicmouse/.github/workflows/release.yml \
+  --source-ref refs/tags/v2.0.1 --source-digest "$(git rev-list -n1 v2.0.1)" --deny-self-hosted-runners
 ```
 
-`install.sh --build` builds it with cargo instead, `install.sh --python` installs the Python daemon.
+`install.sh --build` builds the daemon with your Rust toolchain instead (the source is this
+commit and `Cargo.lock`, the bytes are your build), `install.sh --python` installs the Python daemon.
 
 Pair the mouse over Bluetooth as usual; the daemon waits for it and takes it over whenever
 it connects. **After the first install, turn each mouse off and on once**: the driver reads
@@ -309,7 +310,7 @@ walks to each directory without following symlinks, writes to an exclusive tempo
 verifies it, renames it into place atomically and prints SHA-256 digests that `install.sh`
 re-checks as your user. No group changes, no sudoers entries. The one download is the
 daemon binary (see Install): fetched with `curl` over HTTPS only, checked against the
-release's SHA-256 before it is installed, never run by the installer. The daemon runs as your user and talks only to the mouse, `/dev/uinput`
+SHA-256 pinned in `daemon.lock` before it is installed, then started as your user service. The daemon runs as your user and talks only to the mouse, `/dev/uinput`
 and Hyprland's socket.
 
 More detail on the file handling: `config.toml` and the status file are read and written
