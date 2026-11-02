@@ -1,6 +1,7 @@
 //! The touch and pointer engine (Python: `class Engine`, v1.4.1), ported 1:1: same arithmetic in
 //! the same order, same state transitions, same calls on the outside world. Owner: Henry.
 use std::collections::{BTreeSet, VecDeque};
+use std::io::Write as _;
 
 use serde_json::json;
 
@@ -144,6 +145,8 @@ pub struct Engine {
     pub actions: Box<dyn Actions>,
     pub verbose: bool,
     pub probe: Option<Box<dyn ProbeSink>>,
+    /// --record: raw input events, one "ts type code value" line each
+    pub record: Option<Box<dyn std::io::Write>>,
     pub vpad: Option<Box<dyn TouchpadOut>>,
     pub tp_key: Option<Key>,
     pub tp_pair_n: i64,
@@ -195,6 +198,8 @@ pub struct Engine {
     pub fw_seen: bool,
     pub fw_slot_ok: bool,
     pub fw_cache: (f64, String),
+    /// report_undeciphered in sysfs (UNDECIPHERED); None = counts as missing (replay)
+    pub undeciphered: Option<std::path::PathBuf>,
     pub parked_touch: OMap<i64, Touch>,
     pub pending_lift: Option<f64>,
     pub touches: OMap<i64, Touch>,
@@ -242,6 +247,7 @@ impl Engine {
             actions,
             verbose,
             probe: None,
+            record: None,
             vpad: None,
             tp_key: None,
             tp_pair_n: 0,
@@ -289,6 +295,7 @@ impl Engine {
             fw_seen: false,
             fw_slot_ok: false,
             fw_cache: (-1.0, String::new()),
+            undeciphered: Some(UNDECIPHERED.into()),
             parked_touch: OMap::new(),
             pending_lift: None,
             touches: OMap::new(),
@@ -356,6 +363,26 @@ impl Engine {
 
     pub fn set_probe(&mut self, probe: Option<Box<dyn ProbeSink>>) {
         self.probe = probe;
+    }
+
+    /// --record (Python `eng.record`): every input event is written there before it is processed.
+    pub fn set_record(&mut self, w: Option<Box<dyn std::io::Write>>) {
+        self.record = w;
+    }
+
+    /// ((x_min, x_max), (y_min, y_max), res_x): the touch surface, for VPad::new.
+    pub fn surface(&self) -> ((i32, i32), (i32, i32), f64) {
+        ((self.x_min as i32, self.x_max as i32), (self.y_min as i32, self.y_max as i32), self.res_x)
+    }
+
+    /// Python `bool(eng.touches)`: a finger is on the mouse (the probe follows that mouse).
+    pub fn has_touches(&self) -> bool {
+        !self.touches.is_empty()
+    }
+
+    /// Where report_undeciphered is read (fw_status, for the probe); None = it counts as missing.
+    pub fn set_undeciphered_path(&mut self, p: Option<std::path::PathBuf>) {
+        self.undeciphered = p;
     }
 
     pub fn coasting(&self) -> bool {
@@ -505,6 +532,9 @@ impl Engine {
 
     // ---- event intake
     pub fn feed(&mut self, ev: Event) {
+        if let Some(r) = self.record.as_mut() {
+            let _ = writeln!(r, "{:.6} {} {} {}", ev.ts, ev.kind, ev.code, ev.value);
+        }
         if ev.kind == EV_SYN {
             if ev.code == SYN_DROPPED {
                 self.dropped = true;
@@ -698,9 +728,11 @@ impl Engine {
             "active"
         } else {
             let ready = self.dev.as_ref().is_some_and(|d| d.has_msc_raw());
-            let switched = std::fs::read_to_string(UNDECIPHERED)
-                .map(|s| matches!(s.trim(), "Y" | "1"))
-                .unwrap_or(false);
+            let switched = self
+                .undeciphered
+                .as_ref()
+                .and_then(|p| std::fs::read_to_string(p).ok())
+                .is_some_and(|s| matches!(s.trim(), "Y" | "1"));
             if ready {
                 "ready"
             } else if switched {
