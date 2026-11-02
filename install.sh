@@ -66,7 +66,7 @@ daemon_download() {
   [ -f "$here/daemon.lock" ] || { say "no daemon.lock in this checkout"; return 1; }
   local pins
   pins="$(grep -v '^[[:space:]]*\(#\|$\)' "$here/daemon.lock")"
-  [ "$(printf '%s\n' "$pins" | wc -l)" = 1 ] || die "daemon.lock must pin exactly one daemon: not installing anything"
+  [ -n "$pins" ] && [ "$(printf '%s\n' "$pins" | wc -l)" = 1 ] || die "daemon.lock must pin exactly one daemon: not installing anything"
   read -r tag asset want extra <<<"$pins"
   [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.+-][0-9A-Za-z.-]+)?$ && $asset =~ ^[A-Za-z0-9._-]+$ \
      && $want =~ ^[0-9a-f]{64}$ && -z $extra ]] || die "daemon.lock is malformed: not installing anything"

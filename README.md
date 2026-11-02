@@ -196,11 +196,16 @@ omarchy plugin add https://github.com/2strange/omarchy-magicmouse --enable
 The installer downloads the one daemon pinned in [`daemon.lock`](daemon.lock) (release tag,
 asset, SHA-256) over HTTPS and checks it against the SHA-256 **in that file**, not against
 anything in the release, before installing it to `~/.local/bin`. So the commit you install
-decides the exact bytes; a changed release cannot change them, it only makes the install stop.
+decides the exact bytes; a changed release cannot change them: a different file stops the
+install, and a missing one makes it build from this checkout's source instead.
 It never runs the download, and the daemon never runs as root. `daemon.lock` also names the
-build: v2.0.0 was built by the [release workflow run](https://github.com/2strange/omarchy-magicmouse/actions/runs/41421554038)
-from tag v2.0.0, whose log shows the same digest; later releases also carry a build provenance
-attestation (`gh attestation verify magic-mouse-daemon-x86_64-linux -R 2strange/omarchy-magicmouse`). `install.sh --build` builds it with cargo
+build. From v2.0.1 on, each release binary has a build provenance attestation; check a
+downloaded file with
+
+```sh
+gh attestation verify magic-mouse-daemon-x86_64-linux -R 2strange/omarchy-magicmouse \
+  --signer-workflow 2strange/omarchy-magicmouse/.github/workflows/release.yml --source-ref refs/tags/v2.0.1
+``` `install.sh --build` builds it with cargo
 instead, `install.sh --python` installs the Python daemon.
 
 Pair the mouse over Bluetooth as usual; the daemon waits for it and takes it over whenever
