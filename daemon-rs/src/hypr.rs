@@ -608,7 +608,12 @@ pub fn step_fallback(forward: bool, cfg: &Config) -> String {
 
 // --------------------------------------------------------------------------- vpad
 
-/// Python `vpad_lua(cfg)`: Hyprland settings for the virtual touchpad only.
+/// Every mouse has its own virtual touchpad, all with the same name; Hyprland names the second one
+/// "...-1", the third "...-2". A rule for the plain name only would leave them on the global touchpad
+/// settings (the built-in trackpad's, e.g. 4x the scroll speed), so cover them all (Python `VPAD_HYPR_NAMES`).
+pub const VPAD_HYPR_SUFFIXES: [&str; 4] = ["", "-1", "-2", "-3"];
+
+/// Python `vpad_lua(cfg)`: Hyprland settings for the virtual touchpads only.
 pub fn vpad_lua(cfg: &Config) -> String {
     let natural = if cfg_get(cfg, "scroll", "natural").is_some_and(py_truthy) {
         "true"
@@ -616,9 +621,15 @@ pub fn vpad_lua(cfg: &Config) -> String {
         "false"
     };
     let factor = py_fmt4(cfg.f("touchpad", "scroll_speed") / TP_SCROLL_GAIN);
-    format!(
-        r#"hl.device({{ name = "{VPAD_HYPR}", scroll_factor = {factor}, natural_scroll = {natural}, tap_to_click = false }})"#
-    )
+    VPAD_HYPR_SUFFIXES
+        .iter()
+        .map(|sfx| {
+            format!(
+                r#"hl.device({{ name = "{VPAD_HYPR}{sfx}", scroll_factor = {factor}, natural_scroll = {natural}, tap_to_click = false }})"#
+            )
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// Python `f"{x:.4f}"`.
@@ -716,22 +727,29 @@ mod tests {
             } else {
                 "false"
             };
-            assert_eq!(
-                vpad_lua(&cfg(&e)),
-                format!(
-                    r#"hl.device({{ name = "magic-mouse-virtual-touchpad", scroll_factor = {factor}, natural_scroll = {nat}, tap_to_click = false }})"#
-                )
-            );
+            let want: Vec<String> = ["", "-1", "-2", "-3"]
+                .iter()
+                .map(|sfx| {
+                    format!(
+                        r#"hl.device({{ name = "magic-mouse-virtual-touchpad{sfx}", scroll_factor = {factor}, natural_scroll = {nat}, tap_to_click = false }})"#
+                    )
+                })
+                .collect();
+            assert_eq!(vpad_lua(&cfg(&e)), want.join(" "));
         }
         // an integer scroll_speed and a truthy integer natural, as Python float()/bool()
         let c = cfg(&[
             ("touchpad", "scroll_speed", toml::Value::Integer(3)),
             ("scroll", "natural", toml::Value::Integer(1)),
         ]);
-        assert_eq!(
-            vpad_lua(&c),
+        let lua = vpad_lua(&c);
+        assert!(lua.starts_with(
             r#"hl.device({ name = "magic-mouse-virtual-touchpad", scroll_factor = 1.5000, natural_scroll = true, tap_to_click = false })"#
-        );
+        ));
+        // the second mouse's touchpad, as Hyprland names it, gets the same settings
+        assert!(lua.contains(
+            r#"hl.device({ name = "magic-mouse-virtual-touchpad-1", scroll_factor = 1.5000, natural_scroll = true, tap_to_click = false })"#
+        ));
     }
 
     #[test]

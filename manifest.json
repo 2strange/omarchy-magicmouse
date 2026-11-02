@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.2strange.magicmouse",
   "name": "MagicMouse",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": "2strange",
   "license": "MIT",
   "description": "Apple Magic Mouse that feels like on a Mac, about 98%: touchpad-style scrolling with glide, live workspace swipe, Apple's pointer curve, edge and palm rejection, several mice, battery in the bar and in Bluetooth. Since 1.4 touch is clean: the mouse reports hover versus touch itself, a byte the hid_magicmouse driver drops unless install.sh turns on its report_undeciphered option. 2.0 is rewritten in Rust: one small binary, about 1% CPU while scrolling on a Late 2013 MacBook Pro (1.x: about 5%).",
