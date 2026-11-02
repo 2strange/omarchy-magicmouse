@@ -1,0 +1,81 @@
+# Release: on a tag v<manifest version>, test the Rust daemon, check it against the Python
+# daemon's golden traces, build a static x86_64 binary and attach it (plus its SHA-256) to
+# the GitHub release of that tag. install.sh downloads exactly these two assets.
+#
+# Static musl build: no glibc symbol versions, so the binary runs on any x86_64 Linux,
+# whatever glibc the runner or the user has. All dependencies are pure Rust (no C code),
+# and the daemon is mostly asleep in poll(2), so musl's slower malloc does not matter.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}  # build and test only; uploads happen for tags
+
+permissions:
+  contents: write  # create the release / upload assets
+
+env:
+  CARGO_TERM_COLOR: always
+  TARGET: x86_64-unknown-linux-musl
+  ASSET: magic-mouse-daemon-x86_64-linux
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Tag matches manifest.json
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          want="v$(python3 -c 'import json; print(json.load(open("manifest.json"))["version"])')"
+          [ "$GITHUB_REF_NAME" = "$want" ] || { echo "::error::tag $GITHUB_REF_NAME, manifest.json says $want"; exit 1; }
+
+      - name: Toolchain
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add "$TARGET"
+
+      - name: Unit tests
+        working-directory: daemon-rs
+        run: cargo test --locked
+
+      - name: Release build (static)
+        working-directory: daemon-rs
+        run: |
+          cargo build --release --locked --target "$TARGET"
+          file "target/$TARGET/release/magic-mouse-daemon" | tee /dev/stderr | grep -q 'statically linked'
+
+      - name: Golden traces (Python v1.4.1 behaviour)
+        # compare.py needs only the standard library; python-evdev is needed by golden.py
+        # alone (regenerating the traces, or naming the input line of a divergence).
+        run: >
+          python3 tools/compare.py --golden daemon-rs/tests/golden
+          --run "daemon-rs/target/$TARGET/release/magic-mouse-daemon" --exact
+
+      - name: Assets
+        run: |
+          mkdir dist
+          cp "daemon-rs/target/$TARGET/release/magic-mouse-daemon" "dist/$ASSET"
+          (cd dist && sha256sum "$ASSET" > "$ASSET.sha256" && cat "$ASSET.sha256")
+
+      - name: Attach to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "dist/$ASSET" "dist/$ASSET.sha256" \
+              --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
+          fi
+
+      - name: Keep the build (manual runs)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: ${{ env.ASSET }}
+          path: dist/

@@ -110,9 +110,14 @@ only). Nothing is sent while no preview is connected; `--no-probe` turns it off.
 ## Requirements
 
 - Omarchy 4 with Hyprland 0.56 or newer (Lua config).
-- `python-evdev` (the installer adds it) and the in-kernel `hid_magicmouse` driver.
-- `python-gobject` for the battery in Bluetooth settings (on Omarchy already there, the
-  installer adds it otherwise; without it that one feature is off).
+- The in-kernel `hid_magicmouse` driver, `curl` and `python3` (both on Omarchy; `python3`
+  runs the installer's root step and the bar widget's status reader).
+- Nothing else: the daemon is one prebuilt binary (x86_64, statically linked), downloaded
+  by the installer from this plugin's GitHub release. You do not need Rust.
+- Other machines, or no network: with `cargo` installed the installer builds the daemon
+  from `daemon-rs/` instead. Without either it falls back to the Python daemon of 1.x,
+  which needs `python-evdev` and, for the battery in Bluetooth settings, `python-gobject`
+  (the installer adds both in that case only).
 - **For the workspace swipe in touchpad mode,** Hyprland needs a three-finger workspace
   gesture. Omarchy ships it commented out in `~/.config/hypr/input.lua`; remove the `--`
   in front of
@@ -134,6 +139,12 @@ omarchy plugin add https://github.com/2strange/omarchy-magicmouse --enable
 # 2. the daemon, its user service, a udev rule and a driver option (asks for your password once)
 ~/.config/omarchy/plugins/io.github.2strange.magicmouse/install.sh
 ```
+
+The installer downloads the daemon for the plugin's version
+(`magic-mouse-daemon-x86_64-linux` from the release `v<version>`) over HTTPS and checks it
+against the release's SHA-256 before installing it to `~/.local/bin`; it never runs the
+download, and the daemon never runs as root. `install.sh --build` builds it with cargo
+instead, `install.sh --python` installs the Python daemon.
 
 Pair the mouse over Bluetooth as usual; the daemon waits for it and takes it over whenever
 it connects. **After the first install, turn each mouse off and on once**: the driver reads
@@ -219,8 +230,9 @@ your Hyprland input config stay; delete them by hand for a clean slate.
 
 | Path | What |
 |---|---|
-| `~/.local/bin/magic-mouse-daemon`, `magic-mouse-config`, `magic-mouse-battery-query` | the daemon and its two helpers |
-| `~/.config/systemd/user/magic-mouse.service` | user service, enabled and started |
+| `~/.local/bin/magic-mouse-daemon` | the daemon (the release binary, a local build, or the Python fallback) |
+| `~/.local/bin/magic-mouse-config`, `magic-mouse-battery-query` (+ `.py`) | its two helpers; the `.py` versions serve the Python fallback |
+| `~/.config/systemd/user/magic-mouse.service` | user service, enabled and (re)started |
 | `~/.config/magic-mouse/config.toml` | your settings (only created if missing) |
 | `~/.config/hypr/input.lua` (or `input.conf`) | a 7-line device block, **appended only after asking**, with a backup |
 | `/etc/udev/rules.d/70-magic-mouse.rules` | a `uaccess` rule for the mouse's input and raw HID nodes and for `/dev/uinput`, matched by device ID |
@@ -232,8 +244,9 @@ embedded in `install.sh` and handed to the distro's `python3` on the command lin
 is in memory before `sudo` runs. It carries the exact bytes of the three `/etc` files,
 walks to each directory without following symlinks, writes to an exclusive temporary file,
 verifies it, renames it into place atomically and prints SHA-256 digests that `install.sh`
-re-checks as your user. No group changes, no sudoers entries, nothing downloaded at
-install time. The daemon runs as your user and talks only to the mouse, `/dev/uinput`
+re-checks as your user. No group changes, no sudoers entries. The one download is the
+daemon binary (see Install): fetched with `curl` over HTTPS only, checked against the
+release's SHA-256 before it is installed, never run by the installer. The daemon runs as your user and talks only to the mouse, `/dev/uinput`
 and Hyprland's socket.
 
 More detail on the file handling: `config.toml` and the status file are read and written
@@ -244,8 +257,15 @@ short-lived child (`status-reader.py`) under `timeout`, never inside the shell.
 ## Development
 
 ```sh
-/usr/bin/python3 -m unittest discover -s tests -v
+/usr/bin/python3 -m unittest discover -s tests -v                  # Python daemon (1.x reference)
+(cd daemon-rs && cargo test)                                       # Rust daemon
+(cd daemon-rs && cargo build --release) && python3 tools/compare.py \
+  --golden daemon-rs/tests/golden --run daemon-rs/target/release/magic-mouse-daemon --exact
 ```
+
+The golden traces pin the Rust daemon to the Python daemon's behaviour. A tag `v<version>`
+(matching `manifest.json`) runs `.github/workflows/release.yml`: tests, golden traces, a
+static musl build, and the binary plus `.sha256` attached to the release.
 
 The tests drive the daemon's engine with synthetic touch frames (touch tracking, touch
 check, the mouse's contact state, touchpad mode and the swipe pair, workspace ends).

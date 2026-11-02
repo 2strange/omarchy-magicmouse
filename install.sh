@@ -13,27 +13,105 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 say() { printf '\033[1;32m==>\033[0m %s\n' "$*"; }
 die() { printf '\033[1;31m==> error:\033[0m %s\n' "$*" >&2; exit 1; }
 ASSUME_YES=0
-for arg in "$@"; do case "$arg" in --yes|-y) ASSUME_YES=1 ;; -h|--help) echo "Usage: ./install.sh [--yes]"; exit 0 ;; esac; done
+MODE=auto  # auto: release binary, else local cargo build, else the Python daemon
+usage() {
+  cat <<'USAGE'
+Usage: ./install.sh [--yes] [--build | --python]
+  --yes      do not ask before appending the Hyprland snippet
+  --build    build the daemon from daemon-rs/ with cargo instead of downloading it
+  --python   install the Python daemon (bin/magic-mouse-daemon, needs python-evdev)
+USAGE
+}
+for arg in "$@"; do case "$arg" in
+  --yes|-y) ASSUME_YES=1 ;;
+  --build) MODE=build ;;
+  --python) MODE=python ;;
+  -h|--help) usage; exit 0 ;;
+  *) usage >&2; die "unknown option: $arg" ;;
+esac; done
 ask() {  # ask "question" -> 0 for yes
   (( ASSUME_YES )) && return 0
   if [ -t 0 ]; then read -r -p "$1 [Y/n] " a; [[ -z $a || $a =~ ^[Yy] ]]; else return 0; fi
 }
 
-if ! /usr/bin/python3 -c 'import evdev' 2>/dev/null; then
-  say "installing python-evdev"
-  if command -v omarchy >/dev/null 2>&1; then omarchy pkg add python-evdev; else sudo pacman -S --needed --noconfirm python-evdev; fi
-fi
+[ "$(id -u)" -ne 0 ] || die "run install.sh as your user, not as root (it asks for sudo itself, once)"
 
-if ! /usr/bin/python3 -c 'import gi' 2>/dev/null; then
-  say "installing python-gobject (battery in Bluetooth settings)"
-  if command -v omarchy >/dev/null 2>&1; then omarchy pkg add python-gobject; else sudo pacman -S --needed --noconfirm python-gobject; fi \
-    || say "python-gobject not installed: Bluetooth settings will not show the charge (the bar still does)"
-fi
+# ---------------------------------------------------------------------------
+# The daemon. 2.0 is one Rust binary; users do not need Rust. In order:
+#   1. the prebuilt binary attached to the GitHub release of this plugin's version
+#      (manifest.json), over HTTPS, checked against the release's SHA-256 before it is
+#      made executable or installed; it is never run here, and never as root;
+#   2. a local build with cargo, when cargo is installed (daemon-rs/);
+#   3. the Python daemon (bin/magic-mouse-daemon) with python-evdev, as up to 1.4.
+# ---------------------------------------------------------------------------
+REPO="2strange/omarchy-magicmouse"
+ASSET="magic-mouse-daemon-x86_64-linux"
+dest="$HOME/.local/bin/magic-mouse-daemon"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
 
-say "daemon -> ~/.local/bin/magic-mouse-daemon"
-install -Dm755 "$here/bin/magic-mouse-daemon" "$HOME/.local/bin/magic-mouse-daemon"
-install -Dm755 "$here/bin/magic-mouse-config" "$HOME/.local/bin/magic-mouse-config"
-install -Dm755 "$here/bin/magic-mouse-battery-query" "$HOME/.local/bin/magic-mouse-battery-query"
+put_daemon() {  # put_daemon file: atomic replace, also while the old daemon runs (no "text file busy")
+  mkdir -p "$(dirname "$dest")"
+  install -m755 "$1" "$dest.new.$$" && mv -f "$dest.new.$$" "$dest" || { rm -f "$dest.new.$$"; return 1; }
+}
+
+pkg_add() {  # pkg_add package
+  if command -v omarchy >/dev/null 2>&1; then omarchy pkg add "$1"; else sudo pacman -S --needed --noconfirm "$1"; fi
+}
+
+daemon_download() {
+  [ "$(uname -m)" = x86_64 ] || { say "no prebuilt daemon for $(uname -m)"; return 1; }
+  command -v curl >/dev/null 2>&1 || { say "curl is missing: cannot download the daemon"; return 1; }
+  local version url
+  version="$(/usr/bin/python3 -I -c 'import json, sys; print(json.load(open(sys.argv[1]))["version"])' "$here/manifest.json")" \
+    || { say "cannot read the version from manifest.json"; return 1; }
+  [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+([.+-][0-9A-Za-z.-]+)?$ ]] || { say "odd version in manifest.json: $version"; return 1; }
+  url="https://github.com/$REPO/releases/download/v$version/$ASSET"
+  say "downloading the daemon $version: $url"
+  local get=(curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location --retry 2 --max-time 120)
+  "${get[@]}" -o "$tmp/$ASSET" "$url" && "${get[@]}" -o "$tmp/$ASSET.sha256" "$url.sha256" \
+    || { say "download failed (no release asset for v$version, or offline)"; return 1; }
+  local want got
+  want="$(head -c 64 "$tmp/$ASSET.sha256")"
+  [[ $want =~ ^[0-9a-f]{64}$ ]] || { say "the downloaded .sha256 is not a SHA-256 sum"; return 1; }
+  got="$(sha256sum "$tmp/$ASSET" | cut -d' ' -f1)"
+  [ "$got" = "$want" ] || { say "checksum mismatch for $ASSET (got $got, want $want): not installing it"; return 1; }
+  [ "$(head -c 4 "$tmp/$ASSET" | od -An -c | tr -d ' ')" = '177ELF' ] || { say "$ASSET is not an ELF binary: not installing it"; return 1; }
+  put_daemon "$tmp/$ASSET" || return 1
+  say "daemon $version (SHA-256 $got) -> ~/.local/bin/magic-mouse-daemon"
+}
+
+daemon_build() {
+  [ -f "$here/daemon-rs/Cargo.toml" ] || { say "no daemon-rs/ in this checkout"; return 1; }
+  command -v cargo >/dev/null 2>&1 || { say "cargo is missing: cannot build the daemon"; return 1; }
+  say "building the daemon with cargo (a few minutes)"
+  cargo build --release --locked --manifest-path "$here/daemon-rs/Cargo.toml" || { say "cargo build failed"; return 1; }
+  put_daemon "$here/daemon-rs/target/release/magic-mouse-daemon" || return 1
+  say "daemon (built here) -> ~/.local/bin/magic-mouse-daemon"
+}
+
+daemon_python() {
+  if ! /usr/bin/python3 -c 'import evdev' 2>/dev/null; then
+    say "installing python-evdev"
+    pkg_add python-evdev || die "could not install python-evdev"
+  fi
+  if ! /usr/bin/python3 -c 'import gi' 2>/dev/null; then
+    say "installing python-gobject (battery in Bluetooth settings)"
+    pkg_add python-gobject || say "python-gobject not installed: Bluetooth settings will not show the charge (the bar still does)"
+  fi
+  put_daemon "$here/bin/magic-mouse-daemon" || die "could not install the daemon to $dest"
+  say "Python daemon -> ~/.local/bin/magic-mouse-daemon"
+}
+
+case "$MODE" in
+  auto) daemon_download || daemon_build || { say "falling back to the Python daemon"; daemon_python; } ;;
+  build) daemon_build || die "could not build the daemon" ;;
+  python) daemon_python ;;
+esac
+# The helpers run whichever daemon is installed next to them (the .py ones for the Python daemon).
+for f in magic-mouse-config magic-mouse-config.py magic-mouse-battery-query magic-mouse-battery-query.py; do
+  install -Dm755 "$here/bin/$f" "$HOME/.local/bin/$f"
+done
 install -Dm644 "$here/config/magic-mouse.service" "$HOME/.config/systemd/user/magic-mouse.service"
 if [ ! -f "$HOME/.config/magic-mouse/config.toml" ]; then
   install -Dm644 "$here/config/config.toml" "$HOME/.config/magic-mouse/config.toml"
@@ -270,7 +348,8 @@ fi
 
 say "enabling magic-mouse.service (user)"
 systemctl --user daemon-reload
-systemctl --user enable --now magic-mouse.service
+systemctl --user enable magic-mouse.service
+systemctl --user restart magic-mouse.service  # a running daemon (maybe the old Python one) picks up the new one
 sleep 1
 systemctl --user --no-pager --lines=5 status magic-mouse.service || true
 
