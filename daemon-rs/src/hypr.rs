@@ -570,10 +570,8 @@ impl Actions for HyprActions {
         run_action(cmd);
     }
 
-    fn workspace_step(&mut self, forward: bool, cfg: &Config) {
-        let include_empty = cfg_get(cfg, "gestures", "include_empty").is_none_or(py_truthy);
-        let fallback = step_fallback(forward, cfg);
-        workspace_step(forward, &swipe_end(cfg), &fallback, include_empty);
+    fn workspace_step(&mut self, forward: bool, end: &str, fallback: &str, include_empty: bool) {
+        workspace_step(forward, end, fallback, include_empty);
     }
 }
 
