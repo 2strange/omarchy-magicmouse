@@ -310,7 +310,7 @@ pub fn run_action(cmd: &str) {
         ActionKind::Nothing => {}
         ActionKind::Hypr => {
             let cmd = cmd.to_owned();
-            std::thread::spawn(move || send_action(&cmd));
+            spawn_logged(move || send_action(&cmd));
         }
         ActionKind::Shell => {
             if let Err(exc) = spawn_shell(cmd) {
@@ -376,10 +376,17 @@ fn shell_command(cmd: &str) -> Command {
 fn spawn_shell(cmd: &str) -> std::io::Result<()> {
     let mut child = shell_command(cmd).spawn()?;
     // reap it, so no zombie stays behind (Python's Popen reaps on a later call)
-    std::thread::spawn(move || {
+    spawn_logged(move || {
         let _ = child.wait();
     });
     Ok(())
+}
+
+/// A detached helper thread; when the system cannot start one (EAGAIN), log and go on.
+fn spawn_logged(f: impl FnOnce() + Send + 'static) {
+    if let Err(exc) = std::thread::Builder::new().spawn(f) {
+        log(&format!("cannot start a helper thread: {exc}"));
+    }
 }
 
 /// One step at a time, so a quick second swipe sees the first one's result.
@@ -388,7 +395,7 @@ static WS_LOCK: Mutex<()> = Mutex::new(());
 /// Python `workspace_step(forward, end, fallback, include_empty)`: in a detached thread.
 pub fn workspace_step(forward: bool, end: &str, fallback: &str, include_empty: bool) {
     let (end, fallback) = (end.to_owned(), fallback.to_owned());
-    std::thread::spawn(move || {
+    spawn_logged(move || {
         let _g = WS_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         workspace_step_with(
             forward,

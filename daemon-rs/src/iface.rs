@@ -87,5 +87,6 @@ pub trait DeviceInfo {
 
 /// Python `log(msg)`: stderr with the daemon's prefix, picked up by journald.
 pub fn log(msg: &str) {
-    eprintln!("{msg}");
+    use std::io::Write;
+    let _ = writeln!(std::io::stderr(), "{msg}"); // a closed stderr must not kill a thread
 }

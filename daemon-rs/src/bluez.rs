@@ -276,6 +276,8 @@ fn e2s(e: impl std::fmt::Display) -> String {
 impl ZbusOps {
     /// System bus, with org.freedesktop.DBus.ObjectManager served at ROOT.
     pub fn connect() -> zbus::Result<Self> {
+        // No per-call timeout in zbus 4 (Python waited 2-5 s): a hung bluetoothd stalls only this
+        // worker thread; the daemon goes on and the queued set/clear wait (one per minute and mouse).
         let conn = Connection::system()?;
         conn.object_server().at(ROOT, zbus::fdo::ObjectManager)?;
         Ok(Self { conn })

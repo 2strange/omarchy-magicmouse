@@ -41,7 +41,9 @@ pub fn parse_value(raw: &str) -> Val {
         }
     }
     if let Ok(v) = t.parse::<f64>() {
-        return Val::Float(v);
+        if v.is_finite() {
+            return Val::Float(v); // nan/inf would write invalid TOML and reset the whole config
+        }
     }
     Val::Str(t.trim_matches('"').to_string())
 }

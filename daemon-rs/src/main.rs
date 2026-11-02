@@ -69,6 +69,19 @@ impl Output for SharedOut {
     }
 }
 
+/// --record: one line-buffered file shared by every Session (lines of two mice do not interleave).
+#[derive(Clone)]
+struct SharedRecord(Rc<RefCell<std::io::LineWriter<std::fs::File>>>);
+
+impl std::io::Write for SharedRecord {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.0.borrow_mut().write(buf)
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.0.borrow_mut().flush()
+    }
+}
+
 /// One grabbed Magic Mouse: its own Engine, battery and Hyprland settings for its touchpad.
 struct Session {
     dev: MagicMouse,
@@ -313,6 +326,13 @@ impl Loop {
 
 fn run(ui: &SharedOut, cfg_path: &Path, verbose: bool, probe: Option<Rc<RefCell<Probe>>>, hypr: &mut HyprEvents, bluez: Rc<BluezBattery>, record: Option<PathBuf>) {
     let start = Instant::now();
+    let record = record.and_then(|r| match std::fs::OpenOptions::new().append(true).create(true).open(&r) {
+        Ok(f) => Some(SharedRecord(Rc::new(RefCell::new(std::io::LineWriter::new(f))))),
+        Err(exc) => {
+            log(&format!("record: {}: {exc}", r.display()));
+            None
+        }
+    });
     let mut lp = Loop { sessions: BTreeMap::new(), active: None, probe };
     let mut cfg = config::load_config(cfg_path);
     let mut mtime = config::config_mtime(cfg_path);
@@ -330,10 +350,7 @@ fn run(ui: &SharedOut, cfg_path: &Path, verbose: bool, probe: Option<Rc<RefCell<
                 match Session::new(dev, ui, &cfg, verbose, bluez.clone(), now) {
                     Ok(mut s) => {
                         if let Some(r) = &record {
-                            match std::fs::OpenOptions::new().append(true).create(true).open(r) {
-                                Ok(f) => s.eng.set_record(Some(Box::new(f))),
-                                Err(exc) => log(&format!("record: {exc}")),
-                            }
+                            s.eng.set_record(Some(Box::new(r.clone())));
                         }
                         lp.sessions.insert(path.clone(), s);
                         if lp.active.is_none() {
@@ -471,7 +488,15 @@ fn main() {
     let (mut cfg_path, mut verbose, mut list, mut record, mut no_probe) = (default_config(), false, false, None, false);
     let (mut replay, mut probe_trace) = (None::<PathBuf>, false);
     let mut cfg_given = false;
-    let mut it = args.iter();
+    // argparse also takes --opt=value
+    let split: Vec<String> = args
+        .iter()
+        .flat_map(|a| match a.split_once('=') {
+            Some((k, v)) if a.starts_with("--") => vec![k.to_string(), v.to_string()],
+            _ => vec![a.clone()],
+        })
+        .collect();
+    let mut it = split.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
             "--config" => {
