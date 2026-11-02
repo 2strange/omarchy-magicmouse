@@ -5,7 +5,7 @@
   "version": "2.0.0",
   "author": "2strange",
   "license": "MIT",
-  "description": "Apple Magic Mouse that feels like on a Mac: touchpad-style scrolling and live workspace swipe, Apple's pointer curve, touch check against hover, edge and palm rejection, live touch preview, battery in the bar. About 98% of the real Mac feel. 2.0 is one 3 MB Rust binary with no dependencies, at about 1% CPU while scrolling on a 13-year-old MacBook Pro.",
+  "description": "Apple Magic Mouse that feels like on a Mac: touchpad-style scrolling and live workspace swipe, Apple's pointer curve, touch check against hover, edge and palm rejection, live touch preview, battery in the bar. About 98% of the real Mac feel. 2.0 is one small Rust binary with no Python packages, at about 1–1.5% CPU while scrolling on a 13-year-old MacBook Pro.",
   "kinds": [
     "bar-widget"
   ],

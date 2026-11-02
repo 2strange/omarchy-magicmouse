@@ -30,18 +30,18 @@ touches. No kernel patch. The size rules stay as the fallback when the switch is
 ### 2.0: the same daemon, now in Rust
 
 Version 2.0 changes nothing you see or set: same settings, same panel, same feel. Underneath,
-the daemon is now one Rust binary of about 3 MB. No Python, no `python-evdev`, no
-`python-gobject` to install, nothing that a Python update can break.
+the daemon is now one small Rust binary. It needs no Python any more: no `python-evdev`, no
+`python-gobject`, nothing that a Python update can break.
 
 The daemon reads every report the mouse sends while a finger is on it, so it should be
 light. Measured on our Late 2013 MacBook Pro (Core i7-4850HQ, 13 years old):
 
 | | 1.x (Python) | 2.0 (Rust) |
 |---|---|---|
-| CPU while scrolling | about 15% | about 1–1.5% |
-| CPU while idle | 0% | 0% |
-| Memory | about 42 MB | about 6 MB |
-| Engine, 94,000 recorded touch events | 3.2 s | 0.36 s |
+| CPU while scrolling (one core) | about 15% | about 1–1.5% |
+| CPU while idle | – | 0% |
+| Resident memory | about 42 MB | about 6 MB |
+| Engine CPU time, 93,869 recorded touch events | 3.2 s | 0.36 s |
 
 A newer machine will need even less. The port is held to the Python daemon: 32 recorded and
 synthetic sessions must give exactly the same output (see Development).
