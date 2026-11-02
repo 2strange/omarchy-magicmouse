@@ -1198,8 +1198,8 @@ class VPad:
 # Every mouse has its own virtual touchpad, all with the same name; Hyprland names the second one
 # "...-1", the third "...-2" (the lowest free number). A rule for the plain name only would leave
 # them on the global touchpad settings (the built-in trackpad's, e.g. 4x the scroll speed), so
-# cover up to eight mice (Rust VPAD_HYPR_SUFFIXES).
-VPAD_HYPR_NAMES = [VPAD_HYPR] + [f"{VPAD_HYPR}-{i}" for i in range(1, 8)]
+# cover up to four mice (Rust VPAD_HYPR_SUFFIXES).
+VPAD_HYPR_NAMES = [VPAD_HYPR] + [f"{VPAD_HYPR}-{i}" for i in range(1, 4)]
 
 
 def vpad_lua(cfg: dict) -> str:

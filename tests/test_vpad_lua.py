@@ -22,7 +22,7 @@ class VpadLua(unittest.TestCase):
         cfg = {"touchpad": {"scroll_speed": 3}, "scroll": {"natural": 1}}
         rules = [f'hl.device({{ name = "magic-mouse-virtual-touchpad{sfx}", scroll_factor = 1.5000, '
                  f'natural_scroll = true, tap_to_click = false }})'
-                 for sfx in ["", "-1", "-2", "-3", "-4", "-5", "-6", "-7"]]
+                 for sfx in ["", "-1", "-2", "-3"]]
         self.assertEqual(daemon.vpad_lua(cfg), " ".join(rules))
 
 
