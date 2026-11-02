@@ -1,0 +1,7 @@
+[touchpad]
+swipe_gain = 4.0
+swipe_reverse = true
+[scroll]
+touch_reverse_mm = 0.0
+touch_straight = 0.0
+touch_start_size = 0

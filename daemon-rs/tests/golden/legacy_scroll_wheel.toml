@@ -1,0 +1,10 @@
+[touchpad]
+enabled = false
+[scroll]
+natural = false
+invert_x = true
+speed = 1.7
+accel = 0.0
+start_mm = 0.2
+[gestures]
+swipe_pages = false

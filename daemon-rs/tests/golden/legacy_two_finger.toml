@@ -1,0 +1,5 @@
+[touchpad]
+enabled = false
+[gestures]
+double_tap = "dispatch zoom"
+two_finger_double_tap = "notify-send overview"

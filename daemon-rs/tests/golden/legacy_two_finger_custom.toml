@@ -1,0 +1,7 @@
+[touchpad]
+enabled = false
+[gestures]
+invert_swipe = true
+swipe_mm = 6.0
+two_finger_swipe_left = "notify-send left"
+swipe_end = "stop"

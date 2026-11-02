@@ -1,0 +1,339 @@
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,0,600,400,"grip",0,-1],[102,0,1900,600,400,"palm",0,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.0,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,0,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.011,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,0,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.022,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,0,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.033,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,0,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.044,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,0,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.055,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,0,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.066,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,25,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.077,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,50,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.088,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,75,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.099,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,100,600,400,"grip",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.11,"why":"only grip fingers","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[101,-1080,125,600,400,"rest",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.121,"why":"fingers resting","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:106.000000
+S
+B {"axis":"y","c":[[101,-1080,150,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.132,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:143.500000
+S
+B {"axis":"y","c":[[101,-1080,175,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.143,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:174.750000
+S
+B {"axis":"y","c":[[101,-1080,200,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.154,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:202.875000
+S
+B {"axis":"y","c":[[101,-1080,225,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.165,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:229.437500
+S
+B {"axis":"y","c":[[101,-1080,250,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.176,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:256.000000
+S
+B {"axis":"y","c":[[101,-1080,275,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.187,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:281.000000
+S
+B {"axis":"y","c":[[101,-1080,300,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.198,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:306.000000
+S
+B {"axis":"y","c":[[101,-1080,325,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.209,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:331.000000
+S
+B {"axis":"y","c":[[101,-1080,350,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.22,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:356.000000
+S
+B {"axis":"y","c":[[101,-1080,375,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.231,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:381.000000
+S
+B {"axis":"y","c":[[101,-1080,400,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.242,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:406.000000
+S
+B {"axis":"y","c":[[101,-1080,425,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.253,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:431.000000
+S
+B {"axis":"y","c":[[101,-1080,450,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.264,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:456.000000
+S
+B {"axis":"y","c":[[101,-1080,475,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.275,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:481.000000
+S
+B {"axis":"y","c":[[101,-1080,500,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.286,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:506.000000
+S
+B {"axis":"y","c":[[101,-1080,525,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.297,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:531.000000
+S
+B {"axis":"y","c":[[101,-1080,550,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.308,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:556.000000
+S
+B {"axis":"y","c":[[101,-1080,575,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.319,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:581.000000
+S
+B {"axis":"y","c":[[101,-1080,600,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.33,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:606.000000
+S
+B {"axis":"y","c":[[101,-1080,625,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.341,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:631.000000
+S
+B {"axis":"y","c":[[101,-1080,650,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.352,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:656.000000
+S
+B {"axis":"y","c":[[101,-1080,675,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.363,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:681.000000
+S
+B {"axis":"y","c":[[101,-1080,700,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.374,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,600,400,"follow",91,-1],[102,0,1900,600,400,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.385,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,160,80,"hover",91,-1],[102,0,1900,160,80,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.396,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,160,80,"hover",91,-1],[102,0,1900,160,80,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.407,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,160,80,"hover",91,-1],[102,0,1900,160,80,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.418,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,160,80,"hover",91,-1],[102,0,1900,160,80,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.429,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,160,80,"hover",91,-1],[102,0,1900,160,80,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.44,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,160,80,"hover",91,-1],[102,0,1900,160,80,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.451,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,160,80,"hover",91,-1],[102,0,1900,160,80,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.462,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 101:-1080.000000:706.000000
+S
+B {"axis":"y","c":[[101,-1080,725,160,80,"hover",91,-1],[102,0,1900,160,80,"palm",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.473,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.484,"why":"no touch","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[103,200,-500,600,400,"hover",0,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1000.995,"why":"not touching yet (size 600)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[103,200,-500,600,400,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.006,"why":"not touching yet (size 600)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[103,200,-500,600,400,"rest",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.017,"why":"fingers resting","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[103,200,-500,600,400,"rest",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.028,"why":"fingers resting","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[103,200,-500,600,400,"rest",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.039,"why":"fingers resting","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-519.000000
+S
+B {"axis":"y","c":[[103,200,-460,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.05,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-459.000000
+S
+B {"axis":"y","c":[[103,200,-420,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.061,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-409.000000
+S
+B {"axis":"y","c":[[103,200,-380,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.072,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-364.000000
+S
+B {"axis":"y","c":[[103,200,-340,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.083,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-321.500000
+S
+B {"axis":"y","c":[[103,200,-300,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.094,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-280.250000
+S
+B {"axis":"y","c":[[103,200,-260,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.105,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-239.000000
+S
+B {"axis":"y","c":[[103,200,-220,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.116,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-199.000000
+S
+B {"axis":"y","c":[[103,200,-180,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.127,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 103:200.000000:-159.000000
+S
+B {"axis":"y","c":[[103,200,-140,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.138,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.149,"why":"no touch","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[104,200,-100,600,400,"hover",0,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.16,"why":"not touching yet (size 600)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[104,200,-60,600,400,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.171,"why":"not touching yet (size 600)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:200.000000:-119.000000
+S
+B {"axis":"y","c":[[104,200,-20,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.182,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:200.000000:-39.000000
+S
+B {"axis":"y","c":[[104,200,20,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.193,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:200.000000:21.000000
+S
+B {"axis":"y","c":[[104,200,60,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.204,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:200.000000:71.000000
+S
+B {"axis":"y","c":[[104,200,100,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.215,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:200.000000:116.000000
+S
+B {"axis":"y","c":[[104,200,140,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.226,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:200.000000:158.500000
+S
+B {"axis":"y","c":[[104,200,180,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.237,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:200.000000:199.750000
+S
+B {"axis":"y","c":[[104,200,220,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.248,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:200.000000:241.000000
+S
+B {"axis":"y","c":[[104,200,260,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.259,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,600,400,"hover",0,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.27,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,600,400,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.281,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.292,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,600,400,"follow",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.303,"why":"touchpad: 1 finger -> 2 (scroll)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,160,80,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.314,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,160,80,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.325,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,160,80,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.336,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,160,80,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.347,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,160,80,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.358,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,160,80,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.369,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,160,80,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.38,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 104:781.000000:281.000000
+S
+B {"axis":"y","c":[[104,800,300,160,80,"hover",91,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.391,"why":"touchpad: 1 finger -> 2 (scroll) held","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.402,"why":"no touch","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,-100,200,120,"hover",0,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.913,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,-80,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.943,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,-60,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1001.973,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,-40,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.003,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,-20,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.033,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,0,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.063,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,20,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.093,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,40,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.123,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,60,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.153,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,80,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.183,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,100,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.213,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,120,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.243,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,140,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.273,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,160,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.303,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,180,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.333,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,200,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.363,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,220,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.393,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,240,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.423,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,260,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.453,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,280,200,120,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.483,"why":"not touching yet (size 200)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,600,0,"hover",33,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.513,"why":"not touching yet (size 0)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,160,80,"hover",45,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.524,"why":"not touching yet (size 160)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,160,80,"hover",54,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.535,"why":"not touching yet (size 160)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,160,80,"hover",61,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.546,"why":"not touching yet (size 160)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,160,80,"hover",67,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.557,"why":"not touching yet (size 160)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,160,80,"hover",72,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.568,"why":"not touching yet (size 160)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,160,80,"hover",76,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.579,"why":"not touching yet (size 160)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,160,80,"hover",79,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.59,"why":"not touching yet (size 160)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[[105,0,300,160,80,"hover",81,-1]],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.601,"why":"not touching yet (size 160)","zones":[3.0,3.0,2.0,18.0]}
+P 2.700000 0 -
+S
+B {"axis":"y","c":[],"coast":false,"fw":"off","moving":false,"scroll":false,"t":1002.612,"why":"no touch","zones":[3.0,3.0,2.0,18.0]}

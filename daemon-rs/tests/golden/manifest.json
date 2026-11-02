@@ -1,0 +1,258 @@
+[
+ {
+  "name": "click",
+  "events": "click.events",
+  "trace": "click.trace",
+  "config": null,
+  "probe": false,
+  "sha256": "37c27c14a46ae038981b033e9190862e73faaf90802e033054758d8937db7d14"
+ },
+ {
+  "name": "click_mapped",
+  "events": "click_mapped.events",
+  "trace": "click_mapped.trace",
+  "config": "click_mapped.toml",
+  "probe": false,
+  "sha256": "56394e5a7b4cec3b6cab5cd90ef0fb7cee5c8e2acd271438101d2c39a0f33b04"
+ },
+ {
+  "name": "control_click",
+  "events": "control_click.events",
+  "trace": "control_click.trace",
+  "config": "control_click.toml",
+  "probe": false,
+  "sha256": "69d0f892171003a6b99c279325e52067aae2d480879a1be681052d5359b168ad"
+ },
+ {
+  "name": "control_click_off",
+  "events": "control_click_off.events",
+  "trace": "control_click_off.trace",
+  "config": null,
+  "probe": false,
+  "sha256": "6d0079346d221a33f94ddf14483a2a5d4ec742c91e041c2d6023fedf8db3baea"
+ },
+ {
+  "name": "edges_touchpad",
+  "events": "edges_touchpad.events",
+  "trace": "edges_touchpad.trace",
+  "config": null,
+  "probe": true,
+  "sha256": "69215fbd426cd0817316fc3491ee3199b858a1e6da556b9bb45ba8cae357f869"
+ },
+ {
+  "name": "legacy_edges",
+  "events": "legacy_edges.events",
+  "trace": "legacy_edges.trace",
+  "config": "legacy_edges.toml",
+  "probe": true,
+  "sha256": "ab1da58fc4a7febb13b8135a2e895628406d86c970e90ce5e0789789bf082b99"
+ },
+ {
+  "name": "legacy_free_axis",
+  "events": "legacy_free_axis.events",
+  "trace": "legacy_free_axis.trace",
+  "config": "legacy_free_axis.toml",
+  "probe": false,
+  "sha256": "478373fca5306050a262c7f79195b1c9dd3f66b08a4b19b3d1e63771f8721f3c"
+ },
+ {
+  "name": "legacy_fw",
+  "events": "legacy_fw.events",
+  "trace": "legacy_fw.trace",
+  "config": "legacy_fw.toml",
+  "probe": false,
+  "sha256": "afd75fe68059af5ece0e173096d37a6ba2014b13702c0cb0f0a4dc8b15b4f052"
+ },
+ {
+  "name": "legacy_long_coast",
+  "events": "legacy_long_coast.events",
+  "trace": "legacy_long_coast.trace",
+  "config": "legacy_long_coast.toml",
+  "probe": false,
+  "sha256": "7be60c8bf697bc96040728eb0aa23a67399810a0eda59ff1c993fb4c26077b44"
+ },
+ {
+  "name": "legacy_no_momentum",
+  "events": "legacy_no_momentum.events",
+  "trace": "legacy_no_momentum.trace",
+  "config": "legacy_no_momentum.toml",
+  "probe": false,
+  "sha256": "e0efda9d783353c316b4916117d6277fbb4d5d7bdc2185cde6444a3333ec4946"
+ },
+ {
+  "name": "legacy_scroll",
+  "events": "legacy_scroll.events",
+  "trace": "legacy_scroll.trace",
+  "config": "legacy_scroll.toml",
+  "probe": false,
+  "sha256": "ca1670c4c4e7f70155b30b8885e9f436ec19905adacca88908cf382edfbcd899"
+ },
+ {
+  "name": "legacy_scroll_wheel",
+  "events": "legacy_scroll_wheel.events",
+  "trace": "legacy_scroll_wheel.trace",
+  "config": "legacy_scroll_wheel.toml",
+  "probe": false,
+  "sha256": "4e9ae333539f05c474f12ea6feea519db371b297f8d51f15dee98fbf5700213d"
+ },
+ {
+  "name": "legacy_two_finger",
+  "events": "legacy_two_finger.events",
+  "trace": "legacy_two_finger.trace",
+  "config": "legacy_two_finger.toml",
+  "probe": false,
+  "sha256": "3471618d7ae26f99b2cabeccf98179576de59931e62f46ef5704b29759a2a244"
+ },
+ {
+  "name": "legacy_two_finger_custom",
+  "events": "legacy_two_finger_custom.events",
+  "trace": "legacy_two_finger_custom.trace",
+  "config": "legacy_two_finger_custom.toml",
+  "probe": false,
+  "sha256": "f7f11f3228988501089cb3cc87d337c217beb46c0c73be4d32cb682b6d863219"
+ },
+ {
+  "name": "rec_flicker",
+  "events": "rec_flicker.events",
+  "trace": "rec_flicker.trace",
+  "config": null,
+  "probe": true,
+  "sha256": "42f9763705fcf68decd0843bdabf53b3bb414bb34dd40dd5b4e82d806271271e"
+ },
+ {
+  "name": "rec_flicker_live",
+  "events": "rec_flicker.events",
+  "trace": "rec_flicker_live.trace",
+  "config": "rec_flicker_live.toml",
+  "probe": false,
+  "sha256": "ba7ebd4379f1a72e88bfd9d2b8726462e1689a4ae036e7024291a46c4eb5bd26"
+ },
+ {
+  "name": "rec_flicker_live_legacy",
+  "events": "rec_flicker.events",
+  "trace": "rec_flicker_live_legacy.trace",
+  "config": "rec_flicker_live_legacy.toml",
+  "probe": false,
+  "sha256": "44caacf828d7a07e9a455e49849e9e863bc815a4c8894f50d5dde382bdefddbf"
+ },
+ {
+  "name": "rec_hidraw",
+  "events": "rec_hidraw.events",
+  "trace": "rec_hidraw.trace",
+  "config": null,
+  "probe": true,
+  "sha256": "4b30e8c05a5dd7dd65feee89e4d966a57b09eb2507174bcbd7f682dde09f517b"
+ },
+ {
+  "name": "rec_hidraw_live",
+  "events": "rec_hidraw.events",
+  "trace": "rec_hidraw_live.trace",
+  "config": "rec_hidraw_live.toml",
+  "probe": false,
+  "sha256": "3c25acad3baf5c15176ec589bdcff99f75bbde226bc4bca6749cc206d9bf9770"
+ },
+ {
+  "name": "rec_hidraw_live_legacy",
+  "events": "rec_hidraw.events",
+  "trace": "rec_hidraw_live_legacy.trace",
+  "config": "rec_hidraw_live_legacy.toml",
+  "probe": false,
+  "sha256": "5f12423daa4142d8dc77e9a61083b089117fb3f6e61c7d6bc65c0516c33d8c4f"
+ },
+ {
+  "name": "rec_mm1_evdev",
+  "events": "rec_mm1_evdev.events",
+  "trace": "rec_mm1_evdev.trace",
+  "config": null,
+  "probe": true,
+  "sha256": "c9820169ee1e900bd16cb9e8a43163abf2a573c509d76ea61bdaf39a629f8909"
+ },
+ {
+  "name": "rec_mm1_evdev_live",
+  "events": "rec_mm1_evdev.events",
+  "trace": "rec_mm1_evdev_live.trace",
+  "config": "rec_mm1_evdev_live.toml",
+  "probe": false,
+  "sha256": "e1472efac4c3d7719151d58382749bbafb63ef67cb2451e2390bd63bc4936f1f"
+ },
+ {
+  "name": "rec_mm1_evdev_live_legacy",
+  "events": "rec_mm1_evdev.events",
+  "trace": "rec_mm1_evdev_live_legacy.trace",
+  "config": "rec_mm1_evdev_live_legacy.toml",
+  "probe": false,
+  "sha256": "2ab61595d40295003d744a582061eb73f7bfee089fa89d438f2dc512004cf3b9"
+ },
+ {
+  "name": "rec_swipe",
+  "events": "rec_swipe.events",
+  "trace": "rec_swipe.trace",
+  "config": null,
+  "probe": true,
+  "sha256": "a6e7dcff30b8ee1b150d7988e307cb3cd3a5e0cd6866108955ea50848534195a"
+ },
+ {
+  "name": "rec_swipe_live",
+  "events": "rec_swipe.events",
+  "trace": "rec_swipe_live.trace",
+  "config": "rec_swipe_live.toml",
+  "probe": false,
+  "sha256": "3e477b278ad725941660272d111b506ae24d088e0500326c09a0d053cab0283b"
+ },
+ {
+  "name": "rec_swipe_live_legacy",
+  "events": "rec_swipe.events",
+  "trace": "rec_swipe_live_legacy.trace",
+  "config": "rec_swipe_live_legacy.toml",
+  "probe": false,
+  "sha256": "e316f5d8f50c5593457719eed342a30648c6037c5a37e8a403b692d0b860aefe"
+ },
+ {
+  "name": "syn_dropped",
+  "events": "syn_dropped.events",
+  "trace": "syn_dropped.trace",
+  "config": "syn_dropped.toml",
+  "probe": false,
+  "sha256": "1d6197ecd033833021ae63ffdfe8594ce93f9e6fee3492af6d7eae2ae0b3008f"
+ },
+ {
+  "name": "touchpad",
+  "events": "touchpad.events",
+  "trace": "touchpad.trace",
+  "config": null,
+  "probe": true,
+  "sha256": "900d44d0628a0091428c647bc62e83b981875010a37cd3be82601f8bbd0aef72"
+ },
+ {
+  "name": "touchpad_fw",
+  "events": "touchpad_fw.events",
+  "trace": "touchpad_fw.trace",
+  "config": null,
+  "probe": true,
+  "sha256": "71d0a14037d2801e93cc359483b5aaecd51c0d105d842bb2f7022ed0201210e8"
+ },
+ {
+  "name": "touchpad_fw_off",
+  "events": "touchpad_fw_off.events",
+  "trace": "touchpad_fw_off.trace",
+  "config": "touchpad_fw_off.toml",
+  "probe": true,
+  "sha256": "2d513253a75b711c2a96a2e0a28aa02740eddd577cb4757c7266396680151797"
+ },
+ {
+  "name": "touchpad_noswipe",
+  "events": "touchpad_noswipe.events",
+  "trace": "touchpad_noswipe.trace",
+  "config": "touchpad_noswipe.toml",
+  "probe": false,
+  "sha256": "fbab98cfade250e056610d140842e91b0b800bfbb82c5ffa40368068cc88a637"
+ },
+ {
+  "name": "touchpad_tuned",
+  "events": "touchpad_tuned.events",
+  "trace": "touchpad_tuned.trace",
+  "config": "touchpad_tuned.toml",
+  "probe": false,
+  "sha256": "d89166c34e323a43d2f2dfef5497ed493e8318755783fc43c0c3543aa04b358a"
+ }
+]

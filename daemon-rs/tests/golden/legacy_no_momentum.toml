@@ -1,0 +1,6 @@
+[touchpad]
+enabled = false
+[momentum]
+enabled = false
+[scroll]
+horizontal = false

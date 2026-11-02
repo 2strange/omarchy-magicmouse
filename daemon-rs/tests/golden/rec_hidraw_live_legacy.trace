@@ -1,0 +1,5186 @@
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+W 2 12 -2
+W 2 11 -2
+S
+S
+W 2 12 -4
+S
+W 2 0 -1
+W 2 12 -3
+S
+W 2 12 -3
+S
+W 2 12 -4
+S
+W 2 0 -1
+W 2 1 1
+W 2 12 -3
+S
+W 2 0 -1
+W 2 12 -3
+S
+W 2 0 -2
+W 2 12 -4
+S
+W 2 0 -3
+W 2 1 -1
+W 2 12 -5
+S
+W 2 0 -2
+W 2 1 -1
+W 2 12 -7
+S
+W 2 0 -1
+W 2 1 -1
+W 2 12 -7
+S
+W 2 0 -1
+W 2 12 -20
+S
+W 2 0 -2
+W 2 1 -1
+W 2 12 -15
+S
+W 2 0 -1
+W 2 1 -1
+W 2 12 -22
+S
+W 2 12 -30
+W 2 6 -1
+S
+W 2 12 -34
+S
+W 2 12 -39
+S
+W 2 1 -1
+W 2 12 -24
+S
+W 2 12 -50
+W 2 6 -1
+S
+W 2 1 -1
+W 2 12 -78
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -4
+W 2 11 -1
+S
+W 2 12 -2
+W 2 11 -3
+S
+W 2 12 -2
+W 2 11 -2
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+W 2 12 4
+W 2 11 -8
+S
+W 2 12 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+W 2 11 -2
+S
+W 2 12 -1
+W 2 11 -3
+S
+W 2 12 -1
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -6
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -6
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -5
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -7
+S
+W 2 11 -5
+S
+W 2 11 -7
+S
+W 2 11 -11
+S
+W 2 11 -6
+S
+W 2 11 -11
+S
+W 2 11 -9
+S
+W 2 11 -9
+S
+W 2 11 -7
+S
+W 2 11 -14
+S
+W 2 11 -7
+S
+W 2 11 -9
+S
+W 2 11 -14
+S
+W 2 11 -11
+W 2 8 -1
+S
+W 2 11 -9
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 12 2
+W 2 11 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+W 2 12 1
+W 2 11 -2
+S
+W 2 12 1
+W 2 11 -1
+S
+W 2 11 -3
+S
+W 2 12 1
+W 2 11 -1
+S
+W 2 12 1
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -1
+S
+W 2 11 -3
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 12 -1
+W 2 11 -2
+S
+W 2 12 -3
+W 2 11 -2
+S
+W 2 12 -3
+W 2 11 -3
+S
+W 2 12 -2
+W 2 11 -3
+S
+W 2 11 -3
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -2
+W 2 11 1
+S
+W 2 12 -3
+W 2 11 2
+S
+W 2 12 -2
+W 2 11 1
+S
+W 2 12 -2
+W 2 11 2
+S
+W 2 12 -1
+W 2 11 2
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 12 -1
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 3
+S
+W 2 11 1
+S
+S
+S
+S
+W 2 12 12
+W 2 11 8
+S
+W 2 12 -1
+W 2 11 5
+S
+W 2 12 -1
+W 2 11 2
+S
+W 2 12 -2
+W 2 11 2
+S
+W 2 12 -1
+W 2 11 3
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+W 2 1 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 1 -1
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 1
+S
+W 2 0 2
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+S
+S
+S
+S
+W 2 0 1
+S
+S
+S
+S
+W 2 0 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 1
+S
+W 2 0 2
+W 2 1 1
+S
+W 2 0 5
+S
+W 2 0 5
+S
+W 2 0 5
+S
+W 2 0 5
+W 2 1 1
+S
+W 2 0 8
+S
+W 2 0 5
+W 2 1 1
+S
+W 2 0 8
+S
+W 2 0 9
+S
+W 2 0 7
+S
+W 2 0 6
+S
+W 2 0 5
+S
+W 2 0 3
+S
+W 2 0 2
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -2
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -2
+S
+W 2 0 -2
+S
+W 2 0 -2
+S
+W 2 0 -3
+S
+W 2 0 -3
+S
+W 2 0 -3
+S
+W 2 0 -3
+S
+W 2 0 -2
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+W 2 1 1
+S
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -2
+S
+W 2 0 -2
+S
+W 2 0 -2
+S
+W 2 0 -3
+S
+W 2 0 -2
+S
+W 2 0 -2
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -2
+S
+W 2 0 -1
+S
+W 2 0 -2
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+W 2 1 1
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 1 1
+S
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -2
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+S
+W 2 0 -1
+S
+W 2 1 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 2
+S
+S
+W 2 0 1
+S
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 1
+S
+W 2 0 2
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+W 2 1 -1
+S
+W 2 0 3
+S
+W 2 0 3
+S
+W 2 0 3
+S
+W 2 0 3
+S
+W 2 0 3
+S
+W 2 0 3
+S
+W 2 0 3
+S
+W 2 0 2
+S
+W 2 0 3
+S
+W 2 0 3
+S
+W 2 0 3
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 1
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 3
+W 2 1 1
+S
+W 2 0 2
+S
+W 2 0 1
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 2
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+S
+S
+S
+W 2 0 1
+S
+S
+S
+W 2 0 1
+S
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+S
+S
+S
+S
+W 2 0 1
+S
+S
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+S
+W 2 0 1
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+S
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+W 2 0 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 0 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 2
+W 2 11 1
+S
+W 2 12 2
+W 2 11 1
+S
+W 2 12 1
+W 2 11 1
+S
+W 2 12 1
+W 2 11 1
+S
+W 2 12 1
+W 2 11 1
+S
+S
+W 2 12 1
+W 2 11 1
+S
+S
+W 2 11 1
+S
+W 2 11 1
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+W 2 12 1
+W 2 11 -1
+S
+W 2 12 1
+W 2 11 -2
+S
+W 2 12 1
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 0 -1
+W 2 11 -4
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -7
+S
+W 2 11 -3
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -6
+S
+W 2 0 -1
+W 2 11 -6
+S
+W 2 11 -7
+S
+W 2 11 -6
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -7
+W 2 8 -1
+S
+W 2 11 -11
+S
+W 2 11 -5
+S
+W 2 11 -9
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -11
+S
+W 2 11 -7
+S
+W 2 11 -6
+S
+W 2 11 -7
+S
+W 2 11 -7
+W 2 8 -1
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -6
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+S
+W 2 11 -1
+S
+W 2 12 -1
+S
+W 2 12 -2
+S
+W 2 11 -1
+S
+W 2 12 -1
+S
+W 2 12 -1
+W 2 11 -1
+S
+W 2 12 -1
+W 2 11 -1
+S
+W 2 12 -1
+S
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+S
+S
+W 2 12 -1
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 12 -1
+W 2 11 5
+S
+W 2 11 5
+S
+W 2 11 10
+S
+W 2 11 11
+S
+W 2 11 12
+S
+W 2 11 13
+S
+W 2 11 13
+S
+W 2 11 14
+S
+W 2 11 9
+S
+W 2 11 18
+S
+W 2 11 12
+W 2 8 1
+S
+W 2 11 12
+S
+W 2 11 7
+S
+W 2 11 10
+S
+W 2 11 10
+S
+W 2 11 10
+S
+W 2 11 9
+S
+W 2 11 9
+S
+W 2 11 12
+S
+W 2 11 5
+S
+W 2 11 10
+S
+W 2 11 12
+S
+W 2 11 10
+S
+W 2 11 11
+W 2 8 1
+S
+W 2 11 8
+S
+W 2 11 10
+S
+W 2 11 11
+S
+W 2 11 10
+S
+W 2 11 9
+S
+W 2 11 7
+S
+W 2 11 7
+S
+W 2 11 7
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 5
+S
+W 2 11 6
+S
+W 2 11 5
+S
+W 2 11 6
+S
+W 2 11 5
+W 2 8 1
+S
+W 2 11 5
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 8
+S
+W 2 11 6
+S
+W 2 11 8
+S
+W 2 11 9
+S
+W 2 11 8
+S
+W 2 11 8
+S
+W 2 11 8
+S
+W 2 11 8
+S
+W 2 11 8
+S
+W 2 11 7
+W 2 8 1
+S
+W 2 11 5
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 250
+W 2 8 1
+W 2 8 1
+S
+S
+W 2 11 1
+S
+W 2 11 34
+S
+S
+W 2 11 8
+S
+W 2 11 33
+S
+S
+W 2 11 16
+S
+W 2 11 32
+W 2 8 1
+S
+S
+W 2 11 18
+S
+W 2 11 31
+S
+S
+W 2 11 5
+S
+W 2 11 30
+S
+S
+W 2 11 10
+S
+W 2 11 29
+W 2 8 1
+S
+S
+W 2 11 14
+S
+W 2 11 28
+S
+S
+W 2 11 10
+S
+W 2 11 27
+S
+S
+W 2 11 10
+S
+W 2 11 25
+W 2 8 1
+S
+S
+W 2 11 10
+S
+W 2 11 25
+S
+S
+W 2 11 12
+S
+W 2 11 24
+S
+S
+W 2 11 8
+S
+W 2 11 24
+W 2 8 1
+S
+S
+W 2 11 8
+S
+W 2 11 23
+S
+S
+S
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 12 3
+W 2 11 -3
+S
+W 2 12 5
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -4
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 0 -1
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -16
+S
+W 2 11 -11
+S
+W 2 11 -10
+S
+W 2 11 -13
+S
+W 2 11 -11
+S
+W 2 11 -14
+S
+W 2 11 -13
+S
+W 2 11 -14
+S
+W 2 11 -14
+S
+W 2 11 -15
+W 2 8 -1
+S
+W 2 11 -20
+S
+W 2 11 -21
+S
+W 2 11 -19
+S
+W 2 11 -19
+S
+W 2 11 -17
+S
+W 2 11 -18
+W 2 8 -1
+S
+W 2 11 -17
+S
+W 2 11 -18
+S
+W 2 11 -18
+S
+W 2 11 -18
+S
+W 2 11 -18
+S
+W 2 11 -18
+S
+W 2 11 -10
+W 2 8 -1
+S
+W 2 11 -21
+S
+W 2 11 -15
+S
+W 2 11 -14
+S
+W 2 11 -16
+S
+W 2 11 -10
+S
+W 2 11 -20
+S
+W 2 11 -15
+S
+W 2 11 -14
+W 2 8 -1
+S
+W 2 11 -14
+S
+W 2 11 -8
+S
+W 2 11 -13
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -59
+S
+W 2 11 -9
+S
+S
+W 2 11 -2
+S
+W 2 11 -8
+W 2 8 -1
+S
+W 2 11 -8
+S
+S
+W 2 11 -7
+S
+S
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -6
+S
+W 2 11 -6
+S
+W 2 11 -7
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -5
+W 2 8 -1
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -5
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -4
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -3
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -2
+W 2 8 -1
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -2
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+W 2 11 -1
+S
+S
+S
+W 2 12 -4
+W 2 11 -10
+S
+W 2 11 -12
+S
+W 2 11 -14
+S
+W 2 11 -15
+S
+W 2 11 -17
+S
+W 2 11 -18
+S
+W 2 11 -21
+S
+W 2 11 -32
+W 2 8 -1
+S
+W 2 11 -36
+S
+W 2 11 -42
+S
+W 2 11 -45
+W 2 8 -1
+S
+W 2 11 -46
+S
+W 2 11 -46
+S
+W 2 11 -48
+W 2 8 -1
+S
+W 2 11 -46
+S
+W 2 11 -28
+S
+W 2 11 -59
+W 2 8 -1
+S
+W 2 11 -26
+S
+W 2 11 -38
+S
+S
+S
+S
+S
+S
+W 2 11 -165
+W 2 8 -1
+W 2 8 -1
+S
+W 2 11 -23
+S
+S
+W 2 11 -8
+S
+W 2 11 -22
+S
+S
+W 2 11 -8
+S
+W 2 11 -21
+W 2 8 -1
+S
+S
+W 2 11 -10
+S
+W 2 11 -21
+S
+S
+W 2 11 -7
+S
+W 2 11 -20
+S
+S
+W 2 11 -16
+S
+S
+W 2 11 -17
+S
+W 2 11 -18
+S
+S
+W 2 11 -10
+W 2 8 -1
+S
+W 2 11 -17
+S
+S
+W 2 11 -6
+S
+W 2 11 -17
+S
+S
+S
+W 2 11 7
+S
+W 2 11 9
+S
+W 2 11 9
+S
+W 2 11 9
+S
+W 2 11 14
+S
+W 2 11 14
+S
+W 2 11 10
+S
+W 2 11 19
+S
+W 2 11 15
+S
+W 2 11 15
+W 2 8 1
+S
+W 2 11 15
+S
+W 2 11 8
+S
+W 2 11 18
+S
+W 2 11 15
+S
+W 2 11 14
+S
+W 2 11 14
+S
+W 2 11 14
+S
+W 2 11 14
+S
+W 2 11 15
+W 2 8 1
+S
+W 2 11 21
+S
+W 2 11 11
+S
+W 2 11 16
+S
+W 2 11 16
+S
+W 2 11 16
+S
+W 2 11 16
+S
+W 2 11 15
+S
+W 2 11 23
+W 2 8 1
+S
+W 2 11 10
+S
+W 2 11 18
+S
+W 2 11 17
+S
+W 2 11 17
+S
+W 2 11 24
+S
+W 2 11 13
+W 2 8 1
+S
+W 2 11 19
+S
+W 2 11 18
+S
+W 2 11 17
+S
+W 2 11 15
+S
+W 2 11 9
+S
+W 2 11 20
+S
+W 2 11 20
+S
+W 2 11 16
+W 2 8 1
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 65
+S
+W 2 11 9
+S
+S
+W 2 11 3
+S
+W 2 11 9
+S
+S
+W 2 11 3
+S
+W 2 11 8
+S
+W 2 11 8
+W 2 8 1
+S
+W 2 11 8
+S
+W 2 11 8
+S
+W 2 11 7
+S
+W 2 11 8
+S
+W 2 11 7
+S
+W 2 11 7
+S
+W 2 11 6
+S
+W 2 11 7
+S
+W 2 11 7
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 6
+S
+W 2 11 5
+S
+W 2 11 6
+S
+W 2 11 5
+S
+W 2 11 6
+S
+W 2 11 5
+S
+W 2 11 5
+W 2 8 1
+S
+W 2 11 5
+S
+W 2 11 4
+S
+W 2 11 5
+S
+W 2 11 5
+S
+W 2 11 4
+S
+W 2 11 4
+S
+W 2 11 4
+S
+W 2 11 5
+S
+W 2 11 4
+S
+W 2 11 3
+S
+W 2 11 4
+S
+W 2 11 4
+S
+W 2 11 4
+S
+W 2 11 3
+S
+W 2 11 3
+S
+W 2 11 4
+S
+W 2 11 3
+S
+W 2 11 3
+S
+W 2 11 3
+S
+W 2 11 3
+S
+W 2 11 3
+S
+W 2 11 3
+S
+W 2 11 3
+S
+W 2 11 3
+S
+W 2 11 2
+S
+W 2 11 3
+S
+W 2 11 2
+S
+W 2 11 3
+S
+W 2 11 2
+S
+W 2 11 3
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 3
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+W 2 8 1
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 2
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+S
+W 2 11 1
+S
+S
+S
+S
+S
+W 2 11 -4
+S
+W 2 11 -7
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -6
+S
+W 2 11 -9
+S
+W 2 11 -13
+S
+W 2 11 -11
+S
+W 2 11 -6
+S
+W 2 11 -13
+S
+W 2 11 -11
+S
+W 2 11 -10
+W 2 8 -1
+S
+W 2 11 -12
+S
+W 2 11 -11
+S
+W 2 11 -7
+S
+W 2 11 -14
+S
+W 2 11 -7
+S
+W 2 11 -9
+S
+W 2 11 -14
+S
+W 2 11 -5
+S
+W 2 11 -9
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -7
+W 2 8 -1
+S
+W 2 11 -7
+S
+W 2 11 -10
+S
+W 2 11 -5
+S
+W 2 11 -9
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -7
+S
+W 2 11 -7
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -6
+S
+W 2 11 -5
+S
+W 2 11 -5
+S
+W 2 11 -8
+S
+W 2 11 -7
+W 2 8 -1
+S
+W 2 11 -9
+S
+W 2 11 -6
+S
+W 2 11 -8
+S
+W 2 11 -8
+S
+W 2 11 -9
+S
+W 2 11 -7
+S
+W 2 11 -8
+S
+W 2 11 -11
+S
+W 2 11 -10
+S
+W 2 11 -8
+S
+W 2 11 -11
+S
+W 2 11 -8
+S
+W 2 11 -14
+W 2 8 -1
+S
+W 2 11 -12
+S
+W 2 1 1
+W 2 11 -8
+S
+W 2 11 -11
+S
+W 2 11 -15
+S
+W 2 11 -13
+S
+W 2 11 -11
+S
+W 2 11 -13
+S
+W 2 11 -13
+S
+W 2 11 -13
+S
+W 2 11 -8
+S
+W 2 11 -17
+W 2 8 -1
+S
+W 2 11 -7
+S
+W 2 11 -16
+S
+W 2 11 -12
+S
+W 2 11 -13
+S
+W 2 0 -1
+W 2 11 -13
+S
+W 2 11 -15
+S
+S
+S
+S
+S
+W 2 1 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 1
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 4
+S
+W 2 12 -2
+W 2 11 -2
+S
+W 2 11 -1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+W 2 12 -1
+S
+W 2 12 -1
+W 2 11 -1
+S
+S
+W 2 12 -1
+S
+S
+S
+S
+S
+S
+W 2 12 1
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+W 2 12 -1
+S
+W 2 11 1
+S
+S
+S
+S
+W 2 12 -1
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+S
+S
+S
+W 2 12 -2
+S
+W 2 12 1
+S
+W 2 12 1
+S
+S
+W 2 11 1
+S
+W 2 12 2
+S
+S
+W 2 12 1
+S
+W 2 12 1
+S
+W 2 12 -1
+S
+S
+W 2 12 1
+S
+S
+S
+W 2 12 1
+S
+S
+S
+S
+S
+W 2 11 -1
+S
+W 2 12 3
+S
+W 2 11 1
+S
+W 2 12 4
+S
+W 2 12 -1
+S
+S
+S
+S
+W 2 12 -1
+W 2 11 1
+S
+W 2 11 1
+S
+W 2 12 -2
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
+S
