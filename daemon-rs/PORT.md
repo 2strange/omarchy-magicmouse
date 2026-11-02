@@ -81,3 +81,10 @@ GitHub Actions builds `x86_64-unknown-linux-gnu` (static-ish, `--release`), atta
 `magic-mouse-daemon-x86_64` + `.sha256` to the release. `install.sh` downloads the binary for the
 tagged version, checks the sum, installs to `~/.local/bin/magic-mouse-daemon`. Python daemon stays in
 the repo until 2.0 is accepted.
+
+## Integration notes (Bob)
+
+- `bin/magic-mouse-config` exec()s the Python daemon file for `load_config`, `DEFAULTS`, `write_own_file`
+  (Bill). With a binary at that path it breaks → the binary gets `config get|defaults|set` subcommands
+  (config::to_json, status::write_own_file) and magic-mouse-config becomes a thin wrapper, same CLI.
+- serde_json `preserve_order` on: probe frames and battery.json keep Python's key order.
