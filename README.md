@@ -52,8 +52,8 @@ light. Measured on our Late 2013 MacBook Pro (Core i7-4850HQ, 13 years old):
 
 | | 1.x (Python) | 2.0 (Rust) |
 |---|---|---|
-| CPU while scrolling (one core) | about 15% | about 1–1.5% |
-| CPU while idle | – | 0% |
+| CPU while scrolling (one core, 90 s each) | about 5% (peaks 11%) | about 1% (peaks 3%) |
+| CPU while idle | 0% | 0% |
 | Resident memory | about 42 MB | about 6 MB |
 | Engine CPU time, 93,869 recorded touch events | 3.2 s | 0.36 s |
 
