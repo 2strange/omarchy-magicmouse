@@ -1,3 +1,17 @@
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo-dark.svg">
+    <img src="docs/images/logo-light.svg" alt="MagicMouse" width="440">
+  </picture>
+  <p><strong>Your Magic Mouse, the way it feels on a Mac.</strong></p>
+  <p>
+    <img alt="Made for Omarchy" src="https://img.shields.io/badge/Omarchy-4-e0913a?style=flat-square">
+    <img alt="Wayland and Hyprland" src="https://img.shields.io/badge/Wayland-Hyprland-202431?style=flat-square">
+    <img alt="Daemon in Rust" src="https://img.shields.io/badge/daemon-Rust-202431?style=flat-square">
+    <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/License-MIT-e0913a?style=flat-square"></a>
+  </p>
+</div>
+
 # MagicMouse for Omarchy
 
 Make an Apple Magic Mouse feel like it does on a Mac, on [Omarchy](https://omarchy.org)
