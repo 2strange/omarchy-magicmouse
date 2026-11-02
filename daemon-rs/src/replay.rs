@@ -36,7 +36,6 @@ pub trait ReplayEngine {
 
 // Bind to the real Engine and config. Henry's engine.rs is not merged yet: until then this part is
 // compiled out. Once Engine has the API of PORT.md (and control_click), drop both cfg lines.
-#[cfg(feature = "replay")]
 impl ReplayEngine for crate::engine::Engine {
     fn attach(&mut self, dev: Box<dyn DeviceInfo>) {
         crate::engine::Engine::attach(self, dev)
@@ -59,7 +58,6 @@ impl ReplayEngine for crate::engine::Engine {
 }
 
 /// Replay one events file through the real Engine and write the trace to `out`.
-#[cfg(feature = "replay")]
 pub fn run(events: &Path, config: Option<&Path>, probe: bool, out: &mut dyn Write) -> io::Result<()> {
     let cfg = match config {
         Some(p) => crate::config::load_config(p),
@@ -67,7 +65,11 @@ pub fn run(events: &Path, config: Option<&Path>, probe: bool, out: &mut dyn Writ
     };
     let input = BufReader::new(File::open(events)?);
     run_with(
-        |cfg, ui, actions| crate::engine::Engine::new(cfg, false, ui, actions),
+        |cfg, ui, actions| {
+            let mut eng = crate::engine::Engine::new(cfg, false, ui, actions);
+            eng.set_undeciphered_path(None); // the fixtures assume report_undeciphered is absent
+            eng
+        },
         cfg,
         input,
         probe,
