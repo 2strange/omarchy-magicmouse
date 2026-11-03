@@ -203,10 +203,10 @@ attestation; check a downloaded file against the workflow, the tag and its exact
 this checkout (the first line must succeed, or the commit would not be checked at all):
 
 ```sh
-source_sha=$(git rev-parse --verify 'refs/tags/v2.0.1^{commit}') &&
+source_sha=$(git rev-parse --verify 'refs/tags/v2.0.2^{commit}') &&
 gh attestation verify magic-mouse-daemon-x86_64-linux -R 2strange/omarchy-magicmouse \
   --signer-workflow 2strange/omarchy-magicmouse/.github/workflows/release.yml \
-  --source-ref refs/tags/v2.0.1 --source-digest "$source_sha" --deny-self-hosted-runners
+  --source-ref refs/tags/v2.0.2 --source-digest "$source_sha" --deny-self-hosted-runners
 ```
 
 `install.sh --build` builds the daemon with your Rust toolchain instead (the source is this

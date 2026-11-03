@@ -3,12 +3,11 @@
 # exact bytes it installs; the release's own .sha256 is not trusted. Changing the release cannot
 # change what this commit installs.
 #
-# v2.0.1: built by https://github.com/2strange/omarchy-magicmouse/actions/runs/41541010196 (attempt 1,
-# GitHub-hosted runner) from tag v2.0.1 = commit c4c4e176de60c2cd5f1f16826f693bf96213751f; immutable
+# v2.0.2: built by https://github.com/2strange/omarchy-magicmouse/actions/runs/41620412656 (attempt 1,
+# GitHub-hosted runner) from tag v2.0.2 = commit 49deb414d33cfa11f1b64e3b9ebaf305a7889f66; immutable
 # release; build provenance attestation binds this digest to that workflow, tag and commit:
-#   source_sha=$(git rev-parse --verify 'refs/tags/v2.0.1^{commit}') &&
+#   source_sha=$(git rev-parse --verify 'refs/tags/v2.0.2^{commit}') &&
 #   gh attestation verify magic-mouse-daemon-x86_64-linux -R 2strange/omarchy-magicmouse \
 #     --signer-workflow 2strange/omarchy-magicmouse/.github/workflows/release.yml \
-#     --source-ref refs/tags/v2.0.1 --source-digest "$source_sha" --deny-self-hosted-runners
-# The build is reproducible: v2.0.0 (run 41421554038, commit 23d77459) gave the same digest.
-v2.0.1 magic-mouse-daemon-x86_64-linux f52fa5ef75424d5c7c1eb13d7c6bb88931c6edb31c858c497a96e1160f8cce56
+#     --source-ref refs/tags/v2.0.2 --source-digest "$source_sha" --deny-self-hosted-runners
+v2.0.2 magic-mouse-daemon-x86_64-linux 52dc86a990f3a5f9d9c02ea327b3363a7831082b8fe5f0dd4c9eeb1b73bf8ef7
